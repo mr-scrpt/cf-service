@@ -1,14 +1,16 @@
 {
-    "name": "@cloudflare-bot/bot",
-    "version": "1.0.0",
-    "private": true,
-    "main": "dist/index.js",
-    "scripts": {
-        "build": "tsc",
-        "dev": "tsx watch src/index.ts",
-        "start": "node dist/index.js"
-    },
-    "dependencies": {
-        "@cloudflare-bot/shared": "workspace:*"
-    }
+  "name": "@cloudflare-bot/bot",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@cloudflare-bot/shared": "workspace:*"
+  }
 }
+

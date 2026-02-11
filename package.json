@@ -2,14 +2,20 @@
   "name": "project",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev:bot": "pnpm --filter @cloudflare-bot/bot dev",
-    "dev:api": "pnpm --filter @cloudflare-bot/api dev",
+    "dev:bot": "pnpm --filter @cloudflare-bot/shared build && pnpm --filter @cloudflare-bot/bot dev",
+    "dev:api": "pnpm --filter @cloudflare-bot/shared build && pnpm --filter @cloudflare-bot/api dev",
     "build": "pnpm -r run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.25.0"
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
 }
