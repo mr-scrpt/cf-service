@@ -13,7 +13,10 @@
     "lint": "eslint packages/*/src/**/*.ts",
     "lint:fix": "eslint packages/*/src/**/*.ts --fix",
     "format": "prettier --write \"packages/*/src/**/*.ts\"",
-    "format:check": "prettier --check \"packages/*/src/**/*.ts\""
+    "format:check": "prettier --check \"packages/*/src/**/*.ts\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "keywords": [],
   "author": "",
