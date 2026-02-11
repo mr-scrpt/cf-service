@@ -1,8 +1,12 @@
-export interface User {
-  id: string;
-  telegramId: number;
-  username: string;
-  isAllowed: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { z } from 'zod';
+
+export const userSchema = z.object({
+  id: z.string(),
+  telegramId: z.number().int().positive(),
+  username: z.string().min(1),
+  isAllowed: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type User = z.infer<typeof userSchema>;
