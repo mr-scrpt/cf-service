@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  packages/api:
+    dependencies:
+      '@cloudflare-bot/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/bot:
+    dependencies:
+      '@cloudflare-bot/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/shared: {}
