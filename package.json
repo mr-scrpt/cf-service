@@ -9,16 +9,24 @@
     "dev:api": "pnpm --filter @cloudflare-bot/shared build && pnpm --filter @cloudflare-bot/api dev",
     "start:bot": "pnpm --filter @cloudflare-bot/bot start",
     "start:api": "pnpm --filter @cloudflare-bot/api start",
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "lint": "eslint packages/*/src/**/*.ts",
+    "lint:fix": "eslint packages/*/src/**/*.ts --fix",
+    "format": "prettier --write \"packages/*/src/**/*.ts\"",
+    "format:check": "prettier --check \"packages/*/src/**/*.ts\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/node": "^25.2.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.55.0"
   }
 }
-
