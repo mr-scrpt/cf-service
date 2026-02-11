@@ -1,8 +1,15 @@
-import { Environment } from '@cloudflare-bot/shared';
-import { env } from './config';
+// packages/bot/src/index.ts (временно)
+import { DnsRecordType, DomainStatus } from '@cloudflare-bot/shared';
+import type { User } from '@cloudflare-bot/shared';
 
-console.log(`Bot starting (env: ${env.NODE_ENV})...`);
+const testUser: User = {
+  id: '1',
+  telegramId: 123,
+  username: 'test',
+  isAllowed: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
-if (env.NODE_ENV === Environment.Production) {
-  console.log('output_log: TEST ENV =>>>', env.NODE_ENV);
-}
+console.log('Types work:', testUser.username);
+console.log('Enum works:', DnsRecordType.A, DomainStatus.Active);
