@@ -1,23 +1,26 @@
+// Config
 export { Environment } from './config';
 export { commonEnvSchema, type CommonEnv } from './config';
 
+// Domain — constants
 export { DnsRecordType, DomainStatus } from './domain';
 
-export type { User } from './domain';
-export type { CloudflareDomain } from './domain';
-export type { DnsRecord } from './domain';
+// Domain — schemas & entities
+export { domainNameSchema, domainSchema, type Domain } from './domain';
+export { userSchema, type User } from './domain';
+export { dnsRecordSchema, type DnsRecord } from './domain';
 
 export {
-  domainNameSchema,
+  createUserSchema,
   registerDomainSchema,
   createDnsRecordSchema,
   updateDnsRecordSchema,
-  createUserSchema,
 } from './validation';
 
+// Validation — inferred types (DTO)
 export type {
+  CreateUserInput,
   RegisterDomainInput,
   CreateDnsRecordInput,
   UpdateDnsRecordInput,
-  CreateUserInput,
 } from './validation';

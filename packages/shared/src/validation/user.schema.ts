@@ -1,11 +1,9 @@
 import { z } from 'zod';
+import { userSchema } from '../domain';
 
-export const createUserSchema = z.object({
-  telegramId: z.number().int().positive(),
-  username: z
-    .string()
-    .min(1)
-    .regex(/^@?[a-zA-Z0-9_]+$/, 'Invalid Telegram username'),
+export const createUserSchema = userSchema.pick({
+  telegramId: true,
+  username: true,
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;

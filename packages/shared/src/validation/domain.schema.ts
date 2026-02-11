@@ -1,9 +1,5 @@
 import { z } from 'zod';
-
-export const domainNameSchema = z
-  .string()
-  .min(3)
-  .regex(/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/, 'Invalid domain name format');
+import { domainNameSchema } from '../domain';
 
 export const registerDomainSchema = z.object({
   name: domainNameSchema,

@@ -1,11 +1,16 @@
 import { z } from 'zod';
 import { DomainStatus } from './constants.domain';
 
-export const cloudflareDomainSchema = z.object({
+export const domainNameSchema = z
+  .string()
+  .min(3)
+  .regex(/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/, 'Invalid domain name format');
+
+export const domainSchema = z.object({
   id: z.string(),
-  name: z.string().min(1),
+  name: domainNameSchema,
   status: z.enum(DomainStatus),
   nameservers: z.array(z.string()),
 });
 
-export type CloudflareDomain = z.infer<typeof cloudflareDomainSchema>;
+export type Domain = z.infer<typeof domainSchema>;
