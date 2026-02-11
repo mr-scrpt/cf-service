@@ -10,7 +10,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@cloudflare-bot/shared": "workspace:*"
+    "@cloudflare-bot/shared": "workspace:*",
+    "zod": "^4.3.6"
   }
 }
-
