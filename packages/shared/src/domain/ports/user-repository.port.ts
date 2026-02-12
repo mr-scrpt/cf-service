@@ -1,5 +1,5 @@
-import type { User } from '../domain';
-import type { CreateUserInput } from '../validation';
+import type { User } from '..';
+import type { CreateUserInput } from '../../validation';
 
 export interface IUserRepository {
   findByTelegramId(telegramId: number): Promise<User | null>;

@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { ILogger } from '../ports/logger.port';
+import { ILogger } from './ports';
 
 const consoleFormat = winston.format.printf(({ level, message, timestamp, ...meta }) => {
   const metaStr = Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : '';

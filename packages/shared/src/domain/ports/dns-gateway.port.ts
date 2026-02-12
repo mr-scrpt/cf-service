@@ -1,9 +1,9 @@
-import type { Domain, DnsRecord } from '../domain';
+import type { Domain, DnsRecord } from '..';
 import type {
   RegisterDomainInput,
   CreateDnsRecordInput,
   UpdateDnsRecordInput,
-} from '../validation';
+} from '../../validation';
 
 export interface IDnsGateway {
   registerDomain(input: RegisterDomainInput): Promise<Domain>;
