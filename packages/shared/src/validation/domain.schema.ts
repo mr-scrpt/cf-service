@@ -5,4 +5,4 @@ export const registerDomainSchema = z.object({
   name: domainNameSchema,
 });
 
-export type RegisterDomainInput = z.infer<typeof registerDomainSchema>;
+export type RegisterDomainInput = z.input<typeof registerDomainSchema>;

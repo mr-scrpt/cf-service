@@ -24,3 +24,8 @@ export type {
   CreateDnsRecordInput,
   UpdateDnsRecordInput,
 } from './validation';
+
+// Ports
+export type { IDnsGateway } from './ports';
+export type { IUserRepository } from './ports';
+export type { INotifier } from './ports';

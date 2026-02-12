@@ -6,4 +6,4 @@ export const createUserSchema = userSchema.pick({
   username: true,
 });
 
-export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type CreateUserInput = z.input<typeof createUserSchema>;

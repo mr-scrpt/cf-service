@@ -8,5 +8,5 @@ export const createDnsRecordSchema = dnsRecordSchema.omit({ id: true }).extend({
 
 export const updateDnsRecordSchema = dnsRecordSchema.omit({ id: true, zoneId: true }).partial();
 
-export type CreateDnsRecordInput = z.infer<typeof createDnsRecordSchema>;
-export type UpdateDnsRecordInput = z.infer<typeof updateDnsRecordSchema>;
+export type CreateDnsRecordInput = z.input<typeof createDnsRecordSchema>;
+export type UpdateDnsRecordInput = z.input<typeof updateDnsRecordSchema>;
