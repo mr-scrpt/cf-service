@@ -1,87 +1,36 @@
-// packages/bot/src/index.ts
-import {
-  createDnsRecordSchema,
-  // Domain
-  DnsRecordType,
-  DomainStatus,
-  // Config
-  Environment,
-  // Validation
-  registerDomainSchema,
-} from '@cloudflare-bot/shared';
+import { Bot } from 'grammy';
+import { env } from './config/env.config';
+import { formatIncomingRequest } from './utils/format';
 
-import type {
-  CreateDnsRecordInput,
-  DnsRecord,
-  Domain,
-  // Ports
-  IDnsGateway,
-  // Validation DTOs
-  RegisterDomainInput,
-} from '@cloudflare-bot/shared';
-import { env } from './config';
+// 1. Инициализация
+const bot = new Bot(env.TELEGRAM_BOT_TOKEN);
 
-console.log(`Bot starting in ${env.NODE_ENV} mode...`);
+// 2. Логирование старта
+bot.api.getMe().then((me) => {
+  console.log(`Bot started as @${me.username}`);
+  console.log(`Configured Admin ID: ${env.ALLOWED_CHAT_ID}`);
+});
 
-// 1. Проверка Config
-if (env.NODE_ENV === Environment.Production) {
-  console.log('Production mode active');
-}
+// 3. Тест утилиты (временный)
+console.log('Formatter test:\n', formatIncomingRequest('GET', '/test', '127.0.0.1'));
 
-// 2. Проверка Domain Enums
-console.log('Enums:', DnsRecordType.A, DomainStatus.Active);
+// 4. Временный обработчик для узнавания Chat ID
+// Напишите боту любое сообщение, чтобы увидеть ID в консоли
+bot.on('message', (ctx) => {
+  console.log('💬 New message. Chat ID:', ctx.chat.id);
 
-// 3. Проверка Validation & DTO
-const domainInput: RegisterDomainInput = { name: 'example.com' };
-const domainResult = registerDomainSchema.safeParse(domainInput);
-console.log('Domain Validation:', domainResult.success);
-
-const dnsInput: CreateDnsRecordInput = {
-  zoneId: '123',
-  type: DnsRecordType.CNAME,
-  name: 'www',
-  content: 'example.com',
-};
-const dnsResult = createDnsRecordSchema.safeParse(dnsInput);
-console.log('DNS Validation:', dnsResult.success);
-
-// 4. Проверка Портов (Типизация)
-class MockDnsGateway implements IDnsGateway {
-  async registerDomain(input: RegisterDomainInput): Promise<Domain> {
-    return {
-      id: 'mock-id',
-      name: input.name,
-      status: DomainStatus.Pending,
-      nameservers: ['ns1.example.com'],
-    };
+  if (ctx.chat.id !== env.ALLOWED_CHAT_ID) {
+    console.warn(`⚠️ Warning: Message from unauthorized chat ${ctx.chat.id}`);
+  } else {
+    console.log('✅ Authorized admin request');
   }
+});
 
-  async listDomains(): Promise<Domain[]> {
-    return [];
-  }
+// 5. Запуск (Long Polling для dev)
+bot.start({
+  onStart: () => console.log('Bot is running... Send a message to find your Chat ID.'),
+});
 
-  async createDnsRecord(input: CreateDnsRecordInput): Promise<DnsRecord> {
-    return {
-      id: 'mock-dns-id',
-      zoneId: input.zoneId,
-      type: input.type,
-      name: input.name,
-      content: input.content,
-      ttl: input.ttl ?? 1,
-      proxied: input.proxied ?? false,
-    };
-  }
-
-  async updateDnsRecord(): Promise<DnsRecord> {
-    throw new Error('Not implemented');
-  }
-  async deleteDnsRecord(): Promise<void> {
-    throw new Error('Not implemented');
-  }
-  async listDnsRecords(): Promise<DnsRecord[]> {
-    return [];
-  }
-}
-
-const gateway: IDnsGateway = new MockDnsGateway();
-console.log('Gateway mock created successfully');
+// Graceful Stop
+process.once('SIGINT', () => bot.stop());
+process.once('SIGTERM', () => bot.stop());
