@@ -1,36 +1,33 @@
 import { Bot } from 'grammy';
 import { env } from './config/env.config';
-import { formatIncomingRequest } from './utils/format';
+import { logger } from './utils/logger';
+import { authGuard } from './middleware/auth.middleware';
+import { setupErrorHandler } from './utils/error-handler';
 
-// 1. Инициализация
 const bot = new Bot(env.TELEGRAM_BOT_TOKEN);
 
-// 2. Логирование старта
+import { requestLogger } from './middleware/request-logger.middleware';
+
+bot.use(requestLogger);
+
+bot.use(authGuard);
+
 bot.api.getMe().then((me) => {
-  console.log(`Bot started as @${me.username}`);
-  console.log(`Configured Admin ID: ${env.ALLOWED_CHAT_ID}`);
+  logger.info(`Bot started as @${me.username}`);
+  logger.info(`Admin ID: ${env.ALLOWED_CHAT_ID}`);
 });
 
-// 3. Тест утилиты (временный)
-console.log('Formatter test:\n', formatIncomingRequest('GET', '/test', '127.0.0.1'));
+setupErrorHandler(bot);
 
-// 4. Временный обработчик для узнавания Chat ID
-// Напишите боту любое сообщение, чтобы увидеть ID в консоли
-bot.on('message', (ctx) => {
-  console.log('💬 New message. Chat ID:', ctx.chat.id);
+bot.command('start', (ctx) => ctx.reply('👋 Hello!'));
 
-  if (ctx.chat.id !== env.ALLOWED_CHAT_ID) {
-    console.warn(`⚠️ Warning: Message from unauthorized chat ${ctx.chat.id}`);
-  } else {
-    console.log('✅ Authorized admin request');
-  }
-});
-
-// 5. Запуск (Long Polling для dev)
 bot.start({
-  onStart: () => console.log('Bot is running... Send a message to find your Chat ID.'),
+  onStart: () => logger.info('Bot is running uses Shared Logger...'),
 });
 
-// Graceful Stop
-process.once('SIGINT', () => bot.stop());
-process.once('SIGTERM', () => bot.stop());
+const stop = (signal: string) => {
+  logger.info(`Stopping bot... (${signal})`);
+  bot.stop();
+};
+process.once('SIGINT', () => stop('SIGINT'));
+process.once('SIGTERM', () => stop('SIGTERM'));

@@ -26,6 +26,9 @@ export type {
 } from './validation';
 
 // Ports
-export type { IDnsGateway } from './ports';
-export type { IUserRepository } from './ports';
-export type { INotifier } from './ports';
+export type { IDnsGateway, IUserRepository, ILogger, INotifier } from './ports';
+
+export { createLogger, type LoggerOptions, LoggerMode, LoggerLevel } from './foundation/logger';
+
+// Errors
+export { AppError } from './errors/app-error';

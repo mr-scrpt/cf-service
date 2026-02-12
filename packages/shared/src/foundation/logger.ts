@@ -1,0 +1,48 @@
+import winston from 'winston';
+import { ILogger } from '../ports/logger.port';
+
+const consoleFormat = winston.format.printf(({ level, message, timestamp, ...meta }) => {
+  const metaStr = Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : '';
+  return `${timestamp} [${level}]: ${message}${metaStr}`;
+});
+
+export enum LoggerMode {
+  JSON = 'json',
+  Pretty = 'pretty',
+}
+
+export enum LoggerLevel {
+  Error = 'error',
+  Warn = 'warn',
+  Info = 'info',
+  Debug = 'debug',
+}
+
+export interface LoggerOptions {
+  service: string;
+  level?: LoggerLevel;
+  mode?: LoggerMode;
+}
+
+export function createLogger(options: LoggerOptions): ILogger {
+  const level = options.level || LoggerLevel.Info;
+  const mode = options.mode || LoggerMode.JSON;
+
+  return winston.createLogger({
+    level: level,
+    defaultMeta: { service: options.service },
+    format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    transports: [
+      new winston.transports.Console({
+        format:
+          mode === LoggerMode.JSON
+            ? undefined
+            : winston.format.combine(
+                winston.format.colorize(),
+                winston.format.timestamp({ format: 'HH:mm:ss' }),
+                consoleFormat,
+              ),
+      }),
+    ],
+  });
+}
