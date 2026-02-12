@@ -22,27 +22,38 @@ export interface LoggerOptions {
   service: string;
   level?: LoggerLevel;
   mode?: LoggerMode;
+  logFile?: string;
 }
 
 export function createLogger(options: LoggerOptions): ILogger {
   const level = options.level || LoggerLevel.Info;
   const mode = options.mode || LoggerMode.JSON;
 
+  const transports: winston.transport[] = [
+    new winston.transports.Console({
+      format:
+        mode === LoggerMode.JSON
+          ? undefined
+          : winston.format.combine(
+            winston.format.colorize(),
+            winston.format.timestamp({ format: 'HH:mm:ss' }),
+            consoleFormat,
+          ),
+    }),
+  ];
+
+  if (options.logFile) {
+    transports.push(
+      new winston.transports.File({
+        filename: options.logFile,
+      }),
+    );
+  }
+
   return winston.createLogger({
     level: level,
     defaultMeta: { service: options.service },
     format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-    transports: [
-      new winston.transports.Console({
-        format:
-          mode === LoggerMode.JSON
-            ? undefined
-            : winston.format.combine(
-                winston.format.colorize(),
-                winston.format.timestamp({ format: 'HH:mm:ss' }),
-                consoleFormat,
-              ),
-      }),
-    ],
+    transports,
   });
 }

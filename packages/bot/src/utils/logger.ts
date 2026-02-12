@@ -8,7 +8,8 @@ import {
 import { env } from '../config/env.config';
 
 export const logger: ILogger = createLogger({
-  service: 'telegram-bot', // TODO: ADD TO CONFIG
+  service: 'telegram-bot',
   mode: env.NODE_ENV === Environment.Production ? LoggerMode.JSON : LoggerMode.Pretty,
   level: env.NODE_ENV === Environment.Production ? LoggerLevel.Info : LoggerLevel.Debug,
+  logFile: 'bot.log',
 });
