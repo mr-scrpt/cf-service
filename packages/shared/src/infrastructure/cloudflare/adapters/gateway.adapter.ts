@@ -15,6 +15,10 @@ import {
   UpdateDnsRecordInput,
 } from '../../../validation';
 import { DomainStatus, ZoneType } from '../../../domain/constants.domain';
+import {
+  CLOUDFLARE_PAGE_SIZE,
+  CLOUDFLARE_RETRY_CONFIG,
+} from '../cloudflare.config';
 
 /**
  * Cloudflare Gateway Adapter implementing DNS operations
@@ -49,7 +53,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
   async listDomains(): Promise<Domain[]> {
     try {
       const zones = await this.client.zones.list({
-        per_page: 50,
+        per_page: CLOUDFLARE_PAGE_SIZE.ZONES,
         account: { id: this.accountId },
       });
 
@@ -62,10 +66,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
   async createDnsRecord(input: CreateDnsRecordInput): Promise<DnsRecord> {
     const { zoneId, ...recordData } = input;
 
-    try {
-      // SDK correctly envisions discriminated unions.
-      // input remainder (recordData) is now strongly typed to match RecordCreateParams
-      // except for snake_case vs camelCase differences if any (our schema uses 'content', 'name', 'ttl', 'proxied', 'priority', 'data' which match SDK)
+    return this.withRetry(async () => {
       const params = {
         ...recordData,
         zone_id: zoneId,
@@ -73,9 +74,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
 
       const record = await this.client.dns.records.create(params);
       return this.mapRecordToDnsRecord(record, zoneId);
-    } catch (error: unknown) {
-      this.handleError(error, 'Failed to create DNS record');
-    }
+    }, 'Failed to create DNS record');
   }
 
   async updateDnsRecord(
@@ -83,11 +82,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
     zoneId: string,
     input: UpdateDnsRecordInput,
   ): Promise<DnsRecord> {
-    try {
-      // Use 'update' method (PUT semantics) which replaces the record.
-      // We pass the full entity data as required by the schema change.
-      // Casting to RecordUpdateParams because input.type comes from our domain enum
-      // and SDK expects specific string literals in a discriminated union.
+    return this.withRetry(async () => {
       const params = {
         ...input,
         zone_id: input.zoneId,
@@ -97,9 +92,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
         await this.client.dns.records.update(recordId, params),
         input.zoneId,
       );
-    } catch (error: unknown) {
-      this.handleError(error, 'Failed to update DNS record');
-    }
+    }, 'Failed to update DNS record');
   }
 
 
@@ -117,7 +110,7 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
     try {
       const response = await this.client.dns.records.list({
         zone_id: zoneId,
-        per_page: 100,
+        per_page: CLOUDFLARE_PAGE_SIZE.DNS_RECORDS,
       });
 
       return response.result.map((record) =>
@@ -157,8 +150,47 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
     return {
       ...record,
       zoneId: zoneId,
-      // No cast needed for type either due to string union match
     } as unknown as DnsRecord;
+  }
+
+  /**
+   * Retry wrapper for transient network errors with exponential backoff
+   */
+  private async withRetry<T>(
+    operation: () => Promise<T>,
+    context: string,
+  ): Promise<T> {
+    const { MAX_ATTEMPTS, RETRYABLE_STATUS_CODES, BASE_DELAY_MS } =
+      CLOUDFLARE_RETRY_CONFIG;
+
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+
+        // Only retry for transient errors
+        if (error instanceof Cloudflare.APIError) {
+          const isRetryable = RETRYABLE_STATUS_CODES.includes(
+            error.status ?? 0,
+          );
+
+          if (isRetryable && attempt < MAX_ATTEMPTS) {
+            // Exponential backoff: 1s, 2s, 4s
+            const delay = Math.pow(2, attempt - 1) * BASE_DELAY_MS;
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            continue;
+          }
+        }
+
+        // Don't retry for non-transient errors
+        break;
+      }
+    }
+
+    this.handleError(lastError, context);
   }
 
   /**
