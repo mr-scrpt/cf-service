@@ -1,12 +1,21 @@
 import { z } from 'zod';
-import { dnsRecordSchema } from '../domain';
+import {
+  standardRecordSchema,
+  mxRecordSchema,
+  srvRecordSchema,
+} from '../domain/dns-record.schema';
 
-export const createDnsRecordSchema = dnsRecordSchema.omit({ id: true }).extend({
-  ttl: z.number().int().min(1).optional().default(1),
-  proxied: z.boolean().optional().default(false),
-});
+export const createDnsRecordSchema = z.discriminatedUnion('type', [
+  standardRecordSchema.omit({ id: true }),
+  mxRecordSchema.omit({ id: true }),
+  srvRecordSchema.omit({ id: true }),
+]);
 
-export const updateDnsRecordSchema = dnsRecordSchema.omit({ id: true, zoneId: true }).partial();
+export const updateDnsRecordSchema = z.discriminatedUnion('type', [
+  standardRecordSchema.omit({ id: true }),
+  mxRecordSchema.omit({ id: true }),
+  srvRecordSchema.omit({ id: true }),
+]);
 
 export type CreateDnsRecordInput = z.input<typeof createDnsRecordSchema>;
 export type UpdateDnsRecordInput = z.input<typeof updateDnsRecordSchema>;
