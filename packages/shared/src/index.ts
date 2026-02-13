@@ -38,6 +38,9 @@ export {
   LoggerLevel,
 } from './foundation/adapters/logger.adapter';
 
+// Foundation — Logging utilities
+export { createLoggingProxy } from './foundation/logging/logging-proxy';
+
 // Errors
 export { AppError } from './errors/app-error';
 export { InfrastructureError } from './errors/infrastructure.error';

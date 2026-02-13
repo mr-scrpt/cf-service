@@ -1,12 +1,30 @@
 import type { NextFunction, Context } from 'grammy';
-import { logger } from '../utils/logger';
+import {
+  LoggerAdapter,
+  LoggerMode,
+  LoggerLevel,
+  Environment,
+} from '@cloudflare-bot/shared';
+import { env } from '../config/env.config';
+import { resolve } from 'path';
 
-export async function requestLogger(ctx: Context, next: NextFunction): Promise<void> {
+const LOG_DIR = resolve(process.cwd(), 'logs');
+
+// Dedicated logger for Telegram requests
+const requestLogger = new LoggerAdapter({
+  service: 'telegram-requests',
+  mode: env.NODE_ENV === Environment.Production ? LoggerMode.JSON : LoggerMode.Pretty,
+  level: LoggerLevel.Info,
+  logDir: LOG_DIR,
+  filename: 'requests',
+});
+
+export async function requestLoggerMiddleware(ctx: Context, next: NextFunction): Promise<void> {
   const start = Date.now();
   await next();
   const ms = Date.now() - start;
 
-  logger.info(`Processed update ${ctx.update.update_id}`, {
+  requestLogger.info(`Processed update ${ctx.update.update_id}`, {
     duration_ms: ms,
     user_id: ctx.from?.id,
   });

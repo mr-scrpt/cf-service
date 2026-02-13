@@ -3,13 +3,11 @@ import { env } from './config/env.config';
 import { logger } from './utils/logger';
 import { authGuard } from './middleware/auth.middleware';
 import { setupErrorHandler } from './utils/error-handler';
+import { requestLoggerMiddleware } from './middleware/request-logger.middleware';
 
 const bot = new Bot(env.TELEGRAM_BOT_TOKEN);
 
-import { requestLogger } from './middleware/request-logger.middleware';
-
-bot.use(requestLogger);
-
+bot.use(requestLoggerMiddleware);
 bot.use(authGuard);
 
 bot.api.getMe().then((me) => {
