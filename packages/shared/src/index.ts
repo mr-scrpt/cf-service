@@ -31,7 +31,7 @@ export type { LoggerPort, NotifierPort } from './foundation/ports';
 // Ports — Domain
 export type { DnsGatewayPort, UserRepositoryPort } from './domain/ports';
 
-export { LoggerAdapter, type LoggerOptions, LoggerMode, LoggerLevel } from './foundation/logger.adapter';
+export { LoggerAdapter, type LoggerOptions, LoggerMode, LoggerLevel } from './foundation/adapters/logger.adapter';
 
 // Errors
 export { AppError } from './errors/app-error';

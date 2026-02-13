@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { LoggerPort } from './ports';
+import { LoggerPort } from '../ports';
 
 const consoleFormat = winston.format.printf(({ level, message, timestamp, ...meta }) => {
   const metaStr = Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : '';
