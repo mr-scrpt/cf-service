@@ -27,11 +27,11 @@ export type {
 
 // Ports
 // Ports — Foundation
-export type { ILogger, INotifier } from './foundation/ports';
+export type { LoggerPort, NotifierPort } from './foundation/ports';
 // Ports — Domain
-export type { IDnsGateway, IUserRepository } from './domain/ports';
+export type { DnsGatewayPort, UserRepositoryPort } from './domain/ports';
 
-export { createLogger, type LoggerOptions, LoggerMode, LoggerLevel } from './foundation/logger';
+export { LoggerAdapter, type LoggerOptions, LoggerMode, LoggerLevel } from './foundation/logger.adapter';
 
 // Errors
 export { AppError } from './errors/app-error';

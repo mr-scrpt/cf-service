@@ -5,7 +5,7 @@ import type {
   UpdateDnsRecordInput,
 } from '../../validation';
 
-export interface IDnsGateway {
+export interface DnsGatewayPort {
   registerDomain(input: RegisterDomainInput): Promise<Domain>;
 
   listDomains(): Promise<Domain[]>;
