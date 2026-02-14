@@ -1,12 +1,12 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
-import { WorkflowStep } from '../../../core/workflow.step';
-import { IStepResult, NextStepResult, ExitFlowResult, JumpToStepResult } from '../../../core/step.result';
-import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
-import { FIELD_DEFINITIONS, getFieldsForType, DnsFieldDefinition } from '../../edit-dns.config';
-import { MenuCallbacks } from '../../../../menus/main.menu';
-import { Callback, CallbackPattern, CallbackSerializer, DnsEditFieldPayload, DnsSaveRecordPayload } from '../../../../callbacks/callback-data';
-import { EditDnsStep, EditDnsAction } from '../../edit-dns.constants';
+import { WorkflowStep } from '../../core/workflow.step';
+import { IStepResult, NextStepResult, ExitFlowResult, JumpToStepResult } from '../../core/step.result';
+import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
+import { FIELD_DEFINITIONS, getFieldsForType, DnsFieldDefinition } from '../edit-dns.config';
+import { MenuCallbacks } from '../../../menus/main.menu';
+import { Callback, CallbackPattern, CallbackSerializer, DnsEditFieldPayload, DnsSaveRecordPayload } from '../../../callbacks/callback-data';
+import { EditDnsStep, EditDnsAction, DnsFieldName } from '../edit-dns.constants';
 
 export class EditMenuWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
     readonly id = EditDnsStep.EDIT_MENU;
@@ -14,7 +14,18 @@ export class EditMenuWorkflowStep implements WorkflowStep<EditDnsWorkflowContext
     async execute(conversation: Conversation<any>, ctx: Context, state: EditDnsWorkflowContext): Promise<IStepResult> {
         const record = state.getEffectiveRecord();
         const layoutKeys = getFieldsForType(record.type);
-        let message = `✏️ <b>Editing Record</b>: ${record.name} (${record.type})\n\n`;
+
+        // Format Name Relative to Zone
+        let displayName = record.name;
+        const zoneName = state.zoneName;
+        if (zoneName) {
+            const suffix = '.' + zoneName;
+            if (displayName.endsWith(suffix)) {
+                displayName = displayName.substring(0, displayName.length - suffix.length);
+            }
+        }
+
+        let message = `✏️ <b>Editing Record</b>: ${displayName} (${record.type})\n\n`;
 
         for (const key of layoutKeys) {
             const def = FIELD_DEFINITIONS[key];
@@ -56,7 +67,7 @@ export class EditMenuWorkflowStep implements WorkflowStep<EditDnsWorkflowContext
 
         if (CallbackPattern.dnsEditField().test(data)) {
             const payload = CallbackSerializer.deserialize<DnsEditFieldPayload>(data);
-            const field = payload.payload.field;
+            const field = payload.payload.field as DnsFieldName;
 
             if (FIELD_DEFINITIONS[field]) {
                 state.setActiveField(field);

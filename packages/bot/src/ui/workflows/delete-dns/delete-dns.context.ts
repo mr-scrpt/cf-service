@@ -11,12 +11,16 @@ export interface DeleteDnsConversationData {
 
 export class DeleteDnsState implements ZoneAwareContext {
     public zoneId?: string;
+    public zoneName?: string;
     public recordId?: string;
     public recordDetails?: DnsRecord;
 
     // ZoneAwareContext implementation
     setZoneId(zoneId: string) { this.zoneId = zoneId; }
     getZoneId() { return this.zoneId; }
+
+    setZoneName(name: string) { this.zoneName = name; }
+    getZoneName() { return this.zoneName; }
 
     setRecordId(recordId: string) { this.recordId = recordId; }
     setRecordDetails(record: DnsRecord) { this.recordDetails = record; }

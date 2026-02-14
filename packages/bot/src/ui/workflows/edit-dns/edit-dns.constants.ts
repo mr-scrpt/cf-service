@@ -25,3 +25,17 @@ export enum DnsInputType {
     SELECT = 'select',
     BOOLEAN = 'boolean'
 }
+
+export const DnsFieldName = {
+    NAME: 'name',
+    CONTENT: 'content',
+    TTL: 'ttl',
+    PROXIED: 'proxied',
+    PRIORITY: 'priority',
+    SRV_PRIORITY: 'srv_priority',
+    SRV_WEIGHT: 'srv_weight',
+    SRV_PORT: 'srv_port',
+    SRV_TARGET: 'srv_target'
+} as const;
+
+export type DnsFieldName = typeof DnsFieldName[keyof typeof DnsFieldName];

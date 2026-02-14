@@ -1,10 +1,10 @@
 import { WorkflowBuilder } from '../core/workflow.builder';
 import { EditDnsWorkflowContext } from './edit-dns.workflow.context';
-import { SelectZoneWorkflowStep } from './steps/workflow/select-zone.workflow.step';
-import { SelectRecordWorkflowStep } from './steps/workflow/select-record.workflow.step';
-import { EditMenuWorkflowStep } from './steps/workflow/edit-menu.workflow.step';
-import { EditFieldWorkflowStep } from './steps/workflow/edit-field.workflow.step';
-import { SaveRecordWorkflowStep } from './steps/workflow/save-record.workflow.step';
+import { SelectZoneWorkflowStep } from './steps/select-zone.step';
+import { SelectRecordWorkflowStep } from './steps/select-record.step';
+import { EditMenuWorkflowStep } from './steps/edit-menu.step';
+import { EditFieldWorkflowStep } from './steps/edit-field.step';
+import { SaveRecordWorkflowStep } from './steps/save-record.step';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 
 export function editDnsWorkflowFactory(gateway: DnsGatewayPort) {

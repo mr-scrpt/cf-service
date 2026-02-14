@@ -7,7 +7,7 @@ import {
     mxRecordSchema,
     srvRecordSchema
 } from '@cloudflare-bot/shared/dist/domain/dns-record.schema';
-import { DnsInputType } from './edit-dns.constants';
+import { DnsInputType, DnsFieldName } from './edit-dns.constants';
 
 // --- Input Strategies ---
 export type FieldInputStrategy =
@@ -28,19 +28,19 @@ const mxShape = mxRecordSchema.shape;
 const srvDataShape = srvRecordSchema.shape.data.shape;
 
 // --- Field Definitions ---
-export const FIELD_DEFINITIONS: Record<string, DnsFieldDefinition> = {
+export const FIELD_DEFINITIONS: Record<DnsFieldName, DnsFieldDefinition> = {
     // Standard Fields
-    name: {
+    [DnsFieldName.NAME]: {
         label: '📝 Name',
         schema: dnsRecordNameSchema,
         input: { type: DnsInputType.TEXT }
     },
-    content: {
+    [DnsFieldName.CONTENT]: {
         label: '📝 Content',
         schema: dnsRecordContentSchema,
         input: { type: DnsInputType.TEXT }
     },
-    ttl: {
+    [DnsFieldName.TTL]: {
         label: '⏱ TTL',
         schema: ttlSchema,
         input: {
@@ -48,37 +48,37 @@ export const FIELD_DEFINITIONS: Record<string, DnsFieldDefinition> = {
             options: COMMON_TTL_VALUES
         }
     },
-    proxied: {
+    [DnsFieldName.PROXIED]: {
         label: '🛡 Proxy',
         schema: z.boolean(),
         input: { type: DnsInputType.BOOLEAN }
     },
     // MX Specific
-    priority: { // MX Priority
+    [DnsFieldName.PRIORITY]: { // MX Priority
         label: '1️⃣ Priority',
         schema: mxShape.priority,
         input: { type: DnsInputType.NUMBER }
     },
     // SRV Specific
-    srv_priority: {
+    [DnsFieldName.SRV_PRIORITY]: {
         label: '1️⃣ Priority',
         schema: srvDataShape.priority,
         input: { type: DnsInputType.NUMBER },
         path: ['data', 'priority']
     },
-    srv_weight: {
+    [DnsFieldName.SRV_WEIGHT]: {
         label: '⚖️ Weight',
         schema: srvDataShape.weight,
         input: { type: DnsInputType.NUMBER },
         path: ['data', 'weight']
     },
-    srv_port: {
+    [DnsFieldName.SRV_PORT]: {
         label: '🔌 Port',
         schema: srvDataShape.port,
         input: { type: DnsInputType.NUMBER },
         path: ['data', 'port']
     },
-    srv_target: {
+    [DnsFieldName.SRV_TARGET]: {
         label: '🎯 Target',
         schema: srvDataShape.target,
         input: { type: DnsInputType.TEXT },
@@ -87,20 +87,33 @@ export const FIELD_DEFINITIONS: Record<string, DnsFieldDefinition> = {
 };
 
 // --- Layouts ---
-// Keys are strictly typed to DnsRecordType
-export const RECORD_TYPE_LAYOUTS: Record<DnsRecordType | 'DEFAULT', (keyof typeof FIELD_DEFINITIONS)[]> = {
-    [DnsRecordType.A]: ['name', 'content', 'ttl', 'proxied'],
-    [DnsRecordType.AAAA]: ['name', 'content', 'ttl', 'proxied'],
-    [DnsRecordType.CNAME]: ['name', 'content', 'ttl', 'proxied'],
-    [DnsRecordType.TXT]: ['name', 'content', 'ttl'],
-    [DnsRecordType.NS]: ['name', 'content', 'ttl'],
-    [DnsRecordType.MX]: ['name', 'content', 'priority', 'ttl'],
-    [DnsRecordType.SRV]: ['name', 'srv_priority', 'srv_weight', 'srv_port', 'srv_target', 'ttl', 'proxied'],
-    DEFAULT: ['name', 'content', 'ttl']
+// Keys are strictly typed to DnsRecordType to ensure exhaustiveness
+export const RECORD_TYPE_LAYOUTS: Record<DnsRecordType, DnsFieldName[]> = {
+    [DnsRecordType.A]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.TTL, DnsFieldName.PROXIED],
+    [DnsRecordType.AAAA]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.TTL, DnsFieldName.PROXIED],
+    [DnsRecordType.CNAME]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.TTL, DnsFieldName.PROXIED],
+    [DnsRecordType.TXT]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.TTL],
+    [DnsRecordType.NS]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.TTL],
+    [DnsRecordType.MX]: [DnsFieldName.NAME, DnsFieldName.CONTENT, DnsFieldName.PRIORITY, DnsFieldName.TTL],
+    [DnsRecordType.SRV]: [
+        DnsFieldName.NAME,
+        DnsFieldName.SRV_PRIORITY,
+        DnsFieldName.SRV_WEIGHT,
+        DnsFieldName.SRV_PORT,
+        DnsFieldName.SRV_TARGET,
+        DnsFieldName.TTL,
+        DnsFieldName.PROXIED
+    ]
 };
 
-export function getFieldsForType(type: DnsRecordType): string[] {
-    return RECORD_TYPE_LAYOUTS[type] || RECORD_TYPE_LAYOUTS.DEFAULT;
+export function getFieldsForType(type: DnsRecordType): DnsFieldName[] {
+    const layout = RECORD_TYPE_LAYOUTS[type];
+    if (!layout) {
+        // This should technically be unreachable if DnsRecordType is exhaustive
+        // but acts as a runtime safeguard.
+        throw new Error(`No layout configuration found for record type: ${type}`);
+    }
+    return layout;
 }
 
 

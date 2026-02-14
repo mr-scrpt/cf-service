@@ -7,6 +7,7 @@ import { ZoneAwareContext } from '../common/interfaces/zone-aware.interface';
 
 export class CreateDnsContext implements WizardContext, ZoneAwareContext {
     public zoneId?: string;
+    public zoneName?: string;
     public type?: DnsRecordType;
     public name?: string;
     public content?: string;
@@ -18,6 +19,9 @@ export class CreateDnsContext implements WizardContext, ZoneAwareContext {
     // ZoneAwareContext implementation
     setZoneId(zoneId: string) { this.zoneId = zoneId; }
     getZoneId() { return this.zoneId; }
+
+    setZoneName(name: string) { this.zoneName = name; }
+    getZoneName() { return this.zoneName; }
 
     // Flow specific setters
     setType(type: DnsRecordType) { this.type = type; }

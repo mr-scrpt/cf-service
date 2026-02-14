@@ -29,6 +29,12 @@ export class SelectZoneStep<TContext extends ZoneAwareContext> {
 
         const { payload } = CallbackSerializer.deserialize<DnsZonePayload>(data);
         state.setZoneId(payload.zoneId);
+
+        const selectedZone = zones.find(z => z.id === payload.zoneId);
+        if (selectedZone) {
+            state.setZoneName(selectedZone.name);
+        }
+
         await zC.answerCallbackQuery();
     }
 }

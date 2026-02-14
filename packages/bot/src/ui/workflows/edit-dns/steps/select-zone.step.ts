@@ -1,14 +1,14 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
-import { WorkflowStep } from '../../../core/workflow.step';
-import { IStepResult, NextStepResult, ExitFlowResult } from '../../../core/step.result';
-import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
+import { WorkflowStep } from '../../core/workflow.step';
+import { IStepResult, NextStepResult, ExitFlowResult } from '../../core/step.result';
+import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { buildZoneListKeyboard } from '../../../../keyboards/dns.keyboard';
-import { CallbackPattern, CallbackSerializer, DnsZonePayload } from '../../../../callbacks/callback-data';
+import { buildZoneListKeyboard } from '../../../keyboards/dns.keyboard';
+import { CallbackPattern, CallbackSerializer, DnsZonePayload } from '../../../callbacks/callback-data';
 import { InlineKeyboard } from 'grammy';
-import { MenuCallbacks } from '../../../../menus/main.menu';
-import { EditDnsStep } from '../../edit-dns.constants';
+import { MenuCallbacks } from '../../../menus/main.menu';
+import { EditDnsStep } from '../edit-dns.constants';
 
 export class SelectZoneWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
     readonly id = EditDnsStep.SELECT_ZONE;
@@ -35,6 +35,12 @@ export class SelectZoneWorkflowStep implements WorkflowStep<EditDnsWorkflowConte
 
         const { payload } = CallbackSerializer.deserialize<DnsZonePayload>(data);
         state.setZoneId(payload.zoneId);
+
+        const selectedZone = zones.find(z => z.id === payload.zoneId);
+        if (selectedZone) {
+            state.setZoneName(selectedZone.name);
+        }
+
         await zC.answerCallbackQuery();
 
         return new NextStepResult();

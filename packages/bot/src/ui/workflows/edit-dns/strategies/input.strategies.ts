@@ -1,17 +1,17 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
-import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
-import { DnsFieldDefinition } from '../../edit-dns.config';
-import { Callback, CallbackPattern, CallbackSerializer, DnsEditValuePayload, DnsEditBooleanPayload } from '../../../../callbacks/callback-data';
+import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
+import { DnsFieldDefinition } from '../edit-dns.config';
+import { Callback, CallbackPattern, CallbackSerializer, DnsEditValuePayload, DnsEditBooleanPayload } from '../../../callbacks/callback-data';
 import {
     formatTextInputPrompt,
     formatNumberInputPrompt,
     formatSelectInputPrompt,
     formatBooleanInputPrompt,
     InputMessages
-} from '../../../../common/templates/input.templates';
-import { buildBooleanKeyboard, buildSelectionKeyboard } from '../../../../keyboards/common.keyboard';
-import { EditDnsTrigger, EditDnsAction, DnsInputType } from '../../edit-dns.constants';
+} from '../../../common/templates/input.templates';
+import { buildBooleanKeyboard, buildSelectionKeyboard } from '../../../keyboards/common.keyboard';
+import { EditDnsTrigger, EditDnsAction, DnsInputType } from '../edit-dns.constants';
 
 export interface InputStrategy {
     handle(

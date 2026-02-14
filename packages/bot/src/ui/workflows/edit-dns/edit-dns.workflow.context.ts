@@ -3,6 +3,7 @@ import { DnsRecord } from '@cloudflare-bot/shared';
 
 const KEYS = {
     ZONE_ID: 'zoneId',
+    ZONE_NAME: 'zoneName',
     RECORD_ID: 'recordId',
     ORIGINAL_RECORD: 'originalRecord',
     MODIFIED_RECORD: 'modifiedRecord',
@@ -13,6 +14,11 @@ export class EditDnsWorkflowContext extends WorkflowContext {
     // ZoneAware Interface
     get zoneId(): string | undefined { return this.get(KEYS.ZONE_ID); }
     setZoneId(id: string) { this.set(KEYS.ZONE_ID, id); }
+
+    get zoneName(): string | undefined { return this.get(KEYS.ZONE_NAME); }
+    setZoneName(name: string) { this.set(KEYS.ZONE_NAME, name); }
+    getZoneId() { return this.zoneId; }
+    getZoneName() { return this.zoneName; }
 
     // Edit Specific
     get recordId(): string | undefined { return this.get(KEYS.RECORD_ID); }

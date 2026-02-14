@@ -5,6 +5,8 @@ import { Callback, CallbackPattern, CallbackSerializer, DnsRecordPayload, Pagina
 
 interface ZoneAwareState {
     zoneId?: string;
+    zoneName?: string;
+    getZoneName?(): string | undefined; // Optional helper if class passed
 }
 
 export class SelectRecordPaginationStep {
@@ -15,6 +17,8 @@ export class SelectRecordPaginationStep {
     async execute(conversation: Conversation<any>, ctx: Context, state: ZoneAwareState): Promise<DnsRecord | null> {
         const zoneId = state.zoneId;
         if (!zoneId) throw new Error('Zone ID is missing in state');
+
+        const zoneName = state.zoneName || (state.getZoneName ? state.getZoneName() : undefined);
 
         // 1. Fetch all records (assuming < 100 or acceptable limit)
         // In a real generic implementation, we might need real pagination from API, 
@@ -54,8 +58,23 @@ export class SelectRecordPaginationStep {
                 }
 
                 const contentSummary = content.length > 20 ? content.substring(0, 17) + '...' : content;
-                // Don't split name, show full name to avoid confusion (e.g. test.com -> test)
-                const label = `[${record.type}] ${record.name} (${contentSummary})`;
+
+                // Format Name: Relative if possible
+                let displayName = record.name;
+                if (zoneName) {
+                    const suffix = '.' + zoneName;
+                    if (displayName.endsWith(suffix)) {
+                        displayName = displayName.substring(0, displayName.length - suffix.length);
+                    }
+                    // If result is empty string, it means record.name === zoneName (root)
+                    // Dashboard shows root as zoneName (e.g. test.com), so we keep it as is if not ending with suffix?
+                    // Wait if record.name is "test.com" and zoneName is "test.com".
+                    // "test.com".endsWith(".test.com") is FALSE.
+                    // So "test.com" remains "test.com". Correct.
+                    // "my.test.com".endsWith(".test.com") is TRUE. Becomes "my". Correct.
+                }
+
+                const label = `[${record.type}] ${displayName} (${contentSummary})`;
                 keyboard.text(label, Callback.dnsRecord(record.id)).row();
             }
 
