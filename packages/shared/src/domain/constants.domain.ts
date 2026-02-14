@@ -60,3 +60,17 @@ export type ProxiableRecordType = typeof PROXIABLE_TYPES[number];
 export function isProxiable(type: DnsRecordType): type is ProxiableRecordType {
   return (PROXIABLE_TYPES as readonly DnsRecordType[]).includes(type);
 }
+
+export const COMMON_TTL_VALUES = [
+  { label: 'Auto', value: 1 },
+  { label: '1 min', value: 60 },
+  { label: '5 min', value: 300 },
+  { label: '10 min', value: 600 },
+  { label: '15 min', value: 900 },
+  { label: '30 min', value: 1800 },
+  { label: '1 hour', value: 3600 },
+  { label: '2 hours', value: 7200 },
+  { label: '5 hours', value: 18000 },
+  { label: '12 hours', value: 43200 },
+  { label: '1 day', value: 86400 },
+] as const;

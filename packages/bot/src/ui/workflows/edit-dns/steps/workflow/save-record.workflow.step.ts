@@ -6,9 +6,11 @@ import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { MenuCallbacks } from '../../../../menus/main.menu';
 import { logger } from '../../../../../utils/logger';
+import { ErrorMapper } from '../../../../../core/errors/error-mapper';
+import { EditDnsStep } from '../../edit-dns.constants';
 
 export class SaveRecordWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
-    readonly id = 'save_changes';
+    readonly id = EditDnsStep.SAVE_CHANGES;
 
     constructor(private gateway: DnsGatewayPort) { }
 
@@ -29,13 +31,20 @@ export class SaveRecordWorkflowStep implements WorkflowStep<EditDnsWorkflowConte
                 reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
             });
 
-        } catch (e: any) {
+        } catch (error: unknown) {
+            const err = error instanceof Error ? error : new Error(String(error));
+
             logger.error('Error updating DNS record', {
-                error: e.message || String(e),
+                error: err.message,
+                stack: err.stack,
                 recordId: state.recordId,
                 zoneId: state.zoneId
             });
-            await ctx.reply(`❌ Error updating record: ${e.message || String(e)}`, {
+
+            // Use ErrorMapper to get a user-friendly message based on error codes (Shared Errors)
+            const userMessage = ErrorMapper.toUserMessage(err);
+
+            await ctx.reply(userMessage, {
                 reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
             });
         }

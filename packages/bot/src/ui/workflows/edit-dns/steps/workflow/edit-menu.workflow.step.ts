@@ -1,97 +1,107 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
 import { WorkflowStep } from '../../../core/workflow.step';
-import { IStepResult, JumpToStepResult, ExitFlowResult } from '../../../core/step.result';
+import { IStepResult, NextStepResult, ExitFlowResult, JumpToStepResult } from '../../../core/step.result';
 import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
-import { DnsRecord } from '@cloudflare-bot/shared';
+import { FIELD_DEFINITIONS, getFieldsForType, DnsFieldDefinition } from '../../edit-dns.config';
 import { MenuCallbacks } from '../../../../menus/main.menu';
-import { getFieldsForType } from '../../edit-dns.config';
+import { Callback, CallbackPattern, CallbackSerializer, DnsEditFieldPayload, DnsSaveRecordPayload } from '../../../../callbacks/callback-data';
+import { EditDnsStep, EditDnsAction } from '../../edit-dns.constants';
 
 export class EditMenuWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
-    readonly id = 'edit_menu';
+    readonly id = EditDnsStep.EDIT_MENU;
 
     async execute(conversation: Conversation<any>, ctx: Context, state: EditDnsWorkflowContext): Promise<IStepResult> {
         const record = state.getEffectiveRecord();
-        const fields = getFieldsForType(record.type);
-
-        // Build Message
-        const showChange = (label: string, original: any, current: any) => {
-            if (String(original) !== String(current)) {
-                return `🔹 <b>${label}:</b> ${original} ➝ <b>${current}</b>\n`;
-            }
-            return `🔹 <b>${label}:</b> ${current}\n`;
-        };
-
+        const layoutKeys = getFieldsForType(record.type);
         let message = `✏️ <b>Editing Record</b>: ${record.name} (${record.type})\n\n`;
 
-        // Generate status display dynamically based on what fields are available
-        for (const field of fields) {
-            let currentValue: any = record;
-            let originalValue: any = state.originalRecord;
+        for (const key of layoutKeys) {
+            const def = FIELD_DEFINITIONS[key];
+            if (!def) continue;
 
-            // Resolve nested path
-            if (field.path) {
-                for (const key of field.path) {
-                    currentValue = currentValue ? currentValue[key] : undefined;
-                    originalValue = originalValue ? originalValue[key] : undefined;
-                }
-            } else {
-                currentValue = (record as any)[field.key];
-                originalValue = (originalValue as any)[field.key];
-            }
+            const originalVal = this.resolveValue(state.originalRecord, def, key);
+            const currentVal = this.resolveValue(record, def, key);
 
-            // Remove the emoji and space safely (assuming "Emoji Space Name" format)
-            // Using array spread to split by code points or just keeping the original label if it fails?
-            // Simple approach: split by space and take the rest.
-            const cleanLabel = field.label.includes(' ') ? field.label.split(' ').slice(1).join(' ') : field.label;
-
-            message += showChange(cleanLabel, originalValue, currentValue);
+            message += this.formatChange(def.label, originalVal, currentVal);
         }
 
         message += `\n👇 Select a field to edit:`;
 
-        // Build Keyboard
         const keyboard = new InlineKeyboard();
         let rowCount = 0;
 
-        for (const field of fields) {
-            keyboard.text(field.label, `edit:${field.key}`);
+        for (const key of layoutKeys) {
+            const def = FIELD_DEFINITIONS[key];
+            if (!def) continue;
+
+            keyboard.text(def.label, Callback.dnsEditField(key));
             rowCount++;
             if (rowCount % 2 === 0) keyboard.row();
         }
-        if (rowCount % 2 !== 0) keyboard.row(); // Ensure new row if odd
+        if (rowCount % 2 !== 0) keyboard.row();
 
-        keyboard.text('💾 Save Changes', 'edit:save').text('❌ Cancel', 'edit:cancel');
+        keyboard.text('💾 Save Changes', Callback.dnsSaveRecord()).text('❌ Cancel', Callback.dnsEditCancel());
 
         await ctx.reply(message, { reply_markup: keyboard, parse_mode: 'HTML' });
 
-        const callback = await conversation.waitForCallbackQuery(/^edit:/);
+        // Wait for EITHER edit field OR save/cancel action
+        const callback = await conversation.waitForCallbackQuery([
+            CallbackPattern.dnsEditField(),
+            CallbackPattern.dnsSaveRecord()
+        ]);
         await callback.answerCallbackQuery();
 
-        const action = callback.callbackQuery.data.split(':')[1];
+        const data = callback.callbackQuery.data;
 
-        if (action === 'save') return new JumpToStepResult('save_changes');
-        if (action === 'cancel') {
-            await ctx.reply('❌ Edit cancelled.', {
-                reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
-            });
-            return new ExitFlowResult();
-        }
+        if (CallbackPattern.dnsEditField().test(data)) {
+            const payload = CallbackSerializer.deserialize<DnsEditFieldPayload>(data);
+            const field = payload.payload.field;
 
-        // Find the field definition
-        const selectedField = fields.find(f => f.key === action);
-        if (selectedField) {
-            // Set active field for generic step usage
-            state.setActiveField(selectedField);
-
-            // If field has custom step, jump there, otherwise use generic
-            if (selectedField.stepId) {
-                return new JumpToStepResult(selectedField.stepId);
-            } else {
-                return new JumpToStepResult('edit_generic_field');
+            if (FIELD_DEFINITIONS[field]) {
+                state.setActiveField(field);
+                return new JumpToStepResult(EditDnsStep.EDIT_FIELD);
             }
         }
 
-        return new JumpToStepResult('edit_menu'); // Loop back on unknown
+        if (CallbackPattern.dnsSaveRecord().test(data)) {
+            const payload = CallbackSerializer.deserialize<DnsSaveRecordPayload>(data);
+
+            if (payload.payload.action === EditDnsAction.SAVE) {
+                return new JumpToStepResult(EditDnsStep.SAVE_CHANGES);
+            }
+
+            if (payload.payload.action === EditDnsAction.CANCEL) {
+                await ctx.reply('❌ Edit cancelled.', {
+                    reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
+                });
+                return new ExitFlowResult();
+            }
+        }
+
+        return new JumpToStepResult(EditDnsStep.EDIT_MENU);
+    }
+
+    private resolveValue(record: any, def: DnsFieldDefinition, key: string): any {
+        if (!record) return undefined;
+        if (def.path) {
+            let val = record;
+            for (const p of def.path) {
+                val = val ? val[p] : undefined;
+            }
+            return val;
+        }
+        // If no path, assume config key maps to record key
+        return record[key];
+    }
+
+    private formatChange(label: string, original: any, current: any) {
+        // Safe emoji stripping for display if needed, but full label is fine
+        const cleanLabel = label.includes(' ') ? label.split(' ').slice(1).join(' ') : label;
+
+        if (String(original) !== String(current)) {
+            return `🔹 <b>${cleanLabel}:</b> ${original} ➝ <b>${current}</b>\n`;
+        }
+        return `🔹 <b>${cleanLabel}:</b> ${current}\n`;
     }
 }

@@ -6,9 +6,10 @@ import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { SelectRecordPaginationStep } from '../../../delete-dns/steps/select-record-pagination.step';
 import { MenuCallbacks } from '../../../../menus/main.menu';
+import { EditDnsStep } from '../../edit-dns.constants';
 
 export class SelectRecordWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
-    readonly id = 'select_record';
+    readonly id = EditDnsStep.SELECT_RECORD;
 
     constructor(private gateway: DnsGatewayPort) { }
 

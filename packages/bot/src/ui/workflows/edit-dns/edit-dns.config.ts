@@ -1,56 +1,106 @@
-import { DnsRecordType } from '@cloudflare-bot/shared';
+import { DnsRecordType, COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
+import { z, ZodSchema } from 'zod';
+import {
+    dnsRecordNameSchema,
+    dnsRecordContentSchema,
+    ttlSchema,
+    mxRecordSchema,
+    srvRecordSchema
+} from '@cloudflare-bot/shared/dist/domain/dns-record.schema';
+import { DnsInputType } from './edit-dns.constants';
+
+// --- Input Strategies ---
+export type FieldInputStrategy =
+    | { type: DnsInputType.TEXT }
+    | { type: DnsInputType.NUMBER }
+    | { type: DnsInputType.SELECT, options: readonly { label: string, value: any }[] }
+    | { type: DnsInputType.BOOLEAN };
 
 export interface DnsFieldDefinition {
-    key: string;
     label: string;
-    path?: string[];
-    type: 'string' | 'number' | 'boolean';
-    stepId?: string;
+    schema: ZodSchema<any>;
+    input: FieldInputStrategy;
+    path?: string[]; // For nested fields like data.priority
 }
 
-// Reusable Field Definitions
-const F_NAME: DnsFieldDefinition = { key: 'name', label: '📝 Name', type: 'string', stepId: 'edit_name' };
-const F_CONTENT: DnsFieldDefinition = { key: 'content', label: '📝 Content', type: 'string' }; // Generic
-const F_TTL: DnsFieldDefinition = { key: 'ttl', label: '⏱ TTL', type: 'number', stepId: 'edit_ttl' };
-const F_PROXIED: DnsFieldDefinition = { key: 'proxied', label: '🛡 Proxy', type: 'boolean', stepId: 'edit_proxied' };
-const F_PRIORITY: DnsFieldDefinition = { key: 'priority', label: '1️⃣ Priority', type: 'number' }; // For MX
+// Access Schema Shapes for Single Source of Truth
+const mxShape = mxRecordSchema.shape;
+const srvDataShape = srvRecordSchema.shape.data.shape;
 
-// SRV Specific
-const SRV_FIELDS: DnsFieldDefinition[] = [
-    F_NAME,
-    { key: 'priority', label: '1️⃣ Priority', path: ['data', 'priority'], type: 'number' },
-    { key: 'weight', label: '⚖️ Weight', path: ['data', 'weight'], type: 'number' },
-    { key: 'port', label: '🔌 Port', path: ['data', 'port'], type: 'number' },
-    { key: 'target', label: '🎯 Target', path: ['data', 'target'], type: 'string' },
-    F_TTL,
-    F_PROXIED // SRV *can* sometimes be proxied in Cloudflare (Spectrum), but often not. Leaving it enabled as per user previous context, but strictly speaking typically not for standard web.
-    // User didn't complain about SRV proxy, but did about TXT.
-];
-
-// Common Combinations
-const PROXIABLE_FIELDS = [F_NAME, F_CONTENT, F_TTL, F_PROXIED];
-const STANDARD_FIELDS = [F_NAME, F_CONTENT, F_TTL];
-
-export const DNS_RECORD_FIELDS: Record<string, DnsFieldDefinition[]> = {
-    // Proxiable Types
-    A: PROXIABLE_FIELDS,
-    AAAA: PROXIABLE_FIELDS,
-    CNAME: PROXIABLE_FIELDS,
-
-    // Non-Proxiable Types
-    TXT: STANDARD_FIELDS,
-    NS: STANDARD_FIELDS,
-    MX: [F_NAME, F_CONTENT, F_PRIORITY, F_TTL], // MX usually has priority and content (mail server)
-
-    // Complex Types
-    SRV: SRV_FIELDS,
-
-    // Fallback
-    DEFAULT: STANDARD_FIELDS // Default to NO proxy to be safe
+// --- Field Definitions ---
+export const FIELD_DEFINITIONS: Record<string, DnsFieldDefinition> = {
+    // Standard Fields
+    name: {
+        label: '📝 Name',
+        schema: dnsRecordNameSchema,
+        input: { type: DnsInputType.TEXT }
+    },
+    content: {
+        label: '📝 Content',
+        schema: dnsRecordContentSchema,
+        input: { type: DnsInputType.TEXT }
+    },
+    ttl: {
+        label: '⏱ TTL',
+        schema: ttlSchema,
+        input: {
+            type: DnsInputType.SELECT,
+            options: COMMON_TTL_VALUES
+        }
+    },
+    proxied: {
+        label: '🛡 Proxy',
+        schema: z.boolean(),
+        input: { type: DnsInputType.BOOLEAN }
+    },
+    // MX Specific
+    priority: { // MX Priority
+        label: '1️⃣ Priority',
+        schema: mxShape.priority,
+        input: { type: DnsInputType.NUMBER }
+    },
+    // SRV Specific
+    srv_priority: {
+        label: '1️⃣ Priority',
+        schema: srvDataShape.priority,
+        input: { type: DnsInputType.NUMBER },
+        path: ['data', 'priority']
+    },
+    srv_weight: {
+        label: '⚖️ Weight',
+        schema: srvDataShape.weight,
+        input: { type: DnsInputType.NUMBER },
+        path: ['data', 'weight']
+    },
+    srv_port: {
+        label: '🔌 Port',
+        schema: srvDataShape.port,
+        input: { type: DnsInputType.NUMBER },
+        path: ['data', 'port']
+    },
+    srv_target: {
+        label: '🎯 Target',
+        schema: srvDataShape.target,
+        input: { type: DnsInputType.TEXT },
+        path: ['data', 'target']
+    }
 };
 
-export function getFieldsForType(type: DnsRecordType): DnsFieldDefinition[] {
-    const specific = DNS_RECORD_FIELDS[type];
-    if (specific && specific.length > 0) return specific;
-    return DNS_RECORD_FIELDS.DEFAULT;
+// --- Layouts ---
+// Keys are strictly typed to DnsRecordType
+export const RECORD_TYPE_LAYOUTS: Record<DnsRecordType | 'DEFAULT', (keyof typeof FIELD_DEFINITIONS)[]> = {
+    [DnsRecordType.A]: ['name', 'content', 'ttl', 'proxied'],
+    [DnsRecordType.AAAA]: ['name', 'content', 'ttl', 'proxied'],
+    [DnsRecordType.CNAME]: ['name', 'content', 'ttl', 'proxied'],
+    [DnsRecordType.TXT]: ['name', 'content', 'ttl'],
+    [DnsRecordType.NS]: ['name', 'content', 'ttl'],
+    [DnsRecordType.MX]: ['name', 'content', 'priority', 'ttl'],
+    [DnsRecordType.SRV]: ['name', 'srv_priority', 'srv_weight', 'srv_port', 'srv_target', 'ttl', 'proxied'],
+    DEFAULT: ['name', 'content', 'ttl']
+};
+
+export function getFieldsForType(type: DnsRecordType): string[] {
+    return RECORD_TYPE_LAYOUTS[type] || RECORD_TYPE_LAYOUTS.DEFAULT;
 }
+
+

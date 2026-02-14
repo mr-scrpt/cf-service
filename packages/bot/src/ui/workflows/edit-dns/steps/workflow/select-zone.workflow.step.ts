@@ -8,9 +8,10 @@ import { buildZoneListKeyboard } from '../../../../keyboards/dns.keyboard';
 import { CallbackPattern, CallbackSerializer, DnsZonePayload } from '../../../../callbacks/callback-data';
 import { InlineKeyboard } from 'grammy';
 import { MenuCallbacks } from '../../../../menus/main.menu';
+import { EditDnsStep } from '../../edit-dns.constants';
 
 export class SelectZoneWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
-    readonly id = 'select_zone';
+    readonly id = EditDnsStep.SELECT_ZONE;
 
     constructor(private gateway: DnsGatewayPort) { }
 

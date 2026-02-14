@@ -1,6 +1,7 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
 import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
+import { Callback, CallbackPattern, CallbackSerializer, DnsRecordPayload, PaginationPayload } from '../../../callbacks/callback-data';
 
 interface ZoneAwareState {
     zoneId?: string;
@@ -55,37 +56,44 @@ export class SelectRecordPaginationStep {
                 const contentSummary = content.length > 20 ? content.substring(0, 17) + '...' : content;
                 // Don't split name, show full name to avoid confusion (e.g. test.com -> test)
                 const label = `[${record.type}] ${record.name} (${contentSummary})`;
-                keyboard.text(label, `record:${record.id}`).row();
+                keyboard.text(label, Callback.dnsRecord(record.id)).row();
             }
 
             // Navigation Buttons
             const navRow = [];
-            if (page > 0) navRow.push({ text: '⬅️ Prev', callback_data: 'nav:prev' });
-            navRow.push({ text: `Page ${page + 1}/${totalPages}`, callback_data: 'nav:noop' }); // Indicator
-            if (page < totalPages - 1) navRow.push({ text: 'Next ➡️', callback_data: 'nav:next' });
+            if (page > 0) navRow.push({ text: '⬅️ Prev', callback_data: Callback.pagination('prev') });
+            navRow.push({ text: `Page ${page + 1}/${totalPages}`, callback_data: Callback.pagination('noop') }); // Indicator
+            if (page < totalPages - 1) navRow.push({ text: 'Next ➡️', callback_data: Callback.pagination('next') });
 
             if (navRow.length > 0) keyboard.row(...navRow);
 
             // Cancel Button
-            keyboard.row().text('❌ Cancel', 'nav:cancel');
+            keyboard.row().text('❌ Cancel', Callback.pagination('cancel'));
 
-            await ctx.reply('Select a DNS record to delete:', { reply_markup: keyboard });
+            await ctx.reply('Select a DNS record:', { reply_markup: keyboard });
 
             // 3. Wait for selection
-            const callback = await conversation.waitForCallbackQuery(/^record:|nav:/);
+            const callback = await conversation.waitForCallbackQuery([
+                CallbackPattern.dnsRecord(),
+                CallbackPattern.pagination()
+            ]);
             const data = callback.callbackQuery.data;
 
             await callback.answerCallbackQuery(); // acknowledge immediately
 
-            if (data === 'nav:cancel') {
-                return null;
-            } else if (data === 'nav:prev') {
-                page = Math.max(0, page - 1);
-            } else if (data === 'nav:next') {
-                page = Math.min(totalPages - 1, page + 1);
-            } else if (data.startsWith('record:')) {
-                const recordId = data.split(':')[1];
-                return records.find(r => r.id === recordId) || null;
+            if (CallbackPattern.pagination().test(data)) {
+                const { payload } = CallbackSerializer.deserialize<PaginationPayload>(data);
+
+                if (payload.action === 'cancel') return null;
+                if (payload.action === 'prev') page = Math.max(0, page - 1);
+                if (payload.action === 'next') page = Math.min(totalPages - 1, page + 1);
+                // noop does nothing, loop continues
+            }
+
+            if (CallbackPattern.dnsRecord().test(data)) {
+                const { payload } = CallbackSerializer.deserialize<DnsRecordPayload>(data);
+                const record = records.find(r => r.id === payload.recordId);
+                if (record) return record;
             }
 
             // Loop continues for nav actions (will update UI in next iteration)
