@@ -21,6 +21,7 @@ import {
   WizardConfirmHandler,
   NavigationCancelHandler,
   NavigationMainMenuHandler,
+  NavigationBackHandler,
 } from '../handlers';
 import { SessionData } from '../types';
 
@@ -64,6 +65,7 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
     { action: CallbackAction.WIZARD_SKIP, handler: new WizardSkipHandler(wizardEngine) },
     { action: CallbackAction.WIZARD_CONFIRM, handler: new WizardConfirmHandler(wizardEngine) },
     { action: CallbackAction.NAV_CANCEL, handler: new NavigationCancelHandler(wizardEngine) },
+    { action: CallbackAction.NAV_BACK, handler: new NavigationBackHandler(mainMenuFlow) },
     { action: CallbackAction.NAV_MAIN_MENU, handler: new NavigationMainMenuHandler(mainMenuFlow) },
   ]);
 

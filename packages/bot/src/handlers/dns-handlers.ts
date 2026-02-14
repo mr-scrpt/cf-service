@@ -139,3 +139,11 @@ export class NavigationMainMenuHandler implements CallbackHandler<unknown> {
     await this.mainMenuFlow.show(ctx);
   }
 }
+
+export class NavigationBackHandler implements CallbackHandler<unknown> {
+  constructor(private readonly mainMenuFlow: MainMenuFlow) {}
+
+  async handle(ctx: SessionContext): Promise<void> {
+    await this.mainMenuFlow.show(ctx);
+  }
+}
