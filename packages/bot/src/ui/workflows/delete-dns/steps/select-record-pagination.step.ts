@@ -1,14 +1,17 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
 import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
-import { DeleteDnsContext, DeleteDnsState } from '../delete-dns.context';
+
+interface ZoneAwareState {
+    zoneId?: string;
+}
 
 export class SelectRecordPaginationStep {
     private readonly PAGE_SIZE = 10;
 
     constructor(private gateway: DnsGatewayPort) { }
 
-    async execute(conversation: Conversation<DeleteDnsContext>, ctx: Context, state: DeleteDnsState): Promise<DnsRecord | null> {
+    async execute(conversation: Conversation<any>, ctx: Context, state: ZoneAwareState): Promise<DnsRecord | null> {
         const zoneId = state.zoneId;
         if (!zoneId) throw new Error('Zone ID is missing in state');
 
@@ -50,7 +53,8 @@ export class SelectRecordPaginationStep {
                 }
 
                 const contentSummary = content.length > 20 ? content.substring(0, 17) + '...' : content;
-                const label = `[${record.type}] ${record.name.split('.')[0]} (${contentSummary})`;
+                // Don't split name, show full name to avoid confusion (e.g. test.com -> test)
+                const label = `[${record.type}] ${record.name} (${contentSummary})`;
                 keyboard.text(label, `record:${record.id}`).row();
             }
 
@@ -74,7 +78,6 @@ export class SelectRecordPaginationStep {
             await callback.answerCallbackQuery(); // acknowledge immediately
 
             if (data === 'nav:cancel') {
-                await ctx.reply('Operation cancelled.');
                 return null;
             } else if (data === 'nav:prev') {
                 page = Math.max(0, page - 1);

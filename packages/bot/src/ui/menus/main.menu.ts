@@ -7,6 +7,7 @@ export const MenuCallbacks = {
     domain: 'menu:domain',
     help: 'menu:help',
     createDns: 'dns:create',
+    edit: 'dns:edit',
     delete: 'dns:delete',
     noop: 'menu:noop',
 };
@@ -24,7 +25,7 @@ export function buildDnsMenuKeyboard(): InlineKeyboard {
         .text('📝 Create Record', 'dns:create') // Triggers conversation
         .text('📋 List Records', 'dns:list')
         .row()
-        .text('✏️ Edit Record', 'dns:edit')
+        .text('✏️ Edit Record', MenuCallbacks.edit)
         .text('🗑️ Delete Record', MenuCallbacks.delete)
         .row()
         .text('🔙 Back', MenuCallbacks.main);

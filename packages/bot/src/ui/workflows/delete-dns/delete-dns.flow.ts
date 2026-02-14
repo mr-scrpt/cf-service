@@ -28,6 +28,9 @@ export function deleteDnsFlowFactory(gateway: DnsGatewayPort) {
 
         if (!record) {
             // Cancelled or no records
+            await ctx.reply('❌ Operation cancelled.', {
+                reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
+            });
             return;
         }
 
@@ -50,7 +53,9 @@ export function deleteDnsFlowFactory(gateway: DnsGatewayPort) {
                 await ctx.reply(`❌ <b>Error:</b> Failed to delete record.\n${error instanceof Error ? error.message : String(error)}`, { parse_mode: 'HTML' });
             }
         } else {
-            await ctx.reply('❌ Operation cancelled.');
+            await ctx.reply('❌ Operation cancelled.', {
+                reply_markup: new InlineKeyboard().text('🔙 Back to Menu', MenuCallbacks.dns)
+            });
         }
     };
 }

@@ -15,8 +15,19 @@ export class SelectZoneStep<TContext extends ZoneAwareContext> {
     async execute(conversation: Conversation<any>, ctx: Context, state: TContext): Promise<void> {
         const zones = await this.gateway.listDomains();
         await ctx.reply('Домен:', { reply_markup: buildZoneListKeyboard(zones) });
-        const zC = await conversation.waitForCallbackQuery(CallbackPattern.dnsZone());
-        const { payload } = CallbackSerializer.deserialize<DnsZonePayload>(zC.callbackQuery.data);
+
+        // Wait for either Zone Selection OR Cancel
+        const matcher = new RegExp(`^${CallbackPattern.dnsZone().source}|^${CallbackPattern.cancel().source}`);
+        const zC = await conversation.waitForCallbackQuery(matcher);
+
+        const data = zC.callbackQuery.data;
+
+        if (CallbackPattern.cancel().test(data)) {
+            await zC.answerCallbackQuery('Canceled');
+            return; // Exit without setting zoneId
+        }
+
+        const { payload } = CallbackSerializer.deserialize<DnsZonePayload>(data);
         state.setZoneId(payload.zoneId);
         await zC.answerCallbackQuery();
     }

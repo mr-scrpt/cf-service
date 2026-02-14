@@ -21,6 +21,10 @@ export const MENU_DEFINITIONS: Record<string, MenuDefinition> = {
         type: 'conversation',
         name: 'deleteDns'
     }),
+    [MenuCallbacks.edit]: () => ({
+        type: 'conversation',
+        name: 'editDns'
+    }),
     [MenuCallbacks.domain]: () => ({
         type: 'edit',
         text: `🏰 <b>Domain Management</b>\n\nManage your domains here. Select an action:`,
