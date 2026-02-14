@@ -1,8 +1,9 @@
 export enum CreateDnsStep {
     SELECT_ZONE = 'select_zone',
     SELECT_TYPE = 'select_type',
-    CREATE_MENU = 'create_menu',
+    INPUT_WIZARD = 'input_wizard',
     CREATE_FIELD = 'create_field',
+    CREATE_REVIEW = 'create_review',
     CREATE_RECORD = 'create_record'
 }
 

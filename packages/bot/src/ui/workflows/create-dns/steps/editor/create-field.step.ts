@@ -18,7 +18,7 @@ export class CreateFieldWorkflowStep implements WorkflowStep<CreateDnsWorkflowCo
         const fieldName = state.getActiveField();
         if (!fieldName) {
             // Should not happen if flow is correct
-            return new JumpToStepResult(CreateDnsStep.CREATE_MENU);
+            return new JumpToStepResult(CreateDnsStep.INPUT_WIZARD);
         }
 
         const fieldDef = FIELD_DEFINITIONS[fieldName as DnsFieldName];
@@ -36,8 +36,8 @@ export class CreateFieldWorkflowStep implements WorkflowStep<CreateDnsWorkflowCo
 
         await strategy.handle(conversation, ctx, state, fieldDef, currentVal);
 
-        // Helper to clear active field? Not strictly necessary if overwritten next time.
 
-        return new JumpToStepResult(CreateDnsStep.CREATE_MENU);
+        // Return to wizard to check for next field
+        return new JumpToStepResult(CreateDnsStep.INPUT_WIZARD);
     }
 }

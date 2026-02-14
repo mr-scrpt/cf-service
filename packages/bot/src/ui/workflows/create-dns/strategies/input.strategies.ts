@@ -31,10 +31,12 @@ export class TextInputStrategy implements InputStrategy {
         fieldDef: DnsFieldDefinition,
         currentValue: unknown
     ): Promise<void> {
-        await ctx.reply(
-            formatTextInputPrompt(fieldDef.label, currentValue),
-            { parse_mode: 'HTML' }
-        );
+        let msgText = formatTextInputPrompt(fieldDef.label, currentValue);
+        if (fieldDef.hint) {
+            msgText += `\n<i>${fieldDef.hint}</i>`;
+        }
+
+        await ctx.reply(msgText, { parse_mode: 'HTML' });
 
         const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
         const newValue = msg.message.text.trim();
@@ -65,12 +67,15 @@ export class NumberInputStrategy extends TextInputStrategy {
         fieldDef: DnsFieldDefinition,
         currentValue: unknown
     ): Promise<void> {
-        await ctx.reply(
-            formatNumberInputPrompt(fieldDef.label, currentValue),
-            { parse_mode: 'HTML' }
-        );
+        let msgText = formatNumberInputPrompt(fieldDef.label, currentValue);
+        if (fieldDef.hint) {
+            msgText += `\n<i>${fieldDef.hint}</i>`;
+        }
+
+        await ctx.reply(msgText, { parse_mode: 'HTML' });
 
         const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
+
         const rawValue = msg.message.text.trim();
         const num = parseFloat(rawValue);
 
@@ -104,7 +109,12 @@ export class SelectInputStrategy extends TextInputStrategy {
             Callback.dnsEditValueCancel()
         );
 
-        await ctx.reply(formatSelectInputPrompt(fieldDef.label, currentValue), { reply_markup: keyboard });
+        let msgText = formatSelectInputPrompt(fieldDef.label, currentValue);
+        if (fieldDef.hint) {
+            msgText += `\n<i>${fieldDef.hint}</i>`;
+        }
+
+        await ctx.reply(msgText, { reply_markup: keyboard, parse_mode: 'HTML' });
 
         const callback = await conversation.waitForCallbackQuery(CallbackPattern.dnsEditValue());
         await callback.answerCallbackQuery();
@@ -144,7 +154,12 @@ export class BooleanInputStrategy extends TextInputStrategy {
             cancelCallback: Callback.dnsEditBooleanCancel()
         });
 
-        await ctx.reply(formatBooleanInputPrompt(fieldDef.label), { reply_markup: keyboard });
+        let msgText = formatBooleanInputPrompt(fieldDef.label);
+        if (fieldDef.hint) {
+            msgText += `\n<i>${fieldDef.hint}</i>`;
+        }
+
+        await ctx.reply(msgText, { reply_markup: keyboard, parse_mode: 'HTML' });
 
         const callback = await conversation.waitForCallbackQuery(CallbackPattern.dnsEditBoolean());
         await callback.answerCallbackQuery();
