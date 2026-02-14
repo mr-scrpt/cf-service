@@ -63,3 +63,9 @@ export const ttlSchema = z
   .min(60, 'TTL must be at least 60 seconds')
   .max(86400, 'TTL cannot exceed 86400 seconds (1 day)')
   .default(3600);
+
+export const createDnsRecordSchema = z.discriminatedUnion('type', [
+  standardRecordSchema.omit({ id: true }),
+  mxRecordSchema.omit({ id: true }),
+  srvRecordSchema.omit({ id: true }),
+]);

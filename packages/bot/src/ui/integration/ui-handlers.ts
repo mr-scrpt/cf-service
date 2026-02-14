@@ -2,7 +2,7 @@ import type { Context } from 'grammy';
 import type { ConversationFlavor } from '@grammyjs/conversations';
 import { createConversation } from '@grammyjs/conversations';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { createDnsConversationFactory } from '../conversations/create-dns.conversation';
+import { createDnsWorkflowFactory } from '../workflows/create-dns/create-dns.workflow';
 import { registerDomainConversationFactory } from '../conversations/register-domain.conversation';
 import { deleteDnsFlowFactory } from '../workflows/delete-dns/delete-dns.flow';
 import { editDnsWorkflowFactory } from '../workflows/edit-dns/edit-dns.workflow';
@@ -76,7 +76,7 @@ export function registerConversations(
     gateway: DnsGatewayPort
 ) {
     // DNS creation conversation - передаём фабрику напрямую
-    const createDnsConv = createDnsConversationFactory(gateway);
+    const createDnsConv = createDnsWorkflowFactory(gateway);
     bot.use(createConversation(createDnsConv, 'createDns'));
 
     // Domain registration conversation
