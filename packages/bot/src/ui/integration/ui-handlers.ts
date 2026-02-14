@@ -5,7 +5,7 @@ import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { createDnsConversationFactory } from '../conversations/create-dns.conversation';
 import { registerDomainConversationFactory } from '../conversations/register-domain.conversation';
 import { deleteDnsFlowFactory } from '../workflows/delete-dns/delete-dns.flow';
-import { editDnsFlowFactory } from '../workflows/edit-dns/edit-dns.flow';
+import { editDnsWorkflowFactory } from '../workflows/edit-dns/edit-dns.workflow';
 import { Callback } from '../callbacks/callback-data';
 import { InlineKeyboard } from 'grammy';
 
@@ -88,6 +88,6 @@ export function registerConversations(
     bot.use(createConversation(deleteDnsConv, 'deleteDns'));
 
     // Edit DNS conversation
-    const editDnsConv = editDnsFlowFactory(gateway);
+    const editDnsConv = editDnsWorkflowFactory(gateway);
     bot.use(createConversation(editDnsConv, 'editDns'));
 }
