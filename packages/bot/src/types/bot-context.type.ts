@@ -33,6 +33,12 @@ export interface SessionData {
   selectedZoneName?: string;
   tempRecords?: DnsRecord[];
   currentPage?: number;
+  editField?: {
+    recordIndex: number;
+    fieldKey: string;
+    fieldConfig: unknown;
+  };
+  selectedZone?: { zoneId: string; zoneName: string };
 }
 
 export type BotContext = Context & SessionFlavor<SessionData> & ConversationFlavor<Context>;

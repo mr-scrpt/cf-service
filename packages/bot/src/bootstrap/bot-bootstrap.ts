@@ -5,8 +5,8 @@ import { SessionManager } from '../session';
 import { WizardEngine, WizardValidator, WizardRenderer } from '../wizard';
 import { PaginationComponent, KeyboardBuilder } from '../ui/components';
 import { DnsRecordFormatter } from '../ui/formatters';
-import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, MainMenu, DnsMenu } from '../flows';
-import { CallbackRouter } from '../routing';
+import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, EditDnsFlow, MainMenu, DnsMenu } from '../flows';
+import { CallbackRouter, TextInputRouter } from '../routing';
 import { CallbackAction, BotEvent } from '../constants';
 import {
   DnsManagementHandler,
@@ -16,6 +16,9 @@ import {
   PageNavigationHandler,
   DnsDeleteSelectHandler,
   DnsDeleteConfirmHandler,
+  DnsEditSelectHandler,
+  DnsEditRecordHandler,
+  DnsEditFieldHandler,
   WizardSelectOptionHandler,
   WizardSkipHandler,
   WizardConfirmHandler,
@@ -41,10 +44,12 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
   const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenu);
   const listFlow = new ListDnsFlow(gateway, formatter, pagination);
   const deleteFlow = new DeleteDnsFlow(gateway, formatter, mainMenu);
+  const editFlow = new EditDnsFlow(gateway, formatter, mainMenu, strategyRegistry);
 
-  const router = new CallbackRouter();
+  const callbackRouter = new CallbackRouter();
+  const textInputRouter = new TextInputRouter(wizardEngine, editFlow);
 
-  router.registerAll([
+  callbackRouter.registerAll([
     { action: CallbackAction.DNS_MANAGEMENT, handler: new DnsManagementHandler(dnsMenu) },
     {
       action: CallbackAction.DNS_CREATE_SELECT_TYPE,
@@ -59,6 +64,9 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
       action: CallbackAction.DNS_DELETE_CONFIRM,
       handler: new DnsDeleteConfirmHandler(deleteFlow),
     },
+    { action: CallbackAction.DNS_EDIT_SELECT_DOMAIN, handler: new DnsEditSelectHandler(editFlow) },
+    { action: CallbackAction.DNS_EDIT_SELECT_RECORD, handler: new DnsEditRecordHandler(editFlow) },
+    { action: CallbackAction.DNS_EDIT_FIELD, handler: new DnsEditFieldHandler(editFlow) },
     {
       action: CallbackAction.WIZARD_SELECT_OPTION,
       handler: new WizardSelectOptionHandler(wizardEngine),
@@ -71,17 +79,15 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
   ]);
 
   bot.on(BotEvent.CALLBACK_QUERY, async (ctx) => {
-    await router.route(ctx);
+    await callbackRouter.route(ctx);
   });
 
   bot.on(BotEvent.MESSAGE_TEXT, async (ctx, next) => {
-    const isWizardActive = await wizardEngine.isActive(ctx);
-    if (isWizardActive) {
-      await wizardEngine.handleTextInput(ctx, ctx.message.text);
-    } else {
+    const handled = await textInputRouter.route(ctx, ctx.message.text);
+    if (!handled) {
       await next();
     }
   });
 
-  return { strategyRegistry, wizardEngine, createFlow, listFlow, deleteFlow, router };
+  return { strategyRegistry, wizardEngine, createFlow, listFlow, deleteFlow, editFlow, callbackRouter, textInputRouter };
 }

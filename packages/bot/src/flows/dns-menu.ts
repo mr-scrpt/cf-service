@@ -19,6 +19,7 @@ export class DnsMenu {
   private buildDnsMenuKeyboard(): KeyboardBuilder {
     return new KeyboardBuilder()
       .addButton('➕ Create DNS Record', CallbackAction.DNS_CREATE_SELECT_TYPE)
+      .addButton('✏️ Edit DNS Record', CallbackAction.DNS_EDIT_SELECT_DOMAIN)
       .addButton('📋 List DNS Records', CallbackAction.DNS_LIST_DOMAIN)
       .addButton('🗑 Delete DNS Record', CallbackAction.DNS_DELETE_SELECT)
       .addNavigation({ back: true });
@@ -29,7 +30,8 @@ export class DnsMenu {
 
 Manage your DNS records:
 • Create new DNS records
-• View existing records
+• Edit existing records
+• View all records
 • Delete records
 
 Select an action:`;

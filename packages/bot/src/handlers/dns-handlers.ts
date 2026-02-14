@@ -1,5 +1,5 @@
 import { CallbackHandler, SessionContext } from '../routing';
-import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow, MainMenu, DnsMenu } from '../flows';
+import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow, EditDnsFlow, MainMenu, DnsMenu } from '../flows';
 import { WizardEngine } from '../wizard';
 import { FlowStep } from '../constants';
 import {
@@ -12,6 +12,7 @@ import {
   DeleteRecordConfirmPayload,
   WizardOptionPayload,
 } from './handler-payloads';
+import { EditDomainIndexPayload, EditRecordSelectPayload, EditFieldPayload } from './edit-handler-payloads';
 import { SessionValidator } from './session-validators';
 import { DeleteHandlerStrategy } from './delete-handler-strategy';
 
@@ -145,5 +146,33 @@ export class NavigationBackHandler implements CallbackHandler<unknown> {
 
   async handle(ctx: SessionContext): Promise<void> {
     await this.mainMenu.show(ctx);
+  }
+}
+
+export class DnsEditSelectHandler implements CallbackHandler<EditDomainIndexPayload> {
+  constructor(private readonly editFlow: EditDnsFlow) {}
+
+  async handle(ctx: SessionContext, payload: EditDomainIndexPayload): Promise<void> {
+    await this.editFlow.showDomainSelector(ctx);
+  }
+}
+
+export class DnsEditRecordHandler implements CallbackHandler<EditRecordSelectPayload> {
+  constructor(private readonly editFlow: EditDnsFlow) {}
+
+  async handle(ctx: SessionContext, payload: EditRecordSelectPayload): Promise<void> {
+    await this.editFlow.showRecords(ctx, payload.idx);
+  }
+}
+
+export class DnsEditFieldHandler implements CallbackHandler<EditFieldPayload> {
+  constructor(private readonly editFlow: EditDnsFlow) {}
+
+  async handle(ctx: SessionContext, payload: EditFieldPayload): Promise<void> {
+    if (payload.field) {
+      await this.editFlow.editField(ctx, payload.idx, payload.field);
+    } else {
+      await this.editFlow.showFieldSelector(ctx, payload.idx);
+    }
   }
 }
