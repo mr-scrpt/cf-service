@@ -4,6 +4,7 @@ import { createConversation } from '@grammyjs/conversations';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { createDnsConversationFactory } from '../conversations/create-dns.conversation';
 import { registerDomainConversationFactory } from '../conversations/register-domain.conversation';
+import { deleteDnsFlowFactory } from '../workflows/delete-dns/delete-dns.flow';
 import { Callback } from '../callbacks/callback-data';
 import { InlineKeyboard } from 'grammy';
 
@@ -80,5 +81,8 @@ export function registerConversations(
     // Domain registration conversation
     const registerDomainConv = registerDomainConversationFactory(gateway);
     bot.use(createConversation(registerDomainConv, 'registerDomain'));
-}
 
+    // Delete DNS conversation
+    const deleteDnsConv = deleteDnsFlowFactory(gateway);
+    bot.use(createConversation(deleteDnsConv, 'deleteDns'));
+}

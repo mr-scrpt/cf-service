@@ -3,7 +3,7 @@ import {
     DnsGatewayPort,
     ValidationError,
 } from '@cloudflare-bot/shared';
-import { formatDnsRecordCreated } from '../../../commands/dns/dns-messages.template';
+import { formatDnsRecordCreated } from '../../common/templates/dns.templates';
 import { ErrorMapper } from '../../../core/errors/error-mapper';
 import { logger } from '../../../utils/logger';
 import { CreateDnsContext } from './create-dns.context';

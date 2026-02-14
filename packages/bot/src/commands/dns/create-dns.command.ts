@@ -6,7 +6,7 @@ import {
 } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
 import { ErrorMapper } from '../../core/errors/error-mapper';
-import { DnsCommandUsage, formatDnsRecordCreated } from './dns-messages.template';
+import { DnsCommandUsage, formatDnsRecordCreated } from '../../ui/common/templates/dns.templates';
 
 export class CreateDnsCommand implements BotCommand {
   readonly name = 'dns_create';

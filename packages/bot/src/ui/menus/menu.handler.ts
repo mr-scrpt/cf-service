@@ -1,51 +1,26 @@
-import { Context, InlineKeyboard } from 'grammy';
+import { Context } from 'grammy';
 import { ConversationFlavor } from '@grammyjs/conversations';
-import { MenuCallbacks, buildDnsMenuKeyboard, buildMainMenuKeyboard } from './main.menu';
+import { MENU_DEFINITIONS } from './menu.definitions';
+import { MenuResult } from './menu.types';
+import { logger } from '../../utils/logger';
 
 type MyContext = Context & ConversationFlavor<Context>;
-
-// Discriminated union for declarative actions
-type MenuResult =
-    | { type: 'edit'; text: string; keyboard: InlineKeyboard }
-    | { type: 'conversation'; name: string }
-    | { type: 'noop'; message?: string };
 
 export class MenuHandler {
     async handle(ctx: MyContext): Promise<void> {
         if (!ctx.callbackQuery || !ctx.callbackQuery.data) return;
 
         const data = ctx.callbackQuery.data;
+        const handler = MENU_DEFINITIONS[data];
 
-        // Declarative Routing Map
-        const routeMap: Record<string, () => MenuResult> = {
-            [MenuCallbacks.main]: () => ({
-                type: 'edit',
-                text: `👋 <b>Welcome to CoolCinema Bot!</b>\n\nI can help you manage your DNS records and Domains easily.\nSelect an option below to get started:`,
-                keyboard: buildMainMenuKeyboard()
-            }),
-            [MenuCallbacks.dns]: () => ({
-                type: 'edit',
-                text: `🌐 <b>DNS Management</b>\n\nManage your DNS records here. Select an action:`,
-                keyboard: buildDnsMenuKeyboard()
-            }),
-            [MenuCallbacks.createDns]: () => ({
-                type: 'conversation',
-                name: 'createDns'
-            }),
-            [MenuCallbacks.domain]: () => ({
-                type: 'edit',
-                text: `🏰 <b>Domain Management</b>\n\nManage your domains here. Select an action:`,
-                keyboard: new InlineKeyboard().text('Coming Soon', 'noop').row().text('🔙 Back', MenuCallbacks.main)
-            }),
-        };
-
-        const handler = routeMap[data];
-        if (handler) {
-            const result = handler();
-            await this.executeResult(ctx, result);
-        } else if (data === 'noop') {
-            await ctx.answerCallbackQuery('Coming soon!');
+        if (!handler) {
+            logger.warn(`Unknown menu callback received: ${data}`);
+            try { await ctx.answerCallbackQuery('Unknown action or button expired'); } catch { }
+            return;
         }
+
+        const result = handler();
+        await this.executeResult(ctx, result);
     }
 
     private async executeResult(ctx: MyContext, result: MenuResult): Promise<void> {

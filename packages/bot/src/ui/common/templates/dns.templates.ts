@@ -46,8 +46,31 @@ export function formatDnsRecordsList(records: DnsRecord[]): string {
     return `📋 <b>DNS Records</b>\n\n${formatted}`;
 }
 
-export function formatDnsRecordDeleted(recordId: string): string {
-    return `✅ <b>DNS record deleted successfully!</b>\n\n` + `🆔 Record ID: <code>${recordId}</code>`;
+export function formatDnsRecordDeleted(record: DnsRecord): string {
+    return (
+        `✅ <b>DNS record deleted successfully!</b>\n\n` +
+        `🆔 <b>Record ID:</b> <code>${record.id}</code>\n` +
+        `📝 <b>Type:</b> ${record.type}\n` +
+        `🏷 <b>Name:</b> ${record.name}`
+    );
+}
+
+export function formatConfirmDeleteDnsRecord(record: DnsRecord): string {
+    // Handle different record types (SRV has 'data', others have 'content')
+    const contentDisplay =
+        'content' in record
+            ? record.content
+            : `${record.data.priority} ${record.data.weight} ${record.data.port} ${record.data.target}`;
+
+    return (
+        `⚠️ <b>Are you sure you want to delete this record?</b>\n\n` +
+        `🔹 <b>Type:</b> ${record.type}\n` +
+        `🔹 <b>Name:</b> ${record.name}\n` +
+        `🔹 <b>Content:</b> ${contentDisplay}\n` +
+        `🔹 <b>TTL:</b> ${record.ttl === 1 ? 'Auto' : record.ttl}\n` +
+        `🔹 <b>Proxied:</b> ${record.proxied ? '✅ Yes' : '❌ No'}\n\n` +
+        `<i>This action cannot be undone.</i>`
+    );
 }
 
 export const DnsCommandUsage = {
