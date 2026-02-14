@@ -1,10 +1,21 @@
 import { Context } from 'grammy';
 import { InlineKeyboardMarkup, InlineKeyboardButton } from 'grammy/types';
 import { WizardStep, WizardState, WizardConfig } from './wizard.interfaces';
-import { FieldInputType } from '../strategies/field-config.interface';
-import { CallbackAction } from '../constants';
+import { CommonButtons } from '../ui/components/common-buttons';
+import {
+  WizardButtonBuilder,
+  SelectButtonBuilder,
+  BooleanButtonBuilder,
+  SkipButtonBuilder,
+} from './button-builders';
 
 export class WizardRenderer {
+  private readonly buttonBuilders: WizardButtonBuilder[] = [
+    new SelectButtonBuilder(),
+    new BooleanButtonBuilder(),
+    new SkipButtonBuilder(),
+  ];
+
   async render(
     ctx: Context,
     step: WizardStep,
@@ -43,61 +54,13 @@ export class WizardRenderer {
   }
 
   private buildKeyboard(step: WizardStep): InlineKeyboardMarkup | undefined {
-    const buttons: InlineKeyboardButton[][] = [];
+    const buttons = this.buttonBuilders
+      .filter((builder) => builder.canBuild(step))
+      .flatMap((builder) => builder.build(step));
 
-    if (
-      step.fieldConfig.inputType === FieldInputType.SELECT &&
-      step.fieldConfig.options
-    ) {
-      step.fieldConfig.options.forEach((option) => {
-        buttons.push([
-          {
-            text: option.label,
-            callback_data: this.serializeCallback(
-              CallbackAction.WIZARD_SELECT_OPTION,
-              { value: option.value }
-            ),
-          },
-        ]);
-      });
-    }
+    buttons.push([CommonButtons.cancel()]);
 
-    if (step.fieldConfig.inputType === FieldInputType.BOOLEAN) {
-      buttons.push([
-        {
-          text: '✅ Yes',
-          callback_data: this.serializeCallback(
-            CallbackAction.WIZARD_SELECT_OPTION,
-            { value: true }
-          ),
-        },
-        {
-          text: '❌ No',
-          callback_data: this.serializeCallback(
-            CallbackAction.WIZARD_SELECT_OPTION,
-            { value: false }
-          ),
-        },
-      ]);
-    }
-
-    if (!step.fieldConfig.required) {
-      buttons.push([
-        {
-          text: '⏭ Skip',
-          callback_data: CallbackAction.WIZARD_SKIP,
-        },
-      ]);
-    }
-
-    buttons.push([
-      {
-        text: '❌ Cancel',
-        callback_data: CallbackAction.NAV_CANCEL,
-      },
-    ]);
-
-    return buttons.length > 0 ? { inline_keyboard: buttons } : undefined;
+    return { inline_keyboard: buttons };
   }
 
   async renderConfirmation(
@@ -123,7 +86,8 @@ export class WizardRenderer {
       message += `<b>${step.fieldConfig.label}:</b> <code>${displayValue}</code>\n`;
     });
 
-    message += '\n⚠️ Создать DNS запись с этими данными?';
+    const prompt = config.confirmationPrompt || '⚠️ Подтвердить создание?';
+    message += `\n${prompt}`;
 
     return message;
   }
@@ -140,25 +104,8 @@ export class WizardRenderer {
 
   private buildConfirmationKeyboard(): InlineKeyboardMarkup {
     return {
-      inline_keyboard: [
-        [
-          {
-            text: '✅ Создать',
-            callback_data: CallbackAction.WIZARD_CONFIRM,
-          },
-        ],
-        [
-          {
-            text: '❌ Отменить',
-            callback_data: CallbackAction.NAV_CANCEL,
-          },
-        ],
-      ],
+      inline_keyboard: [[CommonButtons.confirm()], [CommonButtons.cancel()]],
     };
   }
 
-  private serializeCallback(action: CallbackAction, payload?: unknown): string {
-    if (!payload) return action;
-    return `${action}:${JSON.stringify(payload)}`;
-  }
 }

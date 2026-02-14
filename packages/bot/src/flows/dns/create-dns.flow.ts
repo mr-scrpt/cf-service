@@ -97,6 +97,7 @@ Select record type:
         fieldConfig,
       })),
       metadata: { zoneId, zoneName, type },
+      confirmationPrompt: '⚠️ Создать DNS запись с этими данными?',
       onComplete: async (ctx: Context, fields: Record<string, unknown>) => {
         try {
           const input = strategy.toCreateInput({ zoneId, fields });

@@ -15,6 +15,7 @@ export interface WizardState {
 export interface WizardConfig {
   steps: WizardStep[];
   metadata: Record<string, unknown>;
+  confirmationPrompt?: string;
   onComplete: (ctx: Context, fields: Record<string, unknown>) => Promise<void>;
   onCancel?: (ctx: Context) => Promise<void>;
 }
