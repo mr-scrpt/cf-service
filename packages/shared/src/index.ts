@@ -41,9 +41,22 @@ export {
 // Foundation — Logging utilities
 export { createLoggingProxy } from './foundation/logging/logging-proxy';
 
+// Domain
+export * from './domain';
+
+// Re-export primitive schemas for external use
+export { zoneIdSchema } from './domain/domain.schema';
+export { dnsRecordNameSchema, dnsRecordContentSchema, ttlSchema } from './domain/dns-record.schema';
+
 // Errors
 export * from './errors';
 
 // Adapters
 export { CloudflareGatewayAdapter } from './infrastructure';
 
+export {
+  TTL_VALUES,
+  PROXIABLE_TYPES,
+  isProxiable,
+  type ProxiableRecordType,
+} from './domain/constants.domain';

@@ -46,3 +46,20 @@ export const dnsRecordSchema = z.discriminatedUnion('type', [
   mxRecordSchema,
   srvRecordSchema,
 ]);
+
+export const dnsRecordNameSchema = z
+  .string()
+  .min(1, 'Record name cannot be empty')
+  .max(255, 'Record name too long');
+
+export const dnsRecordContentSchema = z
+  .string()
+  .min(1, 'Content cannot be empty')
+  .max(512, 'Content too long');
+
+export const ttlSchema = z
+  .number()
+  .int('TTL must be an integer')
+  .min(60, 'TTL must be at least 60 seconds')
+  .max(86400, 'TTL cannot exceed 86400 seconds (1 day)')
+  .default(3600);

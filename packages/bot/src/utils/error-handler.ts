@@ -9,7 +9,7 @@ import { logger } from './logger';
  * Global error handler for Grammy bot
  * Catches all unhandled errors and provides consistent logging and user feedback
  */
-export function setupErrorHandler(bot: Bot<Context>) {
+export function setupErrorHandler<C extends Context>(bot: Bot<C>) {
   bot.catch((err) => {
     const ctx = err.ctx;
     const error = err.error;

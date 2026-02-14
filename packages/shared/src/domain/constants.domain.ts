@@ -32,3 +32,31 @@ export const ZoneType = {
 } as const;
 
 export type ZoneType = (typeof ZoneType)[keyof typeof ZoneType];
+
+export const TTL_VALUES = {
+  MIN: 60,
+  MAX: 86400,
+  AUTO: 1,
+} as const;
+
+/**
+ * Proxiable DNS record types
+ * Source of truth: DnsRecordType
+ */
+export const PROXIABLE_TYPES = [
+  DnsRecordType.A,
+  DnsRecordType.AAAA,
+  DnsRecordType.CNAME,
+] as const;
+
+/**
+ * Type automatically derived from PROXIABLE_TYPES
+ */
+export type ProxiableRecordType = typeof PROXIABLE_TYPES[number];
+
+/**
+ * Type guard for proxiable record types
+ */
+export function isProxiable(type: DnsRecordType): type is ProxiableRecordType {
+  return (PROXIABLE_TYPES as readonly DnsRecordType[]).includes(type);
+}
