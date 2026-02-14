@@ -28,7 +28,7 @@ export interface DeleteRecordSelectPayload {
 }
 
 export interface DeleteRecordConfirmPayload {
-  recordId: string;
+  idx: number;
 }
 
 export interface WizardOptionPayload {

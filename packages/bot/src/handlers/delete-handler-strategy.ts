@@ -42,7 +42,7 @@ class ConfirmStepHandler implements DeleteStepHandler {
       return;
     }
 
-    await this.deleteFlow.showConfirmation(ctx, record.id, record.name, record.type);
+    await this.deleteFlow.showConfirmation(ctx, payload.idx, record.name, record.type);
   }
 }
 

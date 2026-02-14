@@ -14,7 +14,7 @@ export class DnsRecordFormatter {
 
   formatListItem(record: DnsRecord, index: number): string {
     const strategy = this.strategyRegistry.getStrategy(record.type);
-    return `${index + 1}. ${strategy.icon} <b>${record.name}</b> (${record.type})`;
+    return `${index + 1}. ${strategy.icon} ${record.name} (${record.type})`;
   }
 
   formatDetails(record: DnsRecord): string {

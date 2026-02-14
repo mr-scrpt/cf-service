@@ -5,7 +5,7 @@ import { SessionManager } from '../session';
 import { WizardEngine, WizardValidator, WizardRenderer } from '../wizard';
 import { PaginationComponent, KeyboardBuilder } from '../ui/components';
 import { DnsRecordFormatter } from '../ui/formatters';
-import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow } from '../flows';
+import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, MainMenuFlow } from '../flows';
 import { CallbackRouter } from '../routing';
 import { CallbackAction, BotEvent } from '../constants';
 import {
@@ -20,6 +20,7 @@ import {
   WizardSkipHandler,
   WizardConfirmHandler,
   NavigationCancelHandler,
+  NavigationMainMenuHandler,
 } from '../handlers';
 import { SessionData } from '../types';
 
@@ -34,9 +35,10 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
   const pagination = new PaginationComponent();
   const formatter = new DnsRecordFormatter(strategyRegistry);
 
-  const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter);
+  const mainMenuFlow = new MainMenuFlow();
+  const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenuFlow);
   const listFlow = new ListDnsFlow(gateway, formatter, pagination);
-  const deleteFlow = new DeleteDnsFlow(gateway, formatter);
+  const deleteFlow = new DeleteDnsFlow(gateway, formatter, mainMenuFlow);
 
   const router = new CallbackRouter();
 
@@ -62,6 +64,7 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
     { action: CallbackAction.WIZARD_SKIP, handler: new WizardSkipHandler(wizardEngine) },
     { action: CallbackAction.WIZARD_CONFIRM, handler: new WizardConfirmHandler(wizardEngine) },
     { action: CallbackAction.NAV_CANCEL, handler: new NavigationCancelHandler(wizardEngine) },
+    { action: CallbackAction.NAV_MAIN_MENU, handler: new NavigationMainMenuHandler(mainMenuFlow) },
   ]);
 
   bot.on(BotEvent.CALLBACK_QUERY, async (ctx) => {

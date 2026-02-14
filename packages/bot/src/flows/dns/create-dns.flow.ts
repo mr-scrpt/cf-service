@@ -6,6 +6,7 @@ import { KeyboardBuilder } from '../../ui/components';
 import { CallbackAction } from '../../constants';
 import { DnsRecordFormatter } from '../../ui/formatters';
 import { SessionData } from '../../types';
+import { MainMenuFlow } from '../main-menu.flow';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -14,7 +15,8 @@ export class CreateDnsFlow {
     private readonly gateway: DnsGatewayPort,
     private readonly strategyRegistry: DnsStrategyRegistry,
     private readonly wizardEngine: WizardEngine,
-    private readonly formatter: DnsRecordFormatter
+    private readonly formatter: DnsRecordFormatter,
+    private readonly mainMenuFlow: MainMenuFlow
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -104,11 +106,7 @@ Select record type:
           const record = await this.gateway.createDnsRecord(input);
 
           const successMessage = this.formatter.formatCreatedMessage(record);
-          
-          const keyboard = new KeyboardBuilder()
-            .addButton('🌐 DNS Management', CallbackAction.DNS_MANAGEMENT)
-            .addButton('📋 List DNS Records', CallbackAction.DNS_LIST_DOMAIN)
-            .addButton('🗑 Delete DNS Record', CallbackAction.DNS_DELETE_SELECT);
+          const keyboard = this.mainMenuFlow.getMainMenuKeyboard();
 
           await ctx.reply(successMessage, {
             parse_mode: 'HTML',

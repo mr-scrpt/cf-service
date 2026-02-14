@@ -1,5 +1,5 @@
 import { CallbackHandler, SessionContext } from '../routing';
-import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow } from '../flows';
+import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow, MainMenuFlow } from '../flows';
 import { WizardEngine } from '../wizard';
 import { FlowStep } from '../constants';
 import {
@@ -55,7 +55,12 @@ export class DnsSelectTypeHandler implements CallbackHandler<TypeSelectionPayloa
 export class DnsListDomainHandler implements CallbackHandler<DomainIndexPayload> {
   constructor(private readonly listFlow: ListDnsFlow) {}
 
-  async handle(ctx: SessionContext, payload: DomainIndexPayload): Promise<void> {
+  async handle(ctx: SessionContext, payload?: DomainIndexPayload): Promise<void> {
+    if (!payload || payload.idx === undefined) {
+      await this.listFlow.showDomainSelector(ctx);
+      return;
+    }
+
     const domain = SessionValidator.getDomainByIndex(ctx, payload.idx);
     if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
@@ -78,11 +83,16 @@ export class PageNavigationHandler implements CallbackHandler<PaginationPayload>
 export class DnsDeleteSelectHandler implements CallbackHandler<DeleteRecordSelectPayload> {
   private readonly strategy: DeleteHandlerStrategy;
 
-  constructor(deleteFlow: DeleteDnsFlow) {
+  constructor(private readonly deleteFlow: DeleteDnsFlow) {
     this.strategy = new DeleteHandlerStrategy(deleteFlow);
   }
 
-  async handle(ctx: SessionContext, payload: DeleteRecordSelectPayload): Promise<void> {
+  async handle(ctx: SessionContext, payload?: DeleteRecordSelectPayload): Promise<void> {
+    if (!payload || !payload.step) {
+      await this.deleteFlow.showDomainSelector(ctx);
+      return;
+    }
+
     await this.strategy.handle(ctx, payload.step, { idx: payload.idx });
   }
 }
@@ -91,7 +101,7 @@ export class DnsDeleteConfirmHandler implements CallbackHandler<DeleteRecordConf
   constructor(private readonly deleteFlow: DeleteDnsFlow) {}
 
   async handle(ctx: SessionContext, payload: DeleteRecordConfirmPayload): Promise<void> {
-    await this.deleteFlow.deleteRecord(ctx, payload.recordId);
+    await this.deleteFlow.deleteRecord(ctx, payload.idx);
   }
 }
 
@@ -111,15 +121,21 @@ export class WizardSkipHandler implements CallbackHandler<void> {
   }
 }
 
-export class NavigationCancelHandler implements CallbackHandler<void> {
+export class NavigationCancelHandler implements CallbackHandler<unknown> {
   constructor(private readonly wizardEngine: WizardEngine) {}
 
   async handle(ctx: SessionContext): Promise<void> {
-    const isWizardActive = await this.wizardEngine.isActive(ctx);
-    const cancelAction = isWizardActive
-      ? () => this.wizardEngine.cancel(ctx)
-      : () => ctx.editMessageText('❌ Operation cancelled');
-    
-    await cancelAction();
+    const isActive = await this.wizardEngine.isActive(ctx);
+    if (isActive) {
+      await this.wizardEngine.cancel(ctx);
+    }
+  }
+}
+
+export class NavigationMainMenuHandler implements CallbackHandler<unknown> {
+  constructor(private readonly mainMenuFlow: MainMenuFlow) {}
+
+  async handle(ctx: SessionContext): Promise<void> {
+    await this.mainMenuFlow.show(ctx);
   }
 }
