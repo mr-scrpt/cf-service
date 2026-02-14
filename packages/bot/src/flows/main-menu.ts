@@ -5,7 +5,7 @@ import { SessionData } from '../types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
-export class MainMenuFlow {
+export class MainMenu {
   async show(ctx: SessionContext): Promise<void> {
     const keyboard = this.buildMainMenuKeyboard();
     const message = this.formatMainMenuMessage();
@@ -23,14 +23,13 @@ export class MainMenuFlow {
   private buildMainMenuKeyboard(): KeyboardBuilder {
     return new KeyboardBuilder()
       .addButton('🌐 DNS Management', CallbackAction.DNS_MANAGEMENT)
-      .addButton('📋 List DNS Records', CallbackAction.DNS_LIST_DOMAIN)
-      .addButton('🗑 Delete DNS Record', CallbackAction.DNS_DELETE_SELECT);
+      .addButton('🏢 Domain Management', CallbackAction.DOMAIN_MANAGEMENT);
   }
 
   private formatMainMenuMessage(): string {
     return `👋 <b>Welcome to Cloudflare Management Bot!</b>
 
-I can help you manage your DNS records and Domains easily.
-Select an option below to get started:`;
+I can help you manage your Cloudflare resources.
+Select a section:`;
   }
 }

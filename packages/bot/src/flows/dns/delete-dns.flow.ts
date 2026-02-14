@@ -5,7 +5,7 @@ import { DnsRecordFormatter } from '../../ui/formatters';
 import { CallbackAction, FlowStep } from '../../constants';
 import { SessionData } from '../../types';
 import { SessionValidator } from '../../handlers/session-validators';
-import { MainMenuFlow } from '../main-menu.flow';
+import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -13,7 +13,7 @@ export class DeleteDnsFlow {
   constructor(
     private readonly gateway: DnsGatewayPort,
     private readonly formatter: DnsRecordFormatter,
-    private readonly mainMenuFlow: MainMenuFlow
+    private readonly mainMenu: MainMenu
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -150,7 +150,7 @@ Are you sure you want to delete this record?
     await this.gateway.deleteDnsRecord(record.id, zone.zoneId);
 
     const successMessage = this.formatter.formatDeletedMessage(record.name, record.type);
-    const keyboard = this.mainMenuFlow.getMainMenuKeyboard();
+    const keyboard = this.mainMenu.getMainMenuKeyboard();
 
     await ctx.editMessageText(successMessage, {
       parse_mode: 'HTML',

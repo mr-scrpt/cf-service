@@ -5,7 +5,7 @@ import { SessionManager } from '../session';
 import { WizardEngine, WizardValidator, WizardRenderer } from '../wizard';
 import { PaginationComponent, KeyboardBuilder } from '../ui/components';
 import { DnsRecordFormatter } from '../ui/formatters';
-import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, MainMenuFlow } from '../flows';
+import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, MainMenu, DnsMenu } from '../flows';
 import { CallbackRouter } from '../routing';
 import { CallbackAction, BotEvent } from '../constants';
 import {
@@ -36,15 +36,16 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
   const pagination = new PaginationComponent();
   const formatter = new DnsRecordFormatter(strategyRegistry);
 
-  const mainMenuFlow = new MainMenuFlow();
-  const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenuFlow);
+  const mainMenu = new MainMenu();
+  const dnsMenu = new DnsMenu();
+  const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenu);
   const listFlow = new ListDnsFlow(gateway, formatter, pagination);
-  const deleteFlow = new DeleteDnsFlow(gateway, formatter, mainMenuFlow);
+  const deleteFlow = new DeleteDnsFlow(gateway, formatter, mainMenu);
 
   const router = new CallbackRouter();
 
   router.registerAll([
-    { action: CallbackAction.DNS_MANAGEMENT, handler: new DnsManagementHandler(createFlow) },
+    { action: CallbackAction.DNS_MANAGEMENT, handler: new DnsManagementHandler(dnsMenu) },
     {
       action: CallbackAction.DNS_CREATE_SELECT_TYPE,
       handler: new DnsCreateSelectTypeHandler(createFlow),
@@ -65,8 +66,8 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
     { action: CallbackAction.WIZARD_SKIP, handler: new WizardSkipHandler(wizardEngine) },
     { action: CallbackAction.WIZARD_CONFIRM, handler: new WizardConfirmHandler(wizardEngine) },
     { action: CallbackAction.NAV_CANCEL, handler: new NavigationCancelHandler(wizardEngine) },
-    { action: CallbackAction.NAV_BACK, handler: new NavigationBackHandler(mainMenuFlow) },
-    { action: CallbackAction.NAV_MAIN_MENU, handler: new NavigationMainMenuHandler(mainMenuFlow) },
+    { action: CallbackAction.NAV_BACK, handler: new NavigationBackHandler(mainMenu) },
+    { action: CallbackAction.NAV_MAIN_MENU, handler: new NavigationMainMenuHandler(mainMenu) },
   ]);
 
   bot.on(BotEvent.CALLBACK_QUERY, async (ctx) => {

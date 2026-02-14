@@ -17,13 +17,12 @@ export class StartCommand implements BotCommand {
         const welcomeText =
             `👋 <b>Welcome to Cloudflare Management Bot!</b>
 
-I can help you manage your DNS records and Domains easily.
-Select an option below to get started:`;
+I can help you manage your Cloudflare resources.
+Select a section:`;
 
         const keyboard = new KeyboardBuilder()
             .addButton('🌐 DNS Management', CallbackAction.DNS_MANAGEMENT)
-            .addButton('📋 List DNS Records', CallbackAction.DNS_LIST_DOMAIN)
-            .addButton('🗑 Delete DNS Record', CallbackAction.DNS_DELETE_SELECT);
+            .addButton('🏢 Domain Management', CallbackAction.DOMAIN_MANAGEMENT);
 
         await ctx.reply(welcomeText, {
             parse_mode: 'HTML',

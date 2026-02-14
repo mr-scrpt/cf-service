@@ -1,5 +1,5 @@
 import { CallbackHandler, SessionContext } from '../routing';
-import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow, MainMenuFlow } from '../flows';
+import { CreateDnsFlow, ListDnsFlow, DeleteDnsFlow, MainMenu, DnsMenu } from '../flows';
 import { WizardEngine } from '../wizard';
 import { FlowStep } from '../constants';
 import {
@@ -16,10 +16,10 @@ import { SessionValidator } from './session-validators';
 import { DeleteHandlerStrategy } from './delete-handler-strategy';
 
 export class DnsManagementHandler implements CallbackHandler<void> {
-  constructor(private readonly createFlow: CreateDnsFlow) {}
+  constructor(private readonly dnsMenu: DnsMenu) {}
 
   async handle(ctx: SessionContext): Promise<void> {
-    await this.createFlow.showDomainSelector(ctx);
+    await this.dnsMenu.showMenu(ctx);
   }
 }
 
@@ -133,17 +133,17 @@ export class NavigationCancelHandler implements CallbackHandler<unknown> {
 }
 
 export class NavigationMainMenuHandler implements CallbackHandler<unknown> {
-  constructor(private readonly mainMenuFlow: MainMenuFlow) {}
+  constructor(private readonly mainMenu: MainMenu) {}
 
   async handle(ctx: SessionContext): Promise<void> {
-    await this.mainMenuFlow.show(ctx);
+    await this.mainMenu.show(ctx);
   }
 }
 
 export class NavigationBackHandler implements CallbackHandler<unknown> {
-  constructor(private readonly mainMenuFlow: MainMenuFlow) {}
+  constructor(private readonly mainMenu: MainMenu) {}
 
   async handle(ctx: SessionContext): Promise<void> {
-    await this.mainMenuFlow.show(ctx);
+    await this.mainMenu.show(ctx);
   }
 }

@@ -6,7 +6,7 @@ import { KeyboardBuilder } from '../../ui/components';
 import { CallbackAction } from '../../constants';
 import { DnsRecordFormatter } from '../../ui/formatters';
 import { SessionData } from '../../types';
-import { MainMenuFlow } from '../main-menu.flow';
+import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -16,7 +16,7 @@ export class CreateDnsFlow {
     private readonly strategyRegistry: DnsStrategyRegistry,
     private readonly wizardEngine: WizardEngine,
     private readonly formatter: DnsRecordFormatter,
-    private readonly mainMenuFlow: MainMenuFlow
+    private readonly mainMenu: MainMenu
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -106,7 +106,7 @@ Select record type:
           const record = await this.gateway.createDnsRecord(input);
 
           const successMessage = this.formatter.formatCreatedMessage(record);
-          const keyboard = this.mainMenuFlow.getMainMenuKeyboard();
+          const keyboard = this.mainMenu.getMainMenuKeyboard();
 
           await ctx.reply(successMessage, {
             parse_mode: 'HTML',
