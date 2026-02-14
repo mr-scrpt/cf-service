@@ -22,15 +22,10 @@ export class CommandModule<C extends Context = Context> {
 
   private registerCommands(): void {
     const commands: BotCommand<C>[] = [
-      // Domain commands
-      new RegisterDomainCommand(this.gateway) as unknown as BotCommand<C>,
-      new ListDomainsCommand(this.gateway) as unknown as BotCommand<C>,
-
-      // DNS commands
-      new CreateDnsCommand(this.gateway) as unknown as BotCommand<C>,
-
-      // General commands
-      new StartCommand() as unknown as BotCommand<C>,
+      new RegisterDomainCommand(this.gateway) as BotCommand<C>,
+      new ListDomainsCommand(this.gateway) as BotCommand<C>,
+      new CreateDnsCommand(this.gateway) as BotCommand<C>,
+      new StartCommand() as BotCommand<C>,
     ];
 
     this.registry.registerAll(commands);

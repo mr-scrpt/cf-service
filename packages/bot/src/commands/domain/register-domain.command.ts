@@ -5,11 +5,12 @@ import {
   registerDomainSchema,
 } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
+import { CommandName } from '../../constants';
 import { ErrorMapper } from '../../core/errors/error-mapper';
 import { formatDomainRegistered } from './domain-messages.template';
 
 export class RegisterDomainCommand implements BotCommand {
-  readonly name = 'register_domain';
+  readonly name = CommandName.REGISTER_DOMAIN;
   readonly description = 'Add domain to Cloudflare';
 
   constructor(private readonly gateway: DnsGatewayPort) { }
