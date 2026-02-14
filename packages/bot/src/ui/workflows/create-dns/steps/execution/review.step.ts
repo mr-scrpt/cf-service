@@ -38,10 +38,10 @@ export class ReviewWorkflowStep implements WorkflowStep<CreateDnsWorkflowContext
         const data = callback.callbackQuery.data;
         const p = CallbackSerializer.deserialize<any>(data).payload;
 
-        if (p.action === 'save') {
+        if (p.action === CreateDnsAction.SAVE) {
             await callback.answerCallbackQuery();
             return new NextStepResult(); // Proceed to CreateRecord
-        } else if (p.action === 'cancel') {
+        } else if (p.action === CreateDnsAction.CANCEL) {
             await callback.answerCallbackQuery('Cancelled');
             await ctx.reply('❌ Creation cancelled.', {
                 reply_markup: { inline_keyboard: [[{ text: '🔙 Back to Menu', callback_data: MenuCallbacks.dns }]] }

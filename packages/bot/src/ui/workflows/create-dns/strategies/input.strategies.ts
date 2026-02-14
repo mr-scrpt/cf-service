@@ -2,6 +2,8 @@ import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
 import { CreateDnsWorkflowContext } from '../create-dns.workflow.context';
 import { DnsFieldDefinition } from '../config/create-dns.config';
+import { z } from 'zod';
+import { getDnsContentSchema } from '@cloudflare-bot/shared';
 import { Callback, CallbackPattern, CallbackSerializer, DnsEditValuePayload, DnsEditBooleanPayload } from '../../../callbacks/callback-data';
 import {
     formatTextInputPrompt,
@@ -38,10 +40,37 @@ export class TextInputStrategy implements InputStrategy {
 
         await ctx.reply(msgText, { parse_mode: 'HTML' });
 
-        const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
-        const newValue = msg.message.text.trim();
+        while (true) {
+            const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
+            const newValue = msg.message.text.trim();
 
-        this.updateState(state, fieldDef, newValue);
+            const error = this.validateValue(newValue, fieldDef, state);
+            if (!error) {
+                this.updateState(state, fieldDef, newValue);
+                return;
+            }
+
+            await ctx.reply(`❌ ${error}\nPlease try again:`);
+        }
+    }
+
+    protected validateValue(value: string, fieldDef: DnsFieldDefinition, state: CreateDnsWorkflowContext): string | null {
+        // 1. Basic Schema Validation
+        const schemaResult = fieldDef.schema.safeParse(value);
+        if (!schemaResult.success) {
+            return schemaResult.error.issues[0].message;
+        }
+
+        // 2. Contextual Validation for Content
+        if (fieldDef.label === '📝 Content' && state.type) {
+            const contentSchema = getDnsContentSchema(state.type);
+            const contentResult = contentSchema.safeParse(value);
+            if (!contentResult.success) {
+                return contentResult.error.issues[0].message;
+            }
+        }
+
+        return null;
     }
 
     protected updateState(state: CreateDnsWorkflowContext, fieldDef: DnsFieldDefinition, newValue: unknown) {
@@ -74,17 +103,26 @@ export class NumberInputStrategy extends TextInputStrategy {
 
         await ctx.reply(msgText, { parse_mode: 'HTML' });
 
-        const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
+        while (true) {
+            const msg = await conversation.waitFor(CreateDnsTrigger.TEXT);
+            const rawValue = msg.message.text.trim();
+            const num = parseFloat(rawValue);
 
-        const rawValue = msg.message.text.trim();
-        const num = parseFloat(rawValue);
+            if (isNaN(num)) {
+                await ctx.reply(InputMessages.INVALID_NUMBER);
+                continue;
+            }
 
-        if (isNaN(num)) {
-            await ctx.reply(InputMessages.INVALID_NUMBER);
+            // Validate against Zod schema (e.g. min/max)
+            const schemaResult = fieldDef.schema.safeParse(num);
+            if (!schemaResult.success) {
+                await ctx.reply(`❌ ${schemaResult.error.issues[0].message}\nPlease try again:`);
+                continue;
+            }
+
+            this.updateState(state, fieldDef, num);
             return;
         }
-
-        this.updateState(state, fieldDef, num);
     }
 }
 
@@ -122,7 +160,7 @@ export class SelectInputStrategy extends TextInputStrategy {
         const data = CallbackSerializer.deserialize<DnsEditValuePayload>(callback.callbackQuery.data);
 
         // Use Action Constant
-        if (data.payload.action === 'cancel') { // Using string literal as used in callback-data
+        if (data.payload.action === CreateDnsAction.CANCEL) {
             await ctx.reply(InputMessages.CANCELLED);
             return;
         }
@@ -166,7 +204,7 @@ export class BooleanInputStrategy extends TextInputStrategy {
 
         const data = CallbackSerializer.deserialize<DnsEditBooleanPayload>(callback.callbackQuery.data);
 
-        if (data.payload.action === 'cancel') return;
+        if (data.payload.action === CreateDnsAction.CANCEL) return;
 
         this.updateState(state, fieldDef, data.payload.value);
     }

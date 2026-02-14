@@ -4,9 +4,10 @@ import {
     dnsRecordNameSchema,
     dnsRecordContentSchema,
     ttlSchema,
+    standardRecordSchema,
     mxRecordSchema,
     srvRecordSchema
-} from '@cloudflare-bot/shared/dist/domain/dns-record.schema';
+} from '@cloudflare-bot/shared';
 import { DnsInputType, DnsFieldName } from './edit-dns.constants';
 
 // --- Input Strategies ---
@@ -54,7 +55,7 @@ export const FIELD_DEFINITIONS: Record<DnsFieldName, DnsFieldDefinition> = {
     },
     [DnsFieldName.PROXIED]: {
         label: '🛡 Proxy',
-        schema: z.boolean(),
+        schema: standardRecordSchema.shape.proxied,
         input: { type: DnsInputType.BOOLEAN },
         hint: "Orange cloud (CDN & Protection)"
     },

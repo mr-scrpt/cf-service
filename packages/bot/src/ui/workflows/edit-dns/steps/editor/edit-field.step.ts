@@ -1,11 +1,12 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
-import { WorkflowStep } from '../../../core/workflow.step';
 import { IStepResult, JumpToStepResult } from '../../../core/step.result';
+import { WorkflowStep } from '../../../core/workflow.step';
+import { resolveDnsFieldValue } from '../../../shared/dns.utils';
+import { FIELD_DEFINITIONS } from '../../config/edit-dns.config';
+import { DnsFieldName, EditDnsStep } from '../../config/edit-dns.constants';
 import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
-import { FIELD_DEFINITIONS, DnsFieldDefinition } from '../../config/edit-dns.config';
 import { INPUT_STRATEGIES } from '../../strategies/input.strategies';
-import { EditDnsStep, DnsFieldName } from '../../config/edit-dns.constants';
 
 export class EditFieldWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
   readonly id = EditDnsStep.EDIT_FIELD;
@@ -23,21 +24,12 @@ export class EditFieldWorkflowStep implements WorkflowStep<EditDnsWorkflowContex
       return new JumpToStepResult(EditDnsStep.EDIT_MENU);
     }
 
-    const currentValue = this.resolveValue(state.getEffectiveRecord(), fieldDef, fieldName);
+    const currentValue = resolveDnsFieldValue(state.getEffectiveRecord(), fieldDef, fieldName);
 
     const strategy = INPUT_STRATEGIES[fieldDef.input.type];
 
     await strategy.handle(conversation, ctx, state, fieldDef, currentValue);
 
-    return new JumpToStepResult('edit_menu');
-  }
-
-  private resolveValue(record: any, fieldDef: DnsFieldDefinition, fieldName: string): unknown {
-    if (fieldDef.path) {
-      let val = record;
-      for (const p of fieldDef.path) val = val ? val[p] : undefined;
-      return val;
-    }
-    return record[fieldName];
+    return new JumpToStepResult(EditDnsStep.EDIT_MENU);
   }
 }

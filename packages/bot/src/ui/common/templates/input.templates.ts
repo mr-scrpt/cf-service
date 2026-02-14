@@ -35,7 +35,7 @@ export function formatBooleanInputPrompt(label: string): string {
 }
 
 export const InputMessages = {
-    INVALID_NUMBER: '❌ Invalid number. Operation cancelled.',
+    INVALID_NUMBER: '❌ Invalid number. Please try again.',
     CANCELLED: 'Cancelled.',
     ERROR_UNKNOWN_FIELD: (key: string) => `⚠️ Error: Unknown field configuration for '${key}'.`,
     ERROR_NO_STRATEGY: (type: string) => `⚠️ Error: No strategy found for input type '${type}'.`,

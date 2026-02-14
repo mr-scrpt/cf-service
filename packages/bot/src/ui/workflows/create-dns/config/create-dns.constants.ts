@@ -13,6 +13,7 @@ export const CreateDnsTrigger = {
 
 export enum CreateDnsAction {
     CREATE = 'create',
+    SAVE = 'save',
     CANCEL = 'cancel',
     SET = 'set',
     PREV = 'prev',

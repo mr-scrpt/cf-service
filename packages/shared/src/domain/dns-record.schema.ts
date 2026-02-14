@@ -69,3 +69,33 @@ export const createDnsRecordSchema = z.discriminatedUnion('type', [
   mxRecordSchema.omit({ id: true }),
   srvRecordSchema.omit({ id: true }),
 ]);
+
+// --- Content Validation Schemas ---
+
+export const ipv4Schema = z.ipv4({ message: 'Invalid IPv4 address (e.g. 1.2.3.4)' });
+export const ipv6Schema = z.ipv6({ message: 'Invalid IPv6 address (e.g. 2001:db8::1)' });
+
+// Basic domain regex. RFC 1035/1123 is complex, this is a practical approximation for user input.
+export const domainValueSchema = z.string()
+  .min(1, 'Domain name cannot be empty')
+  .regex(/^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*$/, 'Invalid domain name format (e.g. example.com)');
+
+export const txtContentSchema = z.string().min(1, 'Content cannot be empty').max(2048, 'Content too long');
+
+export const DNS_CONTENT_SCHEMAS: Partial<Record<DnsRecordType, z.ZodType<any>>> = {
+  [DnsRecordType.A]: ipv4Schema,
+  [DnsRecordType.AAAA]: ipv6Schema,
+  [DnsRecordType.CNAME]: domainValueSchema,
+  [DnsRecordType.NS]: domainValueSchema,
+  [DnsRecordType.MX]: domainValueSchema,  // MX content is the mail server domain
+  [DnsRecordType.SRV]: domainValueSchema, // SRV target
+  [DnsRecordType.TXT]: txtContentSchema,
+};
+
+/**
+ * Returns the specific validation schema for the 'content' field based on the record type.
+ * Fallback to generic dnsRecordContentSchema.
+ */
+export const getDnsContentSchema = (type: DnsRecordType): z.ZodType<any> => {
+  return DNS_CONTENT_SCHEMAS[type] || dnsRecordContentSchema;
+};

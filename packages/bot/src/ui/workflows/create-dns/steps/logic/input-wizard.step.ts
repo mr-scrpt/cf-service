@@ -6,6 +6,7 @@ import { CreateDnsStep } from '../../config/create-dns.constants';
 import { CreateDnsWorkflowContext } from '../../create-dns.workflow.context';
 import { getFieldsForType, FIELD_DEFINITIONS } from '../../config/create-dns.config';
 import { DnsRecordType } from '@cloudflare-bot/shared';
+import { resolveDnsFieldValue } from '../../../shared/dns.utils';
 
 export class InputWizardWorkflowStep implements WorkflowStep<CreateDnsWorkflowContext> {
     readonly id = CreateDnsStep.INPUT_WIZARD;
@@ -27,13 +28,7 @@ export class InputWizardWorkflowStep implements WorkflowStep<CreateDnsWorkflowCo
             const def = FIELD_DEFINITIONS[field];
 
             // Resolve value
-            const anyDraft = draft as any;
-            let val: any;
-            if (def.path && def.path[0] === 'data') {
-                val = anyDraft.data?.[def.path[1]];
-            } else {
-                val = anyDraft[field];
-            }
+            const val = resolveDnsFieldValue(draft, def, field);
 
             // Simple check for "is filled"
             // For boolean (proxied), false is a valid value, so check undefined/null.

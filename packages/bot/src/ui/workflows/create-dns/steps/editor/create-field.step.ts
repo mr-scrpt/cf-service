@@ -6,6 +6,7 @@ import { CreateDnsWorkflowContext } from '../../create-dns.workflow.context';
 import { FIELD_DEFINITIONS } from '../../config/create-dns.config';
 import { INPUT_STRATEGIES } from '../../strategies/input.strategies';
 import { CreateDnsStep, DnsFieldName } from '../../config/create-dns.constants';
+import { resolveDnsFieldValue } from '../../../shared/dns.utils';
 
 export class CreateFieldWorkflowStep implements WorkflowStep<CreateDnsWorkflowContext> {
     readonly id = CreateDnsStep.CREATE_FIELD;
@@ -31,11 +32,10 @@ export class CreateFieldWorkflowStep implements WorkflowStep<CreateDnsWorkflowCo
             throw new Error(`No strategy found for input type ${fieldDef.input.type}`);
         }
 
-        // Get current value from draft to show in prompt? (Strategies handle prompt)
-        const currentVal = undefined; // Or retrieve from draft if we want to show "Current: X"
+        // Get current value from draft to show in prompt
+        const currentVal = resolveDnsFieldValue(state.getEffectiveRecord(), fieldDef, fieldName);
 
         await strategy.handle(conversation, ctx, state, fieldDef, currentVal);
-
 
         // Return to wizard to check for next field
         return new JumpToStepResult(CreateDnsStep.INPUT_WIZARD);
