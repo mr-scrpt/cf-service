@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { ConversationFlavor } from '@grammyjs/conversations';
-import { Domain } from '@cloudflare-bot/shared';
+import { Domain, DnsRecord } from '@cloudflare-bot/shared';
 
 export interface WizardState {
   currentStepIndex: number;
@@ -31,7 +31,7 @@ export interface SessionData {
   tempDomains?: Domain[];
   selectedZoneId?: string;
   selectedZoneName?: string;
-  tempRecords?: unknown[];
+  tempRecords?: DnsRecord[];
   currentPage?: number;
 }
 

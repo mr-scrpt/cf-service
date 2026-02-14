@@ -12,6 +12,8 @@ import {
   DeleteRecordConfirmPayload,
   WizardOptionPayload,
 } from './handler-payloads';
+import { SessionValidator } from './session-validators';
+import { DeleteHandlerStrategy } from './delete-handler-strategy';
 
 export class DnsManagementHandler implements CallbackHandler<void> {
   constructor(private readonly createFlow: CreateDnsFlow) {}
@@ -25,17 +27,13 @@ export class DnsCreateSelectTypeHandler implements CallbackHandler<DomainIndexPa
   constructor(private readonly createFlow: CreateDnsFlow) {}
 
   async handle(ctx: SessionContext, payload: DomainIndexPayload): Promise<void> {
-    const domains = ctx.session.tempDomains;
-    if (!domains || !domains[payload.idx]) {
+    const domain = SessionValidator.getDomainByIndex(ctx, payload.idx);
+    if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
       return;
     }
     
-    const domain = domains[payload.idx];
-    // Store selected domain in session
-    ctx.session.selectedZoneId = domain.id;
-    ctx.session.selectedZoneName = domain.name;
-    
+    SessionValidator.setSelectedZone(ctx, domain);
     await this.createFlow.showTypeSelector(ctx);
   }
 }
@@ -44,15 +42,13 @@ export class DnsSelectTypeHandler implements CallbackHandler<TypeSelectionPayloa
   constructor(private readonly createFlow: CreateDnsFlow) {}
 
   async handle(ctx: SessionContext, payload: TypeSelectionPayload): Promise<void> {
-    const zoneId = ctx.session.selectedZoneId;
-    const zoneName = ctx.session.selectedZoneName;
-    
-    if (!zoneId || !zoneName) {
+    const zone = SessionValidator.getSelectedZone(ctx);
+    if (!zone) {
       await ctx.reply('❌ Domain not selected. Please try again.');
       return;
     }
     
-    await this.createFlow.startWizard(ctx, zoneId, zoneName, payload.type);
+    await this.createFlow.startWizard(ctx, zone.zoneId, zone.zoneName, payload.type);
   }
 }
 
@@ -60,16 +56,13 @@ export class DnsListDomainHandler implements CallbackHandler<DomainIndexPayload>
   constructor(private readonly listFlow: ListDnsFlow) {}
 
   async handle(ctx: SessionContext, payload: DomainIndexPayload): Promise<void> {
-    const domains = ctx.session.tempDomains;
-    if (!domains || !domains[payload.idx]) {
+    const domain = SessionValidator.getDomainByIndex(ctx, payload.idx);
+    if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
       return;
     }
     
-    const domain = domains[payload.idx];
-    ctx.session.selectedZoneId = domain.id;
-    ctx.session.selectedZoneName = domain.name;
-    
+    SessionValidator.setSelectedZone(ctx, domain);
     await this.listFlow.showRecords(ctx, 0);
   }
 }
@@ -83,31 +76,14 @@ export class PageNavigationHandler implements CallbackHandler<PaginationPayload>
 }
 
 export class DnsDeleteSelectHandler implements CallbackHandler<DeleteRecordSelectPayload> {
-  constructor(private readonly deleteFlow: DeleteDnsFlow) {}
+  private readonly strategy: DeleteHandlerStrategy;
+
+  constructor(deleteFlow: DeleteDnsFlow) {
+    this.strategy = new DeleteHandlerStrategy(deleteFlow);
+  }
 
   async handle(ctx: SessionContext, payload: DeleteRecordSelectPayload): Promise<void> {
-    if (payload.step === FlowStep.SELECT_RECORD) {
-      const domains = ctx.session.tempDomains;
-      if (!domains || payload.idx === undefined || !domains[payload.idx]) {
-        await ctx.reply('❌ Domain not found. Please try again.');
-        return;
-      }
-      
-      const domain = domains[payload.idx];
-      ctx.session.selectedZoneId = domain.id;
-      ctx.session.selectedZoneName = domain.name;
-      
-      await this.deleteFlow.showRecordSelector(ctx);
-    } else if (payload.step === FlowStep.CONFIRM && payload.idx !== undefined) {
-      const records = ctx.session.tempRecords as any[];
-      if (!records || !records[payload.idx]) {
-        await ctx.reply('❌ Record not found. Please try again.');
-        return;
-      }
-      
-      const record = records[payload.idx];
-      await this.deleteFlow.showConfirmation(ctx, record.id, record.name, record.type);
-    }
+    await this.strategy.handle(ctx, payload.step, { idx: payload.idx });
   }
 }
 
@@ -140,10 +116,10 @@ export class NavigationCancelHandler implements CallbackHandler<void> {
 
   async handle(ctx: SessionContext): Promise<void> {
     const isWizardActive = await this.wizardEngine.isActive(ctx);
-    if (isWizardActive) {
-      await this.wizardEngine.cancel(ctx);
-    } else {
-      await ctx.editMessageText('❌ Operation cancelled');
-    }
+    const cancelAction = isWizardActive
+      ? () => this.wizardEngine.cancel(ctx)
+      : () => ctx.editMessageText('❌ Operation cancelled');
+    
+    await cancelAction();
   }
 }

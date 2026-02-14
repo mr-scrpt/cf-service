@@ -140,7 +140,7 @@ Are you sure you want to delete this record?
     recordId: string
   ): Promise<void> {
     const zoneId = ctx.session.selectedZoneId;
-    const records = ctx.session.tempRecords as DnsRecord[];
+    const records = ctx.session.tempRecords;
     const record = records?.find(r => r.id === recordId);
     
     if (!zoneId || !record) {
