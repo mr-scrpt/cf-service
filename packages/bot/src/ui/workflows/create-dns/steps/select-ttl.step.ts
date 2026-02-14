@@ -2,7 +2,7 @@ import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
 import { CallbackPattern, CallbackSerializer, DnsTtlPayload } from '../../../callbacks/callback-data';
 import { buildTtlKeyboard } from '../../../keyboards/dns.keyboard';
-import { ConversationStep } from '../../../conversations/__flow/conversation.step';
+import { ConversationStep } from '../../common/interfaces/conversation-step.interface';
 import { CreateDnsContext } from '../create-dns.context';
 
 export class SelectTtlStep implements ConversationStep {

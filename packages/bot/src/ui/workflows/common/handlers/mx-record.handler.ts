@@ -14,6 +14,6 @@ export class MxRecordHandler implements DnsRecordHandler {
         const priorityInput = pM.message.text!.trim();
         const priority = priorityInput ? parseInt(priorityInput) : 10;
 
-        return { content, priority } as any;
+        return { content, priority };
     }
 }

@@ -7,6 +7,7 @@ import { formatDnsRecordCreated } from '../../../commands/dns/dns-messages.templ
 import { ErrorMapper } from '../../../core/errors/error-mapper';
 import { logger } from '../../../utils/logger';
 import { CreateDnsContext } from './create-dns.context';
+import { ConversationStep } from '../common/interfaces/conversation-step.interface';
 import { SelectZoneStep } from '../common/steps/select-zone.step';
 import { SelectTypeStep } from './steps/select-type.step';
 import { EnterNameStep } from './steps/enter-name.step';
@@ -21,7 +22,7 @@ export function createDnsFlowFactory(gateway: DnsGatewayPort) {
             const state = new CreateDnsContext();
 
             // 2. Define Steps Pipeline
-            const steps = [
+            const steps: ConversationStep<CreateDnsContext>[] = [
                 new SelectZoneStep(gateway),
                 new SelectTypeStep(),
                 new EnterNameStep(),
@@ -34,8 +35,7 @@ export function createDnsFlowFactory(gateway: DnsGatewayPort) {
             // Ideally this loop logic could also be extracted to a Workflow Executor, 
             // but for now it's simple enough to stay here.
             for (const step of steps) {
-                // Cast step to any or generic interface to allow execution with compatible state
-                await (step as any).execute(conversation, ctx, state);
+                await step.execute(conversation, ctx, state);
             }
 
             // 4. Validate & Create

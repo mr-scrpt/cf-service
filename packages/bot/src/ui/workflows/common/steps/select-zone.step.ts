@@ -3,7 +3,6 @@ import { Context } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { CallbackPattern, CallbackSerializer, DnsZonePayload } from '../../../callbacks/callback-data';
 import { buildZoneListKeyboard } from '../../../keyboards/dns.keyboard';
-import { ConversationStep } from '../../../conversations/__flow/conversation.step';
 import { ZoneAwareContext } from '../interfaces/zone-aware.interface';
 
 // Note: ConversationStep is generic enough, but strictly typed to DnsWizardContext in previous file.

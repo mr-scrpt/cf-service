@@ -31,6 +31,6 @@ export class SrvRecordHandler implements DnsRecordHandler {
                 port,
                 target
             }
-        } as any;
+        };
     }
 }

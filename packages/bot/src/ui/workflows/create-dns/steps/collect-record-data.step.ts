@@ -1,6 +1,6 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
-import { ConversationStep } from '../../../conversations/__flow/conversation.step';
+import { ConversationStep } from '../../common/interfaces/conversation-step.interface';
 import { CreateDnsContext } from '../create-dns.context';
 import { DnsHandlerFactory } from '../../common/handlers/handler.factory';
 
@@ -13,11 +13,9 @@ export class CollectRecordDataStep implements ConversationStep {
         const data = await handler.collectData(conversation, ctx);
 
         // Map partial data to context fields
-        // We cast to any to safely access properties from the discriminated union partial
-        const payload = data as any;
-
-        if (payload.content !== undefined) state.setContent(payload.content);
-        if (payload.data !== undefined) state.setData(payload.data);
-        if (payload.priority !== undefined) state.setPriority(payload.priority);
+        // Using type guards to safely access properties from the discriminated union partial
+        if ('content' in data && data.content !== undefined) state.setContent(data.content);
+        if ('data' in data && data.data !== undefined) state.setData(data.data);
+        if ('priority' in data && data.priority !== undefined) state.setPriority(data.priority);
     }
 }

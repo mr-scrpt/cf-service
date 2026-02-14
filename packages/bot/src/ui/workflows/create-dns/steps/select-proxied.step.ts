@@ -3,7 +3,7 @@ import { Context } from 'grammy';
 import { isProxiable } from '@cloudflare-bot/shared';
 import { CallbackPattern, CallbackSerializer, DnsProxiedPayload } from '../../../callbacks/callback-data';
 import { buildProxiedKeyboard } from '../../../keyboards/dns.keyboard';
-import { ConversationStep } from '../../../conversations/__flow/conversation.step';
+import { ConversationStep } from '../../common/interfaces/conversation-step.interface';
 import { CreateDnsContext } from '../create-dns.context';
 
 export class SelectProxiedStep implements ConversationStep {

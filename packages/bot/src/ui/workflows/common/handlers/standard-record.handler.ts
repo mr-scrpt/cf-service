@@ -9,6 +9,6 @@ export class StandardRecordHandler implements DnsRecordHandler {
         const cM = await conversation.waitFor('message:text');
         const content = cM.message.text!.trim();
 
-        return { content } as any; // Partial types are tricky with discriminated unions
+        return { content };
     }
 }
