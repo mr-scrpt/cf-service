@@ -1,6 +1,5 @@
-import type { Conversation, ConversationFlavor } from '@grammyjs/conversations';
-import type { Context } from 'grammy';
 import { DnsGatewayPort, registerDomainSchema, ValidationError } from '@cloudflare-bot/shared';
+import type { Conversation } from '@grammyjs/conversations';
 import { formatDomainRegistered } from '../../commands/domain/domain-messages.template';
 import { ErrorMapper } from '../../core/errors/error-mapper';
 import { logger } from '../../utils/logger';

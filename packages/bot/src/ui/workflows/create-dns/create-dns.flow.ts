@@ -14,6 +14,7 @@ import { EnterNameStep } from './steps/enter-name.step';
 import { CollectRecordDataStep } from './steps/collect-record-data.step';
 import { SelectTtlStep } from './steps/select-ttl.step';
 import { SelectProxiedStep } from './steps/select-proxied.step';
+import { buildDnsMenuKeyboard } from '../../menus/main.menu';
 
 export function createDnsFlowFactory(gateway: DnsGatewayPort) {
     return async function (conversation: Conversation<any>, ctx: any) {
@@ -52,14 +53,19 @@ export function createDnsFlowFactory(gateway: DnsGatewayPort) {
             const record = await gateway.createDnsRecord(validationResult.data);
             logger.info('DNS record created successfully', { record });
 
-            await ctx.reply(formatDnsRecordCreated(record), { parse_mode: 'HTML' });
+            await ctx.reply(formatDnsRecordCreated(record), {
+                parse_mode: 'HTML',
+                reply_markup: buildDnsMenuKeyboard()
+            });
 
         } catch (error) {
             logger.error('Error in createDnsFlow', {
                 error: error instanceof Error ? error.message : String(error),
                 stack: error instanceof Error ? error.stack : undefined,
             });
-            await ctx.reply(ErrorMapper.toUserMessage(error as Error));
+            await ctx.reply(ErrorMapper.toUserMessage(error as Error), {
+                reply_markup: buildDnsMenuKeyboard()
+            });
         }
     };
 }

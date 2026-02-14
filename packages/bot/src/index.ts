@@ -8,6 +8,9 @@ import { requestLoggerMiddleware } from './middleware/request-logger.middleware'
 import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
 import { registerUiHandlers, registerConversations } from './ui/integration/ui-handlers';
 
+import { CommandModule } from './commands/base/command.module';
+import { MenuHandler } from './ui/menus/menu.handler';
+
 type BotContext = Context & ConversationFlavor<Context>;
 const bot = new Bot<BotContext>(env.TELEGRAM_BOT_TOKEN);
 
@@ -33,14 +36,13 @@ bot.api.getMe().then((me) => {
 
 setupErrorHandler(bot);
 
-bot.command('start', (ctx) =>
-  ctx.reply(
-    '👋 Привет! Я бот для управления Cloudflare DNS.\n\n' +
-    'Доступные команды:\n' +
-    '/dns - Управление DNS записями\n' +
-    '/domain - Управление доменами'
-  )
-);
+// Initialize Command Module
+const commandModule = new CommandModule<BotContext>(cloudflareGateway);
+commandModule.getRegistry().setupBot(bot);
+
+// Initialize Menu Handler
+const menuHandler = new MenuHandler();
+bot.on('callback_query:data', (ctx) => menuHandler.handle(ctx));
 
 bot.start({
   onStart: () => logger.info('Bot is running uses Shared Logger...'),
