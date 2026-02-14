@@ -1,9 +1,9 @@
 import { Context, InlineKeyboard } from 'grammy';
 import { IStepResult, JumpToStepResult, ExitFlowResult } from '../../core/step.result';
 import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
-import { CallbackPattern, CallbackSerializer, DnsEditFieldPayload, DnsSaveRecordPayload } from '../../../callbacks/callback-data';
-import { EditDnsStep, EditDnsAction, DnsFieldName } from '../edit-dns.constants';
-import { FIELD_DEFINITIONS } from '../edit-dns.config';
+import { CallbackPattern, CallbackSerializer, DnsEditFieldPayload, DnsSaveRecordPayload, CallbackType } from '../../../callbacks/callback-data';
+import { EditDnsStep, EditDnsAction, DnsFieldName } from '../config/edit-dns.constants';
+import { FIELD_DEFINITIONS } from '../config/edit-dns.config';
 import { MenuCallbacks } from '../../../menus/main.menu';
 
 export interface MenuActionStrategy {
@@ -58,7 +58,8 @@ export class SaveRecordActionStrategy implements MenuActionStrategy {
     }
 }
 
-export const MENU_ACTION_STRATEGIES: MenuActionStrategy[] = [
-    new EditFieldActionStrategy(),
-    new SaveRecordActionStrategy()
-];
+// Registry
+export const MENU_ACTION_STRATEGIES: Record<string, MenuActionStrategy> = {
+    [CallbackType.DNS_EDIT_FIELD]: new EditFieldActionStrategy(),
+    [CallbackType.DNS_SAVE_RECORD]: new SaveRecordActionStrategy()
+};

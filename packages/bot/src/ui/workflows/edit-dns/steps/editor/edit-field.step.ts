@@ -1,11 +1,11 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context } from 'grammy';
-import { WorkflowStep } from '../../core/workflow.step';
-import { IStepResult, JumpToStepResult } from '../../core/step.result';
-import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
-import { FIELD_DEFINITIONS, DnsFieldDefinition } from '../edit-dns.config';
-import { INPUT_STRATEGIES } from '../strategies/input.strategies';
-import { EditDnsStep, DnsFieldName } from '../edit-dns.constants';
+import { WorkflowStep } from '../../../core/workflow.step';
+import { IStepResult, JumpToStepResult } from '../../../core/step.result';
+import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
+import { FIELD_DEFINITIONS, DnsFieldDefinition } from '../../config/edit-dns.config';
+import { INPUT_STRATEGIES } from '../../strategies/input.strategies';
+import { EditDnsStep, DnsFieldName } from '../../config/edit-dns.constants';
 
 export class EditFieldWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
   readonly id = EditDnsStep.EDIT_FIELD;

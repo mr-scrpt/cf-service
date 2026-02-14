@@ -1,13 +1,13 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
-import { WorkflowStep } from '../../core/workflow.step';
-import { IStepResult, ExitFlowResult } from '../../core/step.result';
-import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
+import { WorkflowStep } from '../../../core/workflow.step';
+import { IStepResult, JumpToStepResult, ExitFlowResult } from '../../../core/step.result';
+import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { MenuCallbacks } from '../../../menus/main.menu';
-import { logger } from '../../../../utils/logger';
-import { ErrorMapper } from '../../../../core/errors/error-mapper';
-import { EditDnsStep } from '../edit-dns.constants';
+import { MenuCallbacks } from '../../../../menus/main.menu';
+import { logger } from '../../../../../utils/logger';
+import { ErrorMapper } from '../../../../../core/errors/error-mapper';
+import { EditDnsStep } from '../../config/edit-dns.constants';
 
 export class SaveRecordWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
     readonly id = EditDnsStep.SAVE_CHANGES;

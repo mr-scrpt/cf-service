@@ -1,12 +1,14 @@
 import { Conversation } from '@grammyjs/conversations';
 import { Context, InlineKeyboard } from 'grammy';
-import { WorkflowStep } from '../../core/workflow.step';
-import { IStepResult, NextStepResult, ExitFlowResult } from '../../core/step.result';
-import { EditDnsWorkflowContext } from '../edit-dns.workflow.context';
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { SelectRecordPaginationStep } from '../../delete-dns/steps/select-record-pagination.step';
-import { MenuCallbacks } from '../../../menus/main.menu';
-import { EditDnsStep } from '../edit-dns.constants';
+import { Callback, CallbackPattern, CallbackSerializer, DnsRecordPayload, PaginationPayload } from '../../../../callbacks/callback-data';
+import { IStepResult, JumpToStepResult, NextStepResult, ExitFlowResult } from '../../../core/step.result';
+import { WorkflowStep } from '../../../core/workflow.step';
+import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
+import { EditDnsWorkflowContext } from '../../edit-dns.workflow.context';
+import { EditDnsStep } from '../../config/edit-dns.constants';
+import { formatRelativeName } from '../../utils/edit-dns.utils';
+import { SelectRecordPaginationStep } from '../../../delete-dns/steps/select-record-pagination.step';
+import { MenuCallbacks } from '../../../../menus/main.menu';
 
 export class SelectRecordWorkflowStep implements WorkflowStep<EditDnsWorkflowContext> {
     readonly id = EditDnsStep.SELECT_RECORD;
