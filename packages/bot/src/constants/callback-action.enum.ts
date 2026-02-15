@@ -24,9 +24,11 @@ export enum CallbackAction {
   WIZARD_SELECT_OPTION = 'wizard:option',
   WIZARD_CONFIRM = 'wizard:confirm',
   
-  NAV_BACK = 'nav:back',
   NAV_CANCEL = 'nav:cancel',
+  NAV_BACK = 'nav:back',
   NAV_MAIN_MENU = 'nav:main',
+  
+  REQUEST_ACCESS = 'request_access',
   
   PAGE_NEXT = 'page:next',
   PAGE_PREV = 'page:prev',

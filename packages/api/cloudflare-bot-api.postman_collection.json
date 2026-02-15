@@ -12,7 +12,7 @@
     },
     {
       "key": "api_auth_token",
-      "value": "your_api_token_here"
+      "value": "your_jwt_secret_here"
     }
   ],
   "item": [
@@ -144,6 +144,125 @@
               ]
             },
             "description": "Remove user by Telegram ID - requires authentication"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Registration Requests",
+      "item": [
+        {
+          "name": "Create Registration Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telegramId\": 123456789,\n  \"username\": \"john_doe\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registration-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registration-requests"]
+            },
+            "description": "Create a new registration request (typically called from bot when user clicks Request Access button) - requires authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "List Pending Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/registration-requests/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registration-requests", "pending"]
+            },
+            "description": "Get all pending registration requests for admin review - requires authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Registration Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewedBy\": \"admin_username\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registration-requests/:requestId/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registration-requests", ":requestId", "approve"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "paste-request-uuid-here",
+                  "description": "Registration request UUID from pending list"
+                }
+              ]
+            },
+            "description": "Approve a pending registration request - creates User and notifies user via Telegram - requires authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Registration Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewedBy\": \"admin_username\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/registration-requests/:requestId/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "registration-requests", ":requestId", "reject"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "paste-request-uuid-here",
+                  "description": "Registration request UUID from pending list"
+                }
+              ]
+            },
+            "description": "Reject a pending registration request - notifies user via Telegram - requires authentication"
           },
           "response": []
         }

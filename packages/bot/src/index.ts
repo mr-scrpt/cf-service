@@ -14,36 +14,43 @@ import { SessionData } from './types';
 import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
 import { createBotLogger } from './config/logger.config';
 import { createRegistrationHandlers } from './handlers/registration.handler';
+import { CallbackAction } from './constants';
 
-const config = loadConfig();
-const botLogger = createBotLogger(config.NODE_ENV);
-const container = new DIContainer(config, botLogger);
+async function main() {
+  const config = loadConfig();
+  const botLogger = createBotLogger(config.NODE_ENV);
+  const container = new DIContainer(config, botLogger);
 
-initAuthGuard(container);
+  await container.getDatabaseService().connect();
+  logger.info('Database connected');
 
-type BotContext = Context & SessionFlavor<SessionData>;
+  initAuthGuard(container);
 
-const telegramAdapter = container.getTelegramAdapter();
-const cloudflareGateway = new CloudflareGatewayAdapter(env);
-const bot = telegramAdapter.getBotTyped<BotContext>();
+  type BotContext = Context & SessionFlavor<SessionData>;
 
-bootstrapBot(bot, cloudflareGateway);
+  const telegramAdapter = container.getTelegramAdapter();
+  const cloudflareGateway = new CloudflareGatewayAdapter(env);
+  const bot = telegramAdapter.getBotTyped<BotContext>();
 
-bot.use(requestLoggerMiddleware);
-bot.use(authGuard);
-bot.use(createUsernameSyncMiddleware(container));
+  const { callbackRouter } = bootstrapBot(bot, cloudflareGateway);
 
-const registrationHandlers = createRegistrationHandlers(container);
-bot.callbackQuery('request_access', registrationHandlers.handleRequestAccess);
+  bot.use(requestLoggerMiddleware);
+  bot.use(authGuard);
+  bot.use(createUsernameSyncMiddleware(container));
 
-const commandModule = new CommandModule<BotContext>(cloudflareGateway);
-commandModule.getRegistry().setupBot(bot);
+  const registrationHandlers = createRegistrationHandlers(container);
+  callbackRouter.register(CallbackAction.REQUEST_ACCESS, {
+    handle: registrationHandlers.handleRequestAccess
+  });
 
-bot.api.getMe().then((me: UserFromGetMe) => {
-  logger.info('Bot started', { username: me.username, admin_id: env.ALLOWED_CHAT_ID });
-});
+  const commandModule = new CommandModule<BotContext>(cloudflareGateway);
+  commandModule.getRegistry().setupBot(bot);
 
-bot.catch(async (err: BotError<Context>) => {
+  bot.api.getMe().then((me: UserFromGetMe) => {
+    logger.info('Bot started', { username: me.username, admin_id: env.ALLOWED_CHAT_ID });
+  });
+
+  bot.catch(async (err: BotError<Context>) => {
   const { ctx, error } = err;
   
   logger.error('Unhandled bot error', { 
@@ -63,26 +70,32 @@ bot.catch(async (err: BotError<Context>) => {
         await ctx.reply('❌ An unexpected error occurred. Please try again later.');
       } catch {}
     }
-  }
-});
+    }
+  });
 
-bot.start({
-  onStart: () => logger.info('🚀 Cloudflare Management Bot is running with new architecture...'),
-});
+  bot.start({
+    onStart: () => logger.info('🚀 Cloudflare Management Bot is running with new architecture...'),
+  });
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Promise Rejection', { reason, promise });
-});
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Promise Rejection', { reason, promise });
+  });
 
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception', { error: error.message, stack: error.stack });
-  bot.stop();
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception', { error: error.message, stack: error.stack });
+    bot.stop();
+    process.exit(1);
+  });
+
+  const stop = (signal: string) => {
+    console.log(`Stopping bot... (${signal})`);
+    bot.stop();
+  };
+  process.once('SIGINT', () => stop('SIGINT'));
+  process.once('SIGTERM', () => stop('SIGTERM'));
+}
+
+main().catch((error) => {
+  logger.error('Failed to start bot', { error: error.message, stack: error.stack });
   process.exit(1);
 });
-
-const stop = (signal: string) => {
-  console.log(`Stopping bot... (${signal})`);
-  bot.stop();
-};
-process.once('SIGINT', () => stop('SIGINT'));
-process.once('SIGTERM', () => stop('SIGTERM'));
