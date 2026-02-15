@@ -10,11 +10,13 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@cloudflare-bot/domain": "workspace:*",
     "@cloudflare-bot/application": "workspace:*",
+    "@cloudflare-bot/domain": "workspace:*",
     "@cloudflare-bot/infrastructure": "workspace:*",
-    "express": "^4.21.2",
-    "cors": "^2.8.5"
+    "@cloudflare-bot/shared": "workspace:*",
+    "cors": "^2.8.5",
+    "express": "^4.22.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

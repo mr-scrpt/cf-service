@@ -13,8 +13,8 @@ const LOG_DIR = resolve(process.cwd(), 'logs');
 // Dedicated logger for Telegram requests
 const requestLogger = new LoggerAdapter({
   service: 'telegram-requests',
-  mode: env.NODE_ENV === Environment.Production ? LoggerMode.JSON : LoggerMode.Pretty,
-  level: LoggerLevel.Info,
+  mode: env.NODE_ENV === Environment.PRODUCTION ? LoggerMode.JSON : LoggerMode.Pretty,
+  level: env.NODE_ENV === Environment.PRODUCTION ? LoggerLevel.Info : LoggerLevel.Debug,
   logDir: LOG_DIR,
   filename: 'requests',
 });

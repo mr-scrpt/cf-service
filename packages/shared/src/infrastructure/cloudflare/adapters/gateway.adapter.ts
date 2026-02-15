@@ -9,7 +9,7 @@ import { DnsGatewayPort } from '../../../domain/ports';
 import { Domain, DnsRecord } from '../../../domain';
 import { CloudflareApiError, InfrastructureError } from '../../../errors/infrastructure.error';
 import { cloudflareErrorResponseSchema } from '../schemas/error-response.schema';
-import { CommonEnv } from '../../../config';
+import { CloudflareEnv } from '../../../config';
 import {
   RegisterDomainInput,
   CreateDnsRecordInput,
@@ -21,15 +21,11 @@ import {
   CLOUDFLARE_RETRY_CONFIG,
 } from '../cloudflare.config';
 
-/**
- * Cloudflare Gateway Adapter implementing DNS operations
- * Uses official Cloudflare TypeScript SDK with proper typing
- */
 export class CloudflareGatewayAdapter implements DnsGatewayPort {
   private client: Cloudflare;
   private readonly accountId: string;
 
-  constructor(private readonly env: CommonEnv) {
+  constructor(private readonly env: CloudflareEnv) {
     this.client = new Cloudflare({
       apiToken: env.CLOUDFLARE_API_TOKEN,
     });

@@ -44,12 +44,18 @@ importers:
       '@cloudflare-bot/infrastructure':
         specifier: workspace:*
         version: link:../infrastructure
+      '@cloudflare-bot/shared':
+        specifier: workspace:*
+        version: link:../shared
       cors:
         specifier: ^2.8.5
         version: 2.8.6
       express:
-        specifier: ^4.21.2
+        specifier: ^4.22.1
         version: 4.22.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17

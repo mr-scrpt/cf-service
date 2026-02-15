@@ -15,7 +15,6 @@ import {
 import { MongoUserRepository, MongoDomainRepository } from '../database/repositories';
 import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
 import { TelegramNotifierAdapter } from '../telegram/notifier.adapter';
-import { WinstonLoggerAdapter } from '../logger/winston.adapter';
 import { Env } from '../config/env.schema';
 
 export class DIContainer {
@@ -25,8 +24,8 @@ export class DIContainer {
   private notifier: INotifier;
   private logger: ILogger;
 
-  constructor(private config: Env) {
-    this.logger = new WinstonLoggerAdapter(config.NODE_ENV, 'cloudflare-bot');
+  constructor(private config: Env, logger: ILogger) {
+    this.logger = logger;
     this.userRepository = new MongoUserRepository();
     this.domainRepository = new MongoDomainRepository();
     this.cloudflareGateway = new CloudflareAdapter(

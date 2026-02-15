@@ -5,20 +5,24 @@ import { createWebhookRoutes } from './routes/webhooks.routes';
 import { createUserRoutes } from './routes/users.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { errorHandler } from './middleware/error-handler.middleware';
+import { createRequestLoggerMiddleware } from './middleware/request-logger.middleware';
 import { API_PREFIX, ROUTES } from './constants/routes';
+import { createApiLogger } from './config/logger.config';
+import { env } from './config/env.config';
 
 async function main() {
   const config = loadConfig();
   
-  const container = new DIContainer(config);
-  const logger = container.getLogger();
+  const apiLogger = createApiLogger(env.NODE_ENV);
+  const container = new DIContainer(config, apiLogger);
   
-  await connectDatabase(config.MONGODB_URI);
+  await connectDatabase(env.MONGODB_URI);
   
   const app = express();
   
   app.use(cors());
   app.use(express.json());
+  app.use(createRequestLoggerMiddleware(apiLogger));
   
   app.get(ROUTES.HEALTH, (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -26,20 +30,18 @@ async function main() {
   
   app.use(API_PREFIX, createWebhookRoutes(container));
   
-  app.use(API_PREFIX, authMiddleware(config.API_AUTH_TOKEN), createUserRoutes(container));
+  app.use(API_PREFIX, authMiddleware(env.API_AUTH_TOKEN), createUserRoutes(container));
   
   app.use(errorHandler);
   
-  const port = config.API_PORT;
+  const port = env.API_PORT;
   app.listen(port, () => {
-    logger.info('API Server started', { port, env: config.NODE_ENV });
+    apiLogger.info('API Server started', { port, env: env.NODE_ENV });
   });
 }
 
 main().catch((error) => {
-  const config = loadConfig();
-  const container = new DIContainer(config);
-  const logger = container.getLogger();
-  logger.error('Failed to start API server', { error: error.message, stack: error.stack });
+  const apiLogger = createApiLogger(env.NODE_ENV);
+  apiLogger.error('Failed to start API server', { error: error.message, stack: error.stack });
   process.exit(1);
 });

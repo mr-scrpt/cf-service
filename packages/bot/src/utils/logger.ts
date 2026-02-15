@@ -6,7 +6,7 @@ const LOG_DIR = resolve(process.cwd(), 'logs');
 
 export const logger = new LoggerAdapter({
   service: 'cloudflare-bot',
-  mode: env.NODE_ENV === Environment.Production ? LoggerMode.JSON : LoggerMode.Pretty,
+  mode: env.NODE_ENV === Environment.PRODUCTION ? LoggerMode.JSON : LoggerMode.Pretty,
   level: LoggerLevel.Debug,
   logDir: LOG_DIR,
   filename: 'bot',

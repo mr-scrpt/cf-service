@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import { Environment } from '@cloudflare-bot/shared';
+import { env } from '../config/env.config';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
-  console.error('Unhandled error:', err);
-
   res.status(500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    message: env.NODE_ENV === Environment.PRODUCTION ? 'Internal server error' : err.message,
   });
 }

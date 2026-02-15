@@ -18,3 +18,4 @@ export const commonEnvSchema = z.object({
 });
 
 export type CommonEnv = z.infer<typeof commonEnvSchema>;
+export type CloudflareEnv = z.infer<typeof cloudflareSchema>;

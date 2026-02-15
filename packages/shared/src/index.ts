@@ -1,5 +1,4 @@
 // Config
-export { Environment } from './config';
 export { commonEnvSchema, type CommonEnv } from './config';
 
 // Domain — constants
@@ -75,3 +74,5 @@ export {
   isProxiable,
   type ProxiableRecordType,
 } from './domain/constants.domain';
+
+export * from './constants';

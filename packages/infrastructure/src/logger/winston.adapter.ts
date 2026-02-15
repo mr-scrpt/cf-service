@@ -1,13 +1,11 @@
 import winston from 'winston';
 import { ILogger } from '@cloudflare-bot/application';
+import { LoggerConfig, createWinstonTransports } from './logger-config';
 
 export class WinstonLoggerAdapter implements ILogger {
   private logger: winston.Logger;
 
-  constructor(
-    private readonly env: string,
-    private readonly serviceName: string
-  ) {
+  constructor(config: LoggerConfig) {
     const logFormat = winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.errors({ stack: true }),
@@ -23,26 +21,16 @@ export class WinstonLoggerAdapter implements ILogger {
       })
     );
 
+    const transports = createWinstonTransports(config);
+
     this.logger = winston.createLogger({
-      level: env === 'production' ? 'info' : 'debug',
-      defaultMeta: { service: serviceName },
+      level: config.level,
+      defaultMeta: { service: config.serviceName },
       format: logFormat,
-      transports: [
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: 'error',
-          maxsize: 5242880,
-          maxFiles: 5,
-        }),
-        new winston.transports.File({
-          filename: 'logs/combined.log',
-          maxsize: 5242880,
-          maxFiles: 5,
-        }),
-      ],
+      transports,
     });
 
-    if (env !== 'production') {
+    if (config.consoleEnabled) {
       this.logger.add(
         new winston.transports.Console({
           format: consoleFormat,

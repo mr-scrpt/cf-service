@@ -10,12 +10,14 @@ import { CommandModule } from './commands/base/command.module';
 import { bootstrapBot } from './bootstrap';
 import { SessionData } from './types';
 import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
+import { createBotLogger } from './config/logger.config';
 
 type BotContext = Context & SessionFlavor<SessionData>;
 const bot = new Bot<BotContext>(env.TELEGRAM_BOT_TOKEN);
 
 const config = loadConfig();
-const container = new DIContainer(config);
+const botLogger = createBotLogger(config.NODE_ENV);
+const container = new DIContainer(config, botLogger);
 
 const cloudflareGateway = new CloudflareGatewayAdapter(env);
 
