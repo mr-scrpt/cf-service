@@ -7,8 +7,7 @@ import { ResponseHelper } from '../utils/response.helper';
 import { ErrorMapper } from '../mappers/error.mapper';
 
 interface AddUserBody {
-  telegramId: number;
-  username?: string;
+  username: string;
 }
 
 interface UserParams extends Record<string, string> {
@@ -31,7 +30,6 @@ export function createUserRoutes(container: DIContainer): Router {
     ROUTES.USERS.BASE,
     async (req: TypedRequestBody<AddUserBody>, res) => {
       const result = await userService.addUser({
-        telegramId: req.body.telegramId,
         username: req.body.username,
       });
       responseHelper.send(res, result, { successStatus: 201 });

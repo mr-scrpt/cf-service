@@ -16,7 +16,7 @@ export class UserService extends BaseService {
     return this.execute(
       () => this.addUserUseCase.execute(dto),
       'Add user',
-      { telegramId: dto.telegramId }
+      { username: dto.username }
     );
   }
 

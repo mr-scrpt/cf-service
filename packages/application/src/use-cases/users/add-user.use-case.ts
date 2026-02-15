@@ -1,17 +1,22 @@
 import { User, UserId, IUserRepository } from '@cloudflare-bot/domain';
 import { AddUserDto, UserDto, addUserDtoSchema } from '../../dto/add-user.dto';
-import { UserAlreadyExistsError } from '../../errors/application.error';
+import { UserAlreadyExistsError, UserNotFoundError } from '../../errors/application.error';
+import type { ITelegramBot } from '../../ports/telegram-bot.port';
 
 export class AddUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly telegramBot: ITelegramBot
+  ) {}
 
   async execute(dto: AddUserDto): Promise<UserDto> {
     const validated = addUserDtoSchema.parse(dto);
     
-    const existingUser = await this.userRepository.findByTelegramId(validated.telegramId);
+    const existingUser = await this.userRepository.findByUsername(validated.username);
+    
     if (existingUser) {
       if (existingUser.isAllowed()) {
-        throw new UserAlreadyExistsError(validated.telegramId);
+        throw new UserAlreadyExistsError(existingUser.telegramId);
       }
       
       existingUser.allow();
@@ -19,15 +24,20 @@ export class AddUserUseCase {
       return this.toDto(existingUser);
     }
     
-    const userId = UserId.fromTelegramId(validated.telegramId);
+    const telegramUser = await this.telegramBot.getUserByUsername(validated.username);
+    
+    if (!telegramUser) {
+      throw new UserNotFoundError(validated.username);
+    }
+    
+    const userId = UserId.fromTelegramId(telegramUser.id);
     const user = User.create({
       id: userId,
-      telegramId: validated.telegramId,
-      username: validated.username,
+      telegramId: telegramUser.id,
+      username: telegramUser.username,
     });
     
     user.allow();
-    
     await this.userRepository.save(user);
     
     return this.toDto(user);

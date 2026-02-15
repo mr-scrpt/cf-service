@@ -21,12 +21,11 @@ export class DomainAlreadyRegisteredError extends ApplicationError {
 }
 
 export class UserNotFoundError extends ApplicationError {
-  constructor(userId: string) {
-    super(
-      `User not found: ${userId}`,
-      'USER_NOT_FOUND',
-      { userId }
-    );
+  constructor(identifier: number | string) {
+    const message = typeof identifier === 'number' 
+      ? `User with telegram ID ${identifier} not found`
+      : `User @${identifier} not found. User must interact with bot first.`;
+    super(message, 'USER_NOT_FOUND', { identifier });
   }
 }
 

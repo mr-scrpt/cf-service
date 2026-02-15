@@ -4,7 +4,7 @@ export class User {
   private constructor(
     public readonly id: UserId,
     public readonly telegramId: number,
-    private _username: string | null,
+    private _username: string,
     private _isAllowed: boolean,
     public readonly createdAt: Date = new Date()
   ) {}
@@ -12,12 +12,12 @@ export class User {
   static create(params: {
     id: UserId;
     telegramId: number;
-    username?: string | null;
+    username: string;
   }): User {
     return new User(
       params.id,
       params.telegramId,
-      params.username ?? null,
+      params.username,
       false,
       new Date()
     );
@@ -26,7 +26,7 @@ export class User {
   static reconstruct(params: {
     id: UserId;
     telegramId: number;
-    username: string | null;
+    username: string;
     isAllowed: boolean;
     createdAt: Date;
   }): User {
@@ -39,7 +39,7 @@ export class User {
     );
   }
 
-  get username(): string | null {
+  get username(): string {
     return this._username;
   }
 
@@ -55,7 +55,7 @@ export class User {
     return this._isAllowed;
   }
 
-  updateUsername(newUsername: string | null): void {
+  updateUsername(newUsername: string): void {
     this._username = newUsername;
   }
 }

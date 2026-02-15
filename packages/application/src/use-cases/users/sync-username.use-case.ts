@@ -3,7 +3,7 @@ import { IUserRepository } from '@cloudflare-bot/domain';
 export class SyncUsernameUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(telegramId: number, currentUsername: string | null): Promise<void> {
+  async execute(telegramId: number, currentUsername: string): Promise<void> {
     const user = await this.userRepository.findByTelegramId(telegramId);
     
     if (!user) {

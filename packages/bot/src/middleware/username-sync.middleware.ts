@@ -7,9 +7,9 @@ export function createUsernameSyncMiddleware(container: DIContainer) {
 
   return async (ctx: Context, next: NextFunction): Promise<void> => {
     const telegramId = ctx.from?.id;
-    const username = ctx.from?.username ?? null;
+    const username = ctx.from?.username;
 
-    if (telegramId) {
+    if (telegramId && username) {
       try {
         await syncUsernameUseCase.execute(telegramId, username);
       } catch (error) {

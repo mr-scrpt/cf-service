@@ -91,14 +91,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"telegramId\": 123456789,\n  \"username\": \"john_doe\"\n}"
+              "raw": "{\n  \"username\": \"john_doe\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/users",
               "host": ["{{base_url}}"],
               "path": ["api", "users"]
             },
-            "description": "Add or re-enable a user - requires authentication"
+            "description": "Allow user by username (user must have interacted with bot first) - requires authentication"
           },
           "response": []
         },
