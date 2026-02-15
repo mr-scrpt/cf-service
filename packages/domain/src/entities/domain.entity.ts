@@ -22,14 +22,32 @@ export class Domain {
     name: DomainName;
     nsServers: string[];
     zoneId: string;
-    status?: DomainStatus;
   }): Domain {
     return new Domain(
       params.id,
       params.name,
       params.nsServers,
       params.zoneId,
-      params.status ?? DomainStatus.PENDING
+      DomainStatus.PENDING,
+      new Date()
+    );
+  }
+
+  static reconstruct(params: {
+    id: DomainId;
+    name: DomainName;
+    nsServers: string[];
+    zoneId: string;
+    status: DomainStatus;
+    createdAt: Date;
+  }): Domain {
+    return new Domain(
+      params.id,
+      params.name,
+      params.nsServers,
+      params.zoneId,
+      params.status,
+      params.createdAt
     );
   }
 

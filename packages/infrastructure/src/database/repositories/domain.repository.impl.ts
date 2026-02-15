@@ -30,12 +30,13 @@ export class MongoDomainRepository implements IDomainRepository {
   }
 
   private toDomain(doc: DomainDocument): Domain {
-    return Domain.create({
+    return Domain.reconstruct({
       id: DomainId.create(doc._id),
       name: DomainName.create(doc.name),
       nsServers: doc.nsServers,
       zoneId: doc.zoneId,
       status: doc.status as DomainStatus,
+      createdAt: doc.createdAt,
     });
   }
 

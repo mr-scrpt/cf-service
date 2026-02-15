@@ -13,13 +13,29 @@ export class User {
     id: UserId;
     telegramId: number;
     username?: string | null;
-    isAllowed?: boolean;
   }): User {
     return new User(
       params.id,
       params.telegramId,
       params.username ?? null,
-      params.isAllowed ?? false
+      false,
+      new Date()
+    );
+  }
+
+  static reconstruct(params: {
+    id: UserId;
+    telegramId: number;
+    username: string | null;
+    isAllowed: boolean;
+    createdAt: Date;
+  }): User {
+    return new User(
+      params.id,
+      params.telegramId,
+      params.username,
+      params.isAllowed,
+      params.createdAt
     );
   }
 

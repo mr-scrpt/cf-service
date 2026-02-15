@@ -36,7 +36,30 @@ export class DnsRecord {
       params.name,
       params.content,
       params.ttl,
-      params.proxied ?? false
+      params.proxied ?? false,
+      new Date()
+    );
+  }
+
+  static reconstruct(params: {
+    id: string;
+    zoneId: string;
+    type: DnsRecordType;
+    name: string;
+    content: string;
+    ttl: number;
+    proxied: boolean;
+    createdAt: Date;
+  }): DnsRecord {
+    return new DnsRecord(
+      params.id,
+      params.zoneId,
+      params.type,
+      params.name,
+      params.content,
+      params.ttl,
+      params.proxied,
+      params.createdAt
     );
   }
 }

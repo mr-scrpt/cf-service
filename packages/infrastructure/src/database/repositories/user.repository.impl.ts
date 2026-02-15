@@ -30,11 +30,12 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   private toDomain(doc: UserDocument): User {
-    return User.create({
+    return User.reconstruct({
       id: UserId.create(doc._id),
       telegramId: doc.telegramId,
       username: doc.username,
       isAllowed: doc.isAllowed,
+      createdAt: doc.createdAt,
     });
   }
 

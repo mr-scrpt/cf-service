@@ -19,8 +19,9 @@ export class AddUserUseCase {
       id: userId,
       telegramId: validated.telegramId,
       username: validated.username,
-      isAllowed: true,
     });
+    
+    user.allow();
     
     await this.userRepository.save(user);
     

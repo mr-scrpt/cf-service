@@ -103,7 +103,6 @@ export class CloudflareAdapter implements ICloudflareGateway {
       name: DomainName.create(zone.name),
       nsServers: zone.name_servers,
       zoneId: zone.id,
-      status: DomainStatus.ACTIVE,
     });
   }
 
