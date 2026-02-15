@@ -6,6 +6,7 @@ import type { ApiResponse } from '../types/express.types';
 export function createWebhookRoutes(container: DIContainer): Router {
   const router = Router();
   const sendNotificationUseCase = container.getSendWebhookNotificationUseCase();
+  const logger = container.getLogger();
 
   router.post(
     ROUTES.WEBHOOK.BASE,
@@ -21,7 +22,11 @@ export function createWebhookRoutes(container: DIContainer): Router {
 
         res.status(200).json({ success: true, message: 'Webhook received' });
       } catch (error) {
-        console.error('Webhook error:', error);
+        logger.error('Webhook processing failed', { 
+          method: req.method,
+          ip: req.ip,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
         res.status(500).json({ success: false, message: 'Internal server error' });
       }
     }

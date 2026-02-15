@@ -18,6 +18,7 @@ export function createUserRoutes(container: DIContainer): Router {
   const addUserUseCase = container.getAddUserUseCase();
   const listUsersUseCase = container.getListUsersUseCase();
   const removeUserUseCase = container.getRemoveUserUseCase();
+  const logger = container.getLogger();
 
   router.post(
     ROUTES.USERS.BASE,
@@ -30,7 +31,10 @@ export function createUserRoutes(container: DIContainer): Router {
 
         res.status(201).json({ success: true, data: user });
       } catch (error) {
-        console.error('Add user error:', error);
+        logger.error('Add user failed', { 
+          telegramId: req.body.telegramId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
         res.status(400).json({
           success: false,
           message: error instanceof Error ? error.message : 'Failed to add user',
@@ -46,7 +50,9 @@ export function createUserRoutes(container: DIContainer): Router {
         const users = await listUsersUseCase.execute();
         res.status(200).json({ success: true, data: users });
       } catch (error) {
-        console.error('List users error:', error);
+        logger.error('List users failed', { 
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
         res.status(500).json({ success: false, message: 'Failed to list users' });
       }
     }
@@ -61,7 +67,10 @@ export function createUserRoutes(container: DIContainer): Router {
         await removeUserUseCase.execute(telegramId);
         res.status(200).json({ success: true, message: 'User removed' });
       } catch (error) {
-        console.error('Remove user error:', error);
+        logger.error('Remove user failed', { 
+          telegramId: req.params.telegramId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
         res.status(400).json({
           success: false,
           message: error instanceof Error ? error.message : 'Failed to remove user',

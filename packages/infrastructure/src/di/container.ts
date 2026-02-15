@@ -8,11 +8,13 @@ import {
   ListUsersUseCase,
   RemoveUserUseCase,
   SendWebhookNotificationUseCase,
+  ILogger,
 } from '@cloudflare-bot/application';
 
 import { MongoUserRepository, MongoDomainRepository } from '../database/repositories';
 import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
 import { TelegramNotifierAdapter } from '../telegram/notifier.adapter';
+import { WinstonLoggerAdapter } from '../logger/winston.adapter';
 import { Env } from '../config/env.schema';
 
 export class DIContainer {
@@ -20,8 +22,10 @@ export class DIContainer {
   private domainRepository: IDomainRepository;
   private cloudflareGateway: ICloudflareGateway;
   private notifier: INotifier;
+  private logger: ILogger;
 
   constructor(private config: Env) {
+    this.logger = new WinstonLoggerAdapter(config.NODE_ENV, 'cloudflare-bot');
     this.userRepository = new MongoUserRepository();
     this.domainRepository = new MongoDomainRepository();
     this.cloudflareGateway = new CloudflareAdapter(
@@ -29,6 +33,10 @@ export class DIContainer {
       config.CLOUDFLARE_ACCOUNT_ID
     );
     this.notifier = new TelegramNotifierAdapter(config.TELEGRAM_BOT_TOKEN);
+  }
+
+  getLogger(): ILogger {
+    return this.logger;
   }
 
   getRegisterDomainUseCase(): RegisterDomainUseCase {

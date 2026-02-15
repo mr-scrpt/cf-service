@@ -10,9 +10,10 @@ import { API_PREFIX, ROUTES } from './constants/routes';
 async function main() {
   const config = loadConfig();
   
-  await connectDatabase(config.MONGODB_URI);
-  
   const container = new DIContainer(config);
+  const logger = container.getLogger();
+  
+  await connectDatabase(config.MONGODB_URI);
   
   const app = express();
   
@@ -31,11 +32,14 @@ async function main() {
   
   const port = config.API_PORT;
   app.listen(port, () => {
-    console.log(`✅ API Server running on port ${port}`);
+    logger.info('API Server started', { port, env: config.NODE_ENV });
   });
 }
 
 main().catch((error) => {
-  console.error('❌ Failed to start API server:', error);
+  const config = loadConfig();
+  const container = new DIContainer(config);
+  const logger = container.getLogger();
+  logger.error('Failed to start API server', { error: error.message, stack: error.stack });
   process.exit(1);
 });
