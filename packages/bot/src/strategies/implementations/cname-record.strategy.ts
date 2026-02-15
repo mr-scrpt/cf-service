@@ -1,5 +1,6 @@
 import {
   DnsRecordType,
+  DnsRecord,
   domainValueSchema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -87,6 +88,14 @@ ${data.comment ? `💬 ${data.comment}` : ''}
       proxied: (wizardData.fields.proxied as boolean) ?? false,
       comment: wizardData.fields.comment as string | undefined,
     };
+  }
+
+  getFieldValue(record: DnsRecord, fieldKey: string): unknown {
+    return (record as any)[fieldKey];
+  }
+
+  applyFieldChanges(record: DnsRecord, changes: Record<string, unknown>): Partial<DnsRecord> {
+    return changes;
   }
 
   private formatTTL(ttl: number): string {

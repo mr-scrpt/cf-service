@@ -1,5 +1,6 @@
 import {
   DnsRecordType,
+  DnsRecord,
   domainValueSchema,
   srvRecordSchema,
   COMMON_TTL_VALUES,
@@ -25,11 +26,19 @@ interface SRVRecordData {
   comment?: string;
 }
 
-export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData> {
+type SRVRecord = Extract<DnsRecord, { type: 'SRV' }>;
+
+export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRecord> {
   readonly type = DnsRecordType.SRV;
   readonly displayName = 'SRV Record';
   readonly icon = '🔌';
   readonly description = 'Service locator record';
+  
+  private readonly dataFields = new Set<keyof SRVRecordData['data']>(['priority', 'weight', 'port', 'target']);
+
+  private isDataField(key: string): key is keyof SRVRecordData['data'] {
+    return this.dataFields.has(key as keyof SRVRecordData['data']);
+  }
 
   getFieldConfigs(): FieldConfig[] {
     return [
@@ -127,6 +136,25 @@ ${data.comment ? `💬 ${data.comment}` : ''}
       ttl: (wizardData.fields.ttl as number) ?? 3600,
       proxied: false,
       comment: wizardData.fields.comment as string | undefined,
+    };
+  }
+
+  getFieldValue(record: SRVRecord, fieldKey: string): unknown {
+    if (this.isDataField(fieldKey)) {
+      return record.data[fieldKey];
+    }
+    return (record as any)[fieldKey];
+  }
+
+  applyFieldChanges(record: SRVRecord, changes: Record<string, unknown>): Partial<SRVRecord> {
+    const entries = Object.entries(changes);
+    
+    const dataEntries = entries.filter(([key]) => this.isDataField(key));
+    const otherEntries = entries.filter(([key]) => !this.isDataField(key));
+    
+    return {
+      ...Object.fromEntries(otherEntries),
+      data: { ...record.data, ...Object.fromEntries(dataEntries) },
     };
   }
 

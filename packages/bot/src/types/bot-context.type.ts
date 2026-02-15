@@ -38,6 +38,10 @@ export interface SessionData {
     fieldKey: string;
     fieldConfig: unknown;
   };
+  editSession?: {
+    recordIndex: number;
+    pendingChanges: Record<string, unknown>;
+  };
   selectedZone?: { zoneId: string; zoneName: string };
 }
 

@@ -19,6 +19,7 @@ import {
   DnsEditSelectHandler,
   DnsEditRecordHandler,
   DnsEditFieldHandler,
+  DnsSaveAllHandler,
   WizardSelectOptionHandler,
   WizardSkipHandler,
   WizardConfirmHandler,
@@ -67,6 +68,7 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
     { action: CallbackAction.DNS_EDIT_SELECT_DOMAIN, handler: new DnsEditSelectHandler(editFlow) },
     { action: CallbackAction.DNS_EDIT_SELECT_RECORD, handler: new DnsEditRecordHandler(editFlow) },
     { action: CallbackAction.DNS_EDIT_FIELD, handler: new DnsEditFieldHandler(editFlow) },
+    { action: CallbackAction.DNS_SAVE_ALL, handler: new DnsSaveAllHandler(editFlow) },
     {
       action: CallbackAction.WIZARD_SELECT_OPTION,
       handler: new WizardSelectOptionHandler(wizardEngine),

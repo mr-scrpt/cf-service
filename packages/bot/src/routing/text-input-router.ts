@@ -49,7 +49,7 @@ export class TextInputRouter {
   private async handleEditFieldInput(ctx: SessionContext, text: string): Promise<boolean> {
     const isEditing = ctx.session.editField !== undefined;
     if (isEditing) {
-      await this.editFlow.saveField(ctx, text);
+      await this.editFlow.validateFieldInput(ctx, text);
       return true;
     }
     return false;

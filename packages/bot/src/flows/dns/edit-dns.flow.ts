@@ -7,7 +7,7 @@ import { SessionData } from '../../types';
 import { SessionValidator } from '../../handlers/session-validators';
 import { MainMenu } from '../main-menu';
 import { DnsStrategyRegistry } from '../../strategies';
-import { FieldConfig } from '../../strategies/field-config.interface';
+import { FieldConfig, FieldInputType } from '../../strategies/field-config.interface';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -83,7 +83,7 @@ export class EditDnsFlow {
     });
   }
 
-  async showFieldSelector(ctx: SessionContext, recordIndex: number): Promise<void> {
+  async showFieldSelector(ctx: SessionContext, recordIndex: number, useReply: boolean = false): Promise<void> {
     const zone = SessionValidator.getSelectedZone(ctx);
     const record = SessionValidator.getRecordByIndex(ctx, recordIndex);
 
@@ -92,18 +92,31 @@ export class EditDnsFlow {
       return;
     }
 
-    // Store record index in session for later use
+    // Initialize or retrieve edit session
+    if (!ctx.session.editSession || ctx.session.editSession.recordIndex !== recordIndex) {
+      ctx.session.editSession = {
+        recordIndex,
+        pendingChanges: {},
+      };
+    }
 
     const strategy = this.strategyRegistry.getStrategy(record.type);
     const fieldConfigs = strategy.getFieldConfigs();
 
     const keyboard = this.buildFieldKeyboard(fieldConfigs, recordIndex);
-    const message = this.formatFieldSelectorMessage(record, fieldConfigs);
+    const message = this.formatFieldSelectorMessage(record, fieldConfigs, ctx.session.editSession.pendingChanges);
 
-    await ctx.editMessageText(message, {
-      parse_mode: 'HTML',
-      reply_markup: keyboard.build(),
-    });
+    if (useReply) {
+      await ctx.reply(message, {
+        parse_mode: 'HTML',
+        reply_markup: keyboard.build(),
+      });
+    } else {
+      await ctx.editMessageText(message, {
+        parse_mode: 'HTML',
+        reply_markup: keyboard.build(),
+      });
+    }
   }
 
   async editField(ctx: SessionContext, recordIndex: number, fieldKey: string): Promise<void> {
@@ -138,18 +151,31 @@ export class EditDnsFlow {
     await ctx.reply('💬 Please enter the new value:', { parse_mode: 'HTML' });
   }
 
-  async saveField(ctx: SessionContext, newValue: string): Promise<void> {
+  async validateFieldInput(ctx: SessionContext, newValue: string): Promise<void> {
     const editField = ctx.session.editField;
-    const record = SessionValidator.getRecordByIndex(ctx, editField!.recordIndex);
-    const zone = SessionValidator.getSelectedZone(ctx);
+    const editSession = ctx.session.editSession;
 
-    if (!editField || !record || !zone) {
+    if (!editField || !editSession) {
       await ctx.reply('❌ Edit session expired. Please try again.');
       return;
     }
 
     const fieldConfig = editField.fieldConfig as FieldConfig;
-    const validation = fieldConfig.validationSchema.safeParse(newValue);
+    
+    // Parse input based on field type
+    let parsedValue: unknown = newValue;
+    if (fieldConfig.inputType === FieldInputType.NUMBER) {
+      const num = Number(newValue);
+      if (isNaN(num)) {
+        await ctx.reply(`❌ Invalid number format. Please enter a valid number:`, { parse_mode: 'HTML' });
+        return;
+      }
+      parsedValue = num;
+    } else if (fieldConfig.inputType === FieldInputType.BOOLEAN) {
+      parsedValue = newValue.toLowerCase() === 'true' || newValue === '1';
+    }
+    
+    const validation = fieldConfig.validationSchema.safeParse(parsedValue);
 
     if (!validation.success) {
       const errorMessage = validation.error.issues[0]?.message || 'Invalid input';
@@ -157,22 +183,54 @@ export class EditDnsFlow {
       return;
     }
 
+    // Directly save to pending changes without confirmation
+    editSession.pendingChanges[fieldConfig.key] = validation.data;
+    delete ctx.session.editField;
+
+    await this.showFieldSelector(ctx, editSession.recordIndex, true);
+  }
+
+
+  async saveAllChanges(ctx: SessionContext): Promise<void> {
+    const editSession = ctx.session.editSession;
+    const zone = SessionValidator.getSelectedZone(ctx);
+    const record = SessionValidator.getRecordByIndex(ctx, editSession!.recordIndex);
+
+    if (!editSession || !zone || !record) {
+      await ctx.reply('❌ Edit session expired. Please try again.');
+      return;
+    }
+
+    if (Object.keys(editSession.pendingChanges).length === 0) {
+      await ctx.editMessageText('⚠️ No changes to save.', { parse_mode: 'HTML' });
+      return;
+    }
+
     try {
+      // Prepare update payload - exclude 'id' as it's passed separately
+      const { id, ...recordWithoutId } = record;
+      
+      // Use strategy to apply field changes (handles nested structures like SRV)
+      const strategy = this.strategyRegistry.getStrategy(record.type);
+      const processedChanges = strategy.applyFieldChanges(record, editSession.pendingChanges);
+      
       const updatedRecord = {
-        ...record,
-        [fieldConfig.key]: validation.data,
+        ...recordWithoutId,
+        ...processedChanges,
       };
 
-      // Update record through gateway
       await this.gateway.updateDnsRecord(record.id, zone.zoneId, updatedRecord as any);
 
-      delete ctx.session.editField;
+      const changesList = Object.entries(editSession.pendingChanges)
+        .map(([key, value]) => `• <b>${key}</b>: <code>${value}</code>`)
+        .join('\n');
 
-      const oldValue = (record as any)[fieldConfig.key] || 'Not set';
-      const successMessage = `✅ <b>DNS Record Updated!</b>\n\n<b>${fieldConfig.label}</b> changed from <code>${oldValue}</code> to <code>${validation.data}</code>`;
+      const successMessage = `✅ <b>DNS Record Updated!</b>\n\nChanges saved:\n${changesList}`;
       const keyboard = this.mainMenu.getMainMenuKeyboard();
 
-      await ctx.reply(successMessage, {
+      delete ctx.session.editSession;
+
+      await ctx.editMessageText(successMessage, {
         parse_mode: 'HTML',
         reply_markup: keyboard.build(),
       });
@@ -193,6 +251,7 @@ export class EditDnsFlow {
       );
     });
 
+    keyboard.addButton('💾 Save All Changes', CallbackAction.DNS_SAVE_ALL, { idx: recordIndex });
     keyboard.addNavigation({ back: true, cancel: true });
     return keyboard;
   }
@@ -218,20 +277,35 @@ Select a record to edit:
 ${recordList}`;
   }
 
-  private formatFieldSelectorMessage(record: DnsRecord, fieldConfigs: FieldConfig[]): string {
+  private formatFieldSelectorMessage(
+    record: DnsRecord,
+    fieldConfigs: FieldConfig[],
+    pendingChanges: Record<string, unknown>
+  ): string {
     const fieldList = fieldConfigs
       .map((f) => {
         const currentValue = this.getFieldCurrentValue(record, f.key);
-        return `• <b>${f.label}:</b> ${currentValue || 'Not set'}`;
+        const hasPendingChange = f.key in pendingChanges;
+        const indicator = hasPendingChange ? '✏️' : '•';
+        
+        if (hasPendingChange) {
+          const newValue = pendingChanges[f.key];
+          return `${indicator} <b>${f.label}:</b> ${currentValue || 'Not set'} → ${newValue}`;
+        } else {
+          return `${indicator} <b>${f.label}:</b> ${currentValue || 'Not set'}`;
+        }
       })
       .join('\n');
+
+    const changesCount = Object.keys(pendingChanges).length;
+    const changesInfo = changesCount > 0 ? `\n\n📝 <b>${changesCount} pending change(s)</b>` : '';
 
     return `✏️ <b>Edit DNS Record</b>
 <b>Type:</b> ${record.type}
 <b>Name:</b> ${record.name}
 
 <b>Current values:</b>
-${fieldList}
+${fieldList}${changesInfo}
 
 Select a field to edit:`;
   }
@@ -252,7 +326,10 @@ Select a field to edit:`;
   }
 
   private getFieldCurrentValue(record: DnsRecord, fieldKey: string): unknown {
-    const value = (record as any)[fieldKey];
+    // Use strategy to get field value (handles nested structures like SRV)
+    const strategy = this.strategyRegistry.getStrategy(record.type);
+    const value = strategy.getFieldValue(record, fieldKey);
+    
     if (value === undefined || value === null) {
       return 'Not set';
     }

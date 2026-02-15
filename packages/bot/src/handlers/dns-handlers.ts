@@ -12,7 +12,7 @@ import {
   DeleteRecordConfirmPayload,
   WizardOptionPayload,
 } from './handler-payloads';
-import { EditDomainIndexPayload, EditRecordSelectPayload, EditFieldPayload } from './edit-handler-payloads';
+import { EditDomainIndexPayload, EditRecordSelectPayload, EditFieldPayload, ConfirmFieldPayload, SaveAllPayload } from './edit-handler-payloads';
 import { SessionValidator } from './session-validators';
 import { DeleteHandlerStrategy } from './delete-handler-strategy';
 
@@ -174,5 +174,14 @@ export class DnsEditFieldHandler implements CallbackHandler<EditFieldPayload> {
     } else {
       await this.editFlow.showFieldSelector(ctx, payload.idx);
     }
+  }
+}
+
+
+export class DnsSaveAllHandler implements CallbackHandler<SaveAllPayload> {
+  constructor(private readonly editFlow: EditDnsFlow) {}
+
+  async handle(ctx: SessionContext, payload: SaveAllPayload): Promise<void> {
+    await this.editFlow.saveAllChanges(ctx);
   }
 }

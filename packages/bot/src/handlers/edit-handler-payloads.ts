@@ -8,5 +8,13 @@ export interface EditRecordSelectPayload {
 
 export interface EditFieldPayload {
   idx: number;
-  field: string;
+  field?: string;
+}
+
+export interface ConfirmFieldPayload {
+  value: unknown;
+}
+
+export interface SaveAllPayload {
+  idx: number;
 }
