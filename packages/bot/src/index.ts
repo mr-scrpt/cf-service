@@ -3,7 +3,9 @@ import { env } from './config/env.config';
 import { logger } from './utils/logger';
 import { authGuard } from './middleware/auth.middleware';
 import { requestLoggerMiddleware } from './middleware/request-logger.middleware';
+import { createUsernameSyncMiddleware } from './middleware/username-sync.middleware';
 import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
+import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
 import { CommandModule } from './commands/base/command.module';
 import { bootstrapBot } from './bootstrap';
 import { SessionData } from './types';
@@ -12,12 +14,16 @@ import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
 type BotContext = Context & SessionFlavor<SessionData>;
 const bot = new Bot<BotContext>(env.TELEGRAM_BOT_TOKEN);
 
+const config = loadConfig();
+const container = new DIContainer(config);
+
 const cloudflareGateway = new CloudflareGatewayAdapter(env);
 
 bootstrapBot(bot, cloudflareGateway);
 
 bot.use(requestLoggerMiddleware);
 bot.use(authGuard);
+bot.use(createUsernameSyncMiddleware(container));
 
 const commandModule = new CommandModule<BotContext>(cloudflareGateway);
 commandModule.getRegistry().setupBot(bot);

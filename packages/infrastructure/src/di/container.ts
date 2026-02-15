@@ -8,6 +8,7 @@ import {
   ListUsersUseCase,
   RemoveUserUseCase,
   SendWebhookNotificationUseCase,
+  SyncUsernameUseCase,
   ILogger,
 } from '@cloudflare-bot/application';
 
@@ -57,6 +58,10 @@ export class DIContainer {
 
   getRemoveUserUseCase(): RemoveUserUseCase {
     return new RemoveUserUseCase(this.userRepository);
+  }
+
+  getSyncUsernameUseCase(): SyncUsernameUseCase {
+    return new SyncUsernameUseCase(this.userRepository);
   }
 
   getSendWebhookNotificationUseCase(): SendWebhookNotificationUseCase {

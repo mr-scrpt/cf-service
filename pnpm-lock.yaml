@@ -73,6 +73,9 @@ importers:
 
   packages/bot:
     dependencies:
+      '@cloudflare-bot/infrastructure':
+        specifier: workspace:*
+        version: link:../infrastructure
       '@cloudflare-bot/shared':
         specifier: workspace:*
         version: link:../shared

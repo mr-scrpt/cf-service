@@ -4,7 +4,7 @@ export class User {
   private constructor(
     public readonly id: UserId,
     public readonly telegramId: number,
-    public readonly username: string | null,
+    private _username: string | null,
     private _isAllowed: boolean,
     public readonly createdAt: Date = new Date()
   ) {}
@@ -23,6 +23,10 @@ export class User {
     );
   }
 
+  get username(): string | null {
+    return this._username;
+  }
+
   allow(): void {
     this._isAllowed = true;
   }
@@ -33,5 +37,9 @@ export class User {
 
   isAllowed(): boolean {
     return this._isAllowed;
+  }
+
+  updateUsername(newUsername: string | null): void {
+    this._username = newUsername;
   }
 }
