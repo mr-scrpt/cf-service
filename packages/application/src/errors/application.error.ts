@@ -38,3 +38,13 @@ export class UserAlreadyExistsError extends ApplicationError {
     );
   }
 }
+
+export class RegistrationRequestNotFoundError extends ApplicationError {
+  constructor(requestId: string) {
+    super(
+      `Registration request ${requestId} not found`,
+      'REGISTRATION_REQUEST_NOT_FOUND',
+      { requestId }
+    );
+  }
+}

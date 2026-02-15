@@ -62,7 +62,7 @@ export class CloudflareAdapter implements ICloudflareGateway {
     proxied?: boolean;
   }): Promise<DnsRecord> {
     try {
-      const updateParams: any = {
+      const updateParams: Record<string, unknown> = {
         zone_id: params.zoneId,
       };
       if (params.type) updateParams.type = params.type;
@@ -71,7 +71,7 @@ export class CloudflareAdapter implements ICloudflareGateway {
       if (params.ttl) updateParams.ttl = params.ttl;
       if (params.proxied !== undefined) updateParams.proxied = params.proxied;
 
-      const record = await this.client.dns.records.update(params.recordId, updateParams);
+      const record = await this.client.dns.records.update(params.recordId, updateParams as any);
 
       return this.mapRecordToDomain(record, params.zoneId);
     } catch (error) {

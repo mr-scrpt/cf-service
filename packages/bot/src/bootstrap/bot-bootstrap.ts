@@ -1,4 +1,4 @@
-import { Bot, Context, SessionFlavor, session } from 'grammy';
+import { Bot, session, Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { bootstrapDnsStrategies } from '../strategies';
 import { SessionManager } from '../session';
@@ -96,11 +96,11 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
     { action: CallbackAction.NAV_MAIN_MENU, handler: new NavigationMainMenuHandler(mainMenu) },
   ]);
 
-  bot.on(BotEvent.CALLBACK_QUERY, async (ctx) => {
+  bot.on(BotEvent.CALLBACK_QUERY, async (ctx: any) => {
     await callbackRouter.route(ctx);
   });
 
-  bot.on(BotEvent.MESSAGE_TEXT, async (ctx, next) => {
+  bot.on(BotEvent.MESSAGE_TEXT, async (ctx: any, next) => {
     const handled = await textInputRouter.route(ctx, ctx.message.text);
     if (!handled) {
       await next();

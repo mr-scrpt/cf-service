@@ -2,22 +2,22 @@ import { Bot, Context } from 'grammy';
 import { BotCommand } from './command.interface';
 
 export class CommandRegistry<C extends Context = Context> {
-  private commands = new Map<string, BotCommand<C>>();
+  private commands = new Map<string, BotCommand>();
 
-  register(command: BotCommand<C>): void {
-    if (this.commands.has(command.name)) {
-      throw new Error(`Command ${command.name} is already registered`);
+  register(name: string, command: BotCommand): void {
+    if (this.commands.has(name)) {
+      throw new Error(`Command ${name} is already registered`);
     }
-    this.commands.set(command.name, command);
+    this.commands.set(name, command);
   }
 
-  registerAll(commands: BotCommand<C>[]): void {
-    commands.forEach((cmd) => this.register(cmd));
+  registerAll(commands: BotCommand[]): void {
+    commands.forEach((cmd) => this.register(cmd.name, cmd));
   }
 
   setupBot(bot: Bot<C>): void {
     this.commands.forEach((command, name) => {
-      bot.command(name, (ctx) => command.execute(ctx));
+      bot.command(name, (ctx: C) => command.execute(ctx));
     });
   }
 

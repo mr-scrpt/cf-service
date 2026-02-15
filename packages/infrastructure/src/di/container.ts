@@ -8,12 +8,16 @@ import {
   RemoveUserUseCase,
   SendWebhookNotificationUseCase,
   SyncUsernameUseCase,
+  CreateRegistrationRequestUseCase,
+  ListPendingRequestsUseCase,
+  ApproveRegistrationRequestUseCase,
+  RejectRegistrationRequestUseCase,
   ILogger,
   IDatabaseService,
   ITelegramBot
 } from '@cloudflare-bot/application';
-import { IUserRepository, IDomainRepository } from '@cloudflare-bot/domain';
-import { MongoUserRepository, MongoDomainRepository } from '../database/repositories';
+import { IUserRepository, IDomainRepository, IRegistrationRequestRepository } from '@cloudflare-bot/domain';
+import { MongoUserRepository, MongoDomainRepository, MongoRegistrationRequestRepository } from '../database/repositories';
 import { MongooseDatabaseService } from '../database';
 import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
 import { TelegramAdapter } from '../telegram';
@@ -22,6 +26,7 @@ import { Env } from '../config/env.schema';
 export class DIContainer {
   private userRepository: IUserRepository;
   private domainRepository: IDomainRepository;
+  private registrationRequestRepository: IRegistrationRequestRepository;
   private cloudflareGateway: ICloudflareGateway;
   private telegram: TelegramAdapter;
   private logger: ILogger;
@@ -32,6 +37,7 @@ export class DIContainer {
     this.databaseService = new MongooseDatabaseService(config.MONGODB_URI);
     this.userRepository = new MongoUserRepository();
     this.domainRepository = new MongoDomainRepository();
+    this.registrationRequestRepository = new MongoRegistrationRequestRepository();
     this.cloudflareGateway = new CloudflareAdapter(
       config.CLOUDFLARE_API_TOKEN,
       config.CLOUDFLARE_ACCOUNT_ID
@@ -53,6 +59,10 @@ export class DIContainer {
 
   getTelegramAdapter(): TelegramAdapter {
     return this.telegram;
+  }
+
+  getCloudflareGateway(): ICloudflareGateway {
+    return this.cloudflareGateway;
   }
 
   getAddUserUseCase(): AddUserUseCase {
@@ -79,7 +89,27 @@ export class DIContainer {
     return new SendWebhookNotificationUseCase(this.telegram, this.config.ALLOWED_CHAT_ID);
   }
 
-  getUserService(): any {
+  getCreateRegistrationRequestUseCase(): CreateRegistrationRequestUseCase {
+    return new CreateRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository);
+  }
+
+  getListPendingRequestsUseCase(): ListPendingRequestsUseCase {
+    return new ListPendingRequestsUseCase(this.registrationRequestRepository);
+  }
+
+  getApproveRegistrationRequestUseCase(): ApproveRegistrationRequestUseCase {
+    return new ApproveRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository, this.telegram);
+  }
+
+  getRejectRegistrationRequestUseCase(): RejectRegistrationRequestUseCase {
+    return new RejectRegistrationRequestUseCase(this.registrationRequestRepository, this.telegram);
+  }
+
+  getRegistrationRequestRepository(): IRegistrationRequestRepository {
+    return this.registrationRequestRepository;
+  }
+
+  getUserService() {
     return {
       addUserUseCase: this.getAddUserUseCase(),
       listUsersUseCase: this.getListUsersUseCase(),
@@ -88,14 +118,24 @@ export class DIContainer {
     };
   }
 
-  getWebhookService(): any {
+  getWebhookService() {
     return {
       sendNotificationUseCase: this.getSendWebhookNotificationUseCase(),
       logger: this.logger,
     };
   }
 
-  getResponseHelper(): any {
+  getResponseHelper() {
     return { errorMapper: {} };
+  }
+
+  getRegistrationService() {
+    return {
+      createRequestUseCase: this.getCreateRegistrationRequestUseCase(),
+      listPendingRequestsUseCase: this.getListPendingRequestsUseCase(),
+      approveRequestUseCase: this.getApproveRegistrationRequestUseCase(),
+      rejectRequestUseCase: this.getRejectRegistrationRequestUseCase(),
+      logger: this.logger,
+    };
   }
 }

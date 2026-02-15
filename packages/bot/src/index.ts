@@ -1,27 +1,31 @@
 import { Bot, Context, SessionFlavor } from 'grammy';
+import type { BotError } from 'grammy';
+import type { UserFromGetMe } from 'grammy/types';
 import { env } from './config/env.config';
 import { logger } from './utils/logger';
-import { authGuard } from './middleware/auth.middleware';
+import { authGuard, initAuthGuard } from './middleware/auth.middleware';
 import { requestLoggerMiddleware } from './middleware/request-logger.middleware';
 import { createUsernameSyncMiddleware } from './middleware/username-sync.middleware';
-import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
 import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
+import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
 import { CommandModule } from './commands/base/command.module';
 import { bootstrapBot } from './bootstrap';
 import { SessionData } from './types';
 import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
 import { createBotLogger } from './config/logger.config';
+import { createRegistrationHandlers } from './handlers/registration.handler';
 
 const config = loadConfig();
 const botLogger = createBotLogger(config.NODE_ENV);
 const container = new DIContainer(config, botLogger);
 
-const telegramAdapter = container.getTelegramAdapter();
-const bot = telegramAdapter.getBot() as any;
+initAuthGuard(container);
 
 type BotContext = Context & SessionFlavor<SessionData>;
 
+const telegramAdapter = container.getTelegramAdapter();
 const cloudflareGateway = new CloudflareGatewayAdapter(env);
+const bot = telegramAdapter.getBotTyped<BotContext>();
 
 bootstrapBot(bot, cloudflareGateway);
 
@@ -29,14 +33,17 @@ bot.use(requestLoggerMiddleware);
 bot.use(authGuard);
 bot.use(createUsernameSyncMiddleware(container));
 
-const commandModule = new CommandModule(cloudflareGateway);
+const registrationHandlers = createRegistrationHandlers(container);
+bot.callbackQuery('request_access', registrationHandlers.handleRequestAccess);
+
+const commandModule = new CommandModule<BotContext>(cloudflareGateway);
 commandModule.getRegistry().setupBot(bot);
 
-bot.api.getMe().then((me: any) => {
+bot.api.getMe().then((me: UserFromGetMe) => {
   logger.info('Bot started', { username: me.username, admin_id: env.ALLOWED_CHAT_ID });
 });
 
-bot.catch(async (err: any) => {
+bot.catch(async (err: BotError<Context>) => {
   const { ctx, error } = err;
   
   logger.error('Unhandled bot error', { 

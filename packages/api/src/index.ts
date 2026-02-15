@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createWebhookRoutes } from './routes/webhooks.routes';
 import { createUserRoutes } from './routes/users.routes';
+import { createRegistrationRoutes } from './routes/registration.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { errorHandler } from './middleware/error-handler.middleware';
 import { createRequestLoggerMiddleware } from './middleware/request-logger.middleware';
@@ -24,6 +25,7 @@ async function main() {
   app.use(API_PREFIX, createWebhookRoutes(container));
   
   app.use(API_PREFIX, authMiddleware(env.API_AUTH_TOKEN), createUserRoutes(container));
+  app.use(API_PREFIX, authMiddleware(env.API_AUTH_TOKEN), createRegistrationRoutes(container));
   
   app.use(errorHandler);
   

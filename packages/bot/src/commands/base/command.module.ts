@@ -21,14 +21,16 @@ export class CommandModule<C extends Context = Context> {
   }
 
   private registerCommands(): void {
-    const commands: BotCommand<C>[] = [
-      new RegisterDomainCommand(this.gateway) as BotCommand<C>,
-      new ListDomainsCommand(this.gateway) as BotCommand<C>,
-      new CreateDnsCommand(this.gateway) as BotCommand<C>,
-      new StartCommand() as BotCommand<C>,
+    const commands: BotCommand[] = [
+      new RegisterDomainCommand(this.gateway),
+      new ListDomainsCommand(this.gateway),
+      new CreateDnsCommand(this.gateway),
+      new StartCommand(),
     ];
 
-    this.registry.registerAll(commands);
+    commands.forEach((command) => {
+      this.registry.register(command.name, command);
+    });
   }
 
   getRegistry(): CommandRegistry<C> {

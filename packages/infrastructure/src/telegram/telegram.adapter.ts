@@ -1,4 +1,4 @@
-import { Bot } from 'grammy';
+import { Bot, Context } from 'grammy';
 import type { INotifier, ITelegramBot, TelegramUserInfo, ILogger } from '@cloudflare-bot/application';
 
 export class TelegramAdapter implements INotifier, ITelegramBot {
@@ -12,6 +12,10 @@ export class TelegramAdapter implements INotifier, ITelegramBot {
 
   getBot(): Bot {
     return this.bot;
+  }
+
+  getBotTyped<C extends Context>(): Bot<C> {
+    return this.bot as unknown as Bot<C>;
   }
 
   async sendMessage(
