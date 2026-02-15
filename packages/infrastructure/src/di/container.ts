@@ -10,9 +10,11 @@ import {
   SendWebhookNotificationUseCase,
   SyncUsernameUseCase,
   ILogger,
+  IDatabaseService
 } from '@cloudflare-bot/application';
 
 import { MongoUserRepository, MongoDomainRepository } from '../database/repositories';
+import { MongooseDatabaseService } from '../database';
 import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
 import { TelegramNotifierAdapter } from '../telegram/notifier.adapter';
 import { Env } from '../config/env.schema';
@@ -23,9 +25,11 @@ export class DIContainer {
   private cloudflareGateway: ICloudflareGateway;
   private notifier: INotifier;
   private logger: ILogger;
+  private databaseService: IDatabaseService;
 
   constructor(private config: Env, logger: ILogger) {
     this.logger = logger;
+    this.databaseService = new MongooseDatabaseService(config.MONGODB_URI);
     this.userRepository = new MongoUserRepository();
     this.domainRepository = new MongoDomainRepository();
     this.cloudflareGateway = new CloudflareAdapter(
@@ -37,6 +41,10 @@ export class DIContainer {
 
   getLogger(): ILogger {
     return this.logger;
+  }
+
+  getDatabaseService(): IDatabaseService {
+    return this.databaseService;
   }
 
   getRegisterDomainUseCase(): RegisterDomainUseCase {
