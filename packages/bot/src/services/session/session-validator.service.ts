@@ -1,4 +1,4 @@
-import { SessionContext } from '../../infrastructure/routing';
+import { SessionContext } from '@infrastructure/routing';
 import { Domain, DnsRecord } from '@cloudflare-bot/shared';
 
 export class SessionValidator {

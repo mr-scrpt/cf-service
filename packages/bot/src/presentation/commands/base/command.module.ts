@@ -4,10 +4,10 @@ import { BotCommand } from './command.interface';
 import { CommandRegistry } from './command.registry';
 
 // Import commands
-import { RegisterDomainCommand } from '../domain/register-domain.command';
-import { ListDomainsCommand } from '../domain/list-domain.command';
-import { CreateDnsCommand } from '../dns/create-dns.command';
-import { StartCommand } from '../general/start.command';
+import { RegisterDomainCommand } from '@presentation/commands/domain/register-domain.command';
+import { ListDomainsCommand } from '@presentation/commands/domain/list-domain.command';
+import { CreateDnsCommand } from '@presentation/commands/dns/create-dns.command';
+import { StartCommand } from '@presentation/commands/general/start.command';
 
 /**
  * Command module - handles dependency injection and registration

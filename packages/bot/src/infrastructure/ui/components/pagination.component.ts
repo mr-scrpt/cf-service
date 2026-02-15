@@ -1,5 +1,5 @@
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'grammy/types';
-import { CallbackAction } from '../../../shared/constants';
+import { CallbackAction } from '@shared/constants';
 
 export interface PaginationConfig<T> {
   items: T[];

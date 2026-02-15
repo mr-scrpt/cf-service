@@ -1,13 +1,13 @@
 import { Bot, session, Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { bootstrapDnsStrategies } from '../../domain/dns/strategies';
-import { SessionManager } from '../../services/session';
-import { WizardEngine, WizardValidator, WizardRenderer } from '../wizard';
-import { PaginationComponent, KeyboardBuilder } from '../ui/components';
-import { DnsRecordFormatter, DomainFormatter } from '../ui/formatters';
-import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, EditDnsFlow, MainMenu, DnsMenu, DomainMenu, CreateDomainFlow, ListDomainFlow } from '../../application/flows';
-import { CallbackRouter, TextInputRouter } from '../routing';
-import { CallbackAction, BotEvent } from '../../shared/constants';
+import { bootstrapDnsStrategies } from '@domain/dns/strategies';
+import { SessionManager } from '@services/session';
+import { WizardEngine, WizardValidator, WizardRenderer } from '@infrastructure/wizard';
+import { PaginationComponent, KeyboardBuilder } from '@infrastructure/ui/components';
+import { DnsRecordFormatter, DomainFormatter } from '@infrastructure/ui/formatters';
+import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, EditDnsFlow, MainMenu, DnsMenu, DomainMenu, CreateDomainFlow, ListDomainFlow } from '@application/flows';
+import { CallbackRouter, TextInputRouter } from '@infrastructure/routing';
+import { CallbackAction, BotEvent } from '@shared/constants';
 import {
   DnsManagementHandler,
   DnsCreateSelectDomainHandler,
@@ -31,8 +31,8 @@ import {
   NavigationMainMenuHandler,
   NavigationBackHandler,
   RegistrationRequestHandler,
-} from '../../presentation/handlers';
-import { SessionData } from '../../shared/types';
+} from '@presentation/handlers';
+import { SessionData } from '@shared/types';
 import { DIContainer } from '@cloudflare-bot/infrastructure';
 
 export function bootstrapBot(

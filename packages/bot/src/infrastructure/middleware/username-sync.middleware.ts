@@ -1,6 +1,6 @@
 import type { NextFunction, Context } from 'grammy';
 import type { DIContainer } from '@cloudflare-bot/infrastructure';
-import { logger } from '../../shared/utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export function createUsernameSyncMiddleware(container: DIContainer) {
   const syncUsernameUseCase = container.getSyncUsernameUseCase();

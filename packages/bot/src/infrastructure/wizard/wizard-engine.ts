@@ -1,10 +1,10 @@
 import { Context, SessionFlavor } from 'grammy';
-import { SessionManager } from '../../services/session';
-import { SessionKey } from '../../shared/constants';
+import { SessionManager } from '@services/session';
+import { SessionKey } from '@shared/constants';
 import { WizardConfig, WizardState, WizardStep } from './wizard.interfaces';
 import { WizardValidator } from './wizard-validator';
 import { WizardRenderer } from './wizard-renderer';
-import { SessionData } from '../../shared/types';
+import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

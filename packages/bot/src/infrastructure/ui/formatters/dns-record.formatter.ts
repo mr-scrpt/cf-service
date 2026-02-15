@@ -1,5 +1,5 @@
 import { DnsRecord, DnsRecordType } from '@cloudflare-bot/shared';
-import { DnsStrategyRegistry } from '../../../domain/dns/strategies';
+import { DnsStrategyRegistry } from '@domain/dns/strategies';
 
 export class DnsRecordFormatter {
   constructor(private readonly strategyRegistry: DnsStrategyRegistry) {}

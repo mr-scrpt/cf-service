@@ -1,7 +1,7 @@
 import { Context, SessionFlavor } from 'grammy';
-import { KeyboardBuilder } from '../../infrastructure/ui/components';
-import { CallbackAction } from '../../shared/constants';
-import { SessionData } from '../../shared/types';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { CallbackAction } from '@shared/constants';
+import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

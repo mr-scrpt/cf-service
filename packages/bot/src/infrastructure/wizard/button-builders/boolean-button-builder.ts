@@ -1,8 +1,8 @@
 import { InlineKeyboardButton } from 'grammy/types';
 import { WizardButtonBuilder } from './wizard-button-builder.interface';
 import { WizardStep } from '../wizard.interfaces';
-import { FieldConfig, FieldInputType } from '../../../domain/dns/strategies/field-config.interface';
-import { CommonButtons } from '../../ui/components/common-buttons';
+import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
+import { CommonButtons } from '@infrastructure/ui/components/common-buttons';
 
 /**
  * Builds Yes/No buttons for BOOLEAN input type fields.

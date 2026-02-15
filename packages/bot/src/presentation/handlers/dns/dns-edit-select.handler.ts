@@ -1,6 +1,6 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { EditDnsFlow } from '../../../application/flows';
-import { EditDomainIndexPayload } from '../../../shared/types/payloads';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { EditDnsFlow } from '@application/flows';
+import { EditDomainIndexPayload } from '@shared/types/payloads';
 
 export class DnsEditSelectHandler implements CallbackHandler<EditDomainIndexPayload> {
   constructor(private readonly editFlow: EditDnsFlow) {}

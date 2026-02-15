@@ -1,18 +1,18 @@
 import { Bot, Context, SessionFlavor } from 'grammy';
 import type { BotError } from 'grammy';
 import type { UserFromGetMe } from 'grammy/types';
-import { env } from './shared/config/env.config';
-import { logger } from './shared/utils/logger';
-import { authGuard, initAuthGuard } from './infrastructure/middleware/auth.middleware';
-import { requestLoggerMiddleware } from './infrastructure/middleware/request-logger.middleware';
-import { createUsernameSyncMiddleware } from './infrastructure/middleware/username-sync.middleware';
+import { env } from '@shared/config/env.config';
+import { logger } from '@shared/utils/logger';
+import { authGuard, initAuthGuard } from '@infrastructure/middleware/auth.middleware';
+import { requestLoggerMiddleware } from '@infrastructure/middleware/request-logger.middleware';
+import { createUsernameSyncMiddleware } from '@infrastructure/middleware/username-sync.middleware';
 import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
 import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
-import { CommandModule } from './presentation/commands/base/command.module';
-import { bootstrapBot } from './infrastructure/bootstrap';
-import { SessionData } from './shared/types';
-import { TelegramErrorFormatter } from './shared/core/errors/telegram.formatter';
-import { createBotLogger } from './shared/config/logger.config';
+import { CommandModule } from '@presentation/commands/base/command.module';
+import { bootstrapBot } from '@infrastructure/bootstrap';
+import { SessionData } from '@shared/types';
+import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
+import { createBotLogger } from '@shared/config/logger.config';
 
 async function main() {
   const config = loadConfig();

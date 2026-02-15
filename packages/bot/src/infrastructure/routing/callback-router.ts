@@ -1,6 +1,6 @@
-import { CallbackAction } from '../../shared/constants';
+import { CallbackAction } from '@shared/constants';
 import { CallbackHandler, ParsedCallback, SessionContext } from './callback-handler.interface';
-import { logger } from '../../shared/utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export class CallbackRouter {
   private handlers = new Map<CallbackAction, CallbackHandler<unknown>>();

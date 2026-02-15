@@ -1,8 +1,8 @@
 import { Context } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
-import { CommandName } from '../../../shared/constants';
-import { TelegramErrorFormatter } from '../../../shared/core/errors/telegram.formatter';
+import { CommandName } from '@shared/constants';
+import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 import { formatDomainsList } from './domain-messages.template';
 
 export class ListDomainsCommand implements BotCommand {

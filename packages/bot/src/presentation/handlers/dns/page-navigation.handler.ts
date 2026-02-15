@@ -1,6 +1,6 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { ListDnsFlow } from '../../../application/flows';
-import { PaginationPayload } from '../../../shared/types/payloads';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { ListDnsFlow } from '@application/flows';
+import { PaginationPayload } from '@shared/types/payloads';
 
 export class PageNavigationHandler implements CallbackHandler<PaginationPayload> {
   constructor(private readonly listFlow: ListDnsFlow) {}

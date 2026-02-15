@@ -1,5 +1,5 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { CreateDnsFlow } from '../../../application/flows';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { CreateDnsFlow } from '@application/flows';
 
 export class DnsCreateSelectDomainHandler implements CallbackHandler<void> {
   constructor(private readonly createFlow: CreateDnsFlow) {}

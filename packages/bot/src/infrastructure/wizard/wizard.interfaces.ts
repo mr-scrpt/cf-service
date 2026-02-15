@@ -1,5 +1,5 @@
 import { Context } from 'grammy';
-import { FieldConfig } from '../../domain/dns/strategies/field-config.interface';
+import { FieldConfig } from '@domain/dns/strategies/field-config.interface';
 
 export interface WizardStep {
   fieldConfig: FieldConfig;

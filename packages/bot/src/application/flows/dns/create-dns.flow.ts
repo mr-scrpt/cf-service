@@ -1,12 +1,12 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort, DnsRecordType } from '@cloudflare-bot/shared';
-import { DnsStrategyRegistry } from '../../../domain/dns/strategies';
-import { WizardEngine, WizardConfig } from '../../../infrastructure/wizard';
-import { KeyboardBuilder } from '../../../infrastructure/ui/components';
-import { CallbackAction } from '../../../shared/constants';
-import { DnsRecordFormatter } from '../../../infrastructure/ui/formatters';
-import { SessionData } from '../../../shared/types';
-import { TelegramErrorFormatter } from '../../../shared/core/errors/telegram.formatter';
+import { DnsStrategyRegistry } from '@domain/dns/strategies';
+import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { CallbackAction } from '@shared/constants';
+import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { SessionData } from '@shared/types';
+import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;

@@ -1,8 +1,8 @@
 import { Context } from 'grammy';
 import { BotCommand } from '../base/command.interface';
-import { CommandName, CallbackAction } from '../../../shared/constants';
-import { KeyboardBuilder } from '../../../infrastructure/ui/components';
-import { logger } from '../../../shared/utils/logger';
+import { CommandName, CallbackAction } from '@shared/constants';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { logger } from '@shared/utils/logger';
 
 export class StartCommand implements BotCommand {
     readonly name = CommandName.START;

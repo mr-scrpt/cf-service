@@ -1,7 +1,7 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { DeleteDnsFlow } from '../../../application/flows';
-import { DeleteRecordSelectPayload } from '../../../shared/types/payloads';
-import { DeleteHandlerStrategy } from '../../../services/strategies/delete-flow.strategy';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { DeleteDnsFlow } from '@application/flows';
+import { DeleteRecordSelectPayload } from '@shared/types/payloads';
+import { DeleteHandlerStrategy } from '@services/strategies/delete-flow.strategy';
 
 export class DnsDeleteSelectHandler implements CallbackHandler<DeleteRecordSelectPayload> {
   private readonly strategy: DeleteHandlerStrategy;

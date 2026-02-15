@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
-import { SessionKey } from '../../shared/constants';
-import { SessionData } from '../../shared/types';
+import { SessionKey } from '@shared/constants';
+import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

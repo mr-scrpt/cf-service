@@ -1,7 +1,7 @@
 import { Context, SessionFlavor } from 'grammy';
-import { SessionData } from '../../shared/types';
-import { WizardEngine } from '../wizard';
-import { EditDnsFlow } from '../../application/flows';
+import { SessionData } from '@shared/types';
+import { WizardEngine } from '@infrastructure/wizard';
+import { EditDnsFlow } from '@application/flows';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 type TextInputHandler = (ctx: SessionContext, text: string) => Promise<boolean>;

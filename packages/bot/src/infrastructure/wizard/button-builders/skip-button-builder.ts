@@ -1,7 +1,7 @@
 import { InlineKeyboardButton } from 'grammy/types';
 import { WizardButtonBuilder } from './wizard-button-builder.interface';
 import { WizardStep } from '../wizard.interfaces';
-import { CommonButtons } from '../../ui/components/common-buttons';
+import { CommonButtons } from '@infrastructure/ui/components/common-buttons';
 
 /**
  * Builds Skip button for optional (non-required) fields.

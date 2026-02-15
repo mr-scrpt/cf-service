@@ -1,9 +1,9 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { DomainFormatter } from '../../../infrastructure/ui/formatters/domain-formatter';
-import { KeyboardBuilder } from '../../../infrastructure/ui/components';
-import { SessionData } from '../../../shared/types';
-import { TelegramErrorFormatter } from '../../../shared/core/errors/telegram.formatter';
+import { DomainFormatter } from '@infrastructure/ui/formatters/domain-formatter';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { SessionData } from '@shared/types';
+import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

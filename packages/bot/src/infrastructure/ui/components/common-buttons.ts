@@ -1,5 +1,5 @@
 import { InlineKeyboardButton } from 'grammy/types';
-import { CallbackAction } from '../../../shared/constants';
+import { CallbackAction } from '@shared/constants';
 
 /**
  * Factory for commonly used buttons across the application.

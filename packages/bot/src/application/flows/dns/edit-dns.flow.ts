@@ -1,14 +1,14 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
-import { KeyboardBuilder } from '../../../infrastructure/ui/components';
-import { DnsRecordFormatter } from '../../../infrastructure/ui/formatters';
-import { CallbackAction, FlowStep } from '../../../shared/constants';
-import { SessionData } from '../../../shared/types';
-import { SessionValidator } from '../../../services/session/session-validator.service';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { CallbackAction, FlowStep } from '@shared/constants';
+import { SessionData } from '@shared/types';
+import { SessionValidator } from '@services/session/session-validator.service';
 import { MainMenu } from '../main-menu';
-import { DnsStrategyRegistry } from '../../../domain/dns/strategies';
-import { FieldConfig, FieldInputType } from '../../../domain/dns/strategies/field-config.interface';
-import { TelegramErrorFormatter } from '../../../shared/core/errors/telegram.formatter';
+import { DnsStrategyRegistry } from '@domain/dns/strategies';
+import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
+import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

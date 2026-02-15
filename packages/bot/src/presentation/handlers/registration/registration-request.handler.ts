@@ -1,5 +1,5 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing/callback-handler.interface';
-import { logger } from '../../../shared/utils/logger';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing/callback-handler.interface';
+import { logger } from '@shared/utils/logger';
 
 export class RegistrationRequestHandler implements CallbackHandler<void> {
   constructor(private readonly createRequestUseCase: any) {}

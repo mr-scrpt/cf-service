@@ -1,7 +1,7 @@
 import { Context } from 'grammy';
 import { InlineKeyboardMarkup, InlineKeyboardButton } from 'grammy/types';
 import { WizardStep, WizardState, WizardConfig } from './wizard.interfaces';
-import { CommonButtons } from '../ui/components/common-buttons';
+import { CommonButtons } from '@infrastructure/ui/components/common-buttons';
 import {
   WizardButtonBuilder,
   SelectButtonBuilder,

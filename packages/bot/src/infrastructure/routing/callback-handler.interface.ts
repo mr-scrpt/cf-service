@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { SessionData } from '../../shared/types';
+import { SessionData } from '@shared/types';
 
 export type SessionContext = Context & SessionFlavor<SessionData>;
 

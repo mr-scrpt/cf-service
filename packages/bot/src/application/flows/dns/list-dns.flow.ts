@@ -1,9 +1,9 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
-import { KeyboardBuilder, PaginationComponent } from '../../../infrastructure/ui/components';
-import { DnsRecordFormatter } from '../../../infrastructure/ui/formatters';
-import { CallbackAction } from '../../../shared/constants';
-import { SessionData } from '../../../shared/types';
+import { KeyboardBuilder, PaginationComponent } from '@infrastructure/ui/components';
+import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { CallbackAction } from '@shared/constants';
+import { SessionData } from '@shared/types';
 import { PaginationBuilder } from './pagination-builder';
 
 type SessionContext = Context & SessionFlavor<SessionData>;

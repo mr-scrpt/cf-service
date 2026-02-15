@@ -1,5 +1,5 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { WizardEngine } from '../../../infrastructure/wizard';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { WizardEngine } from '@infrastructure/wizard';
 
 export class NavigationCancelHandler implements CallbackHandler<unknown> {
   constructor(private readonly wizardEngine: WizardEngine) {}

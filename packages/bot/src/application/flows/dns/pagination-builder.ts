@@ -1,5 +1,5 @@
-import { KeyboardBuilder } from '../../../infrastructure/ui/components';
-import { CallbackAction } from '../../../shared/constants';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { CallbackAction } from '@shared/constants';
 
 interface PaginationConfig {
   hasNext: boolean;

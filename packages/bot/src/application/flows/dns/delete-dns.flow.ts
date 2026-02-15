@@ -1,10 +1,10 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
-import { KeyboardBuilder, CommonButtons } from '../../../infrastructure/ui/components';
-import { DnsRecordFormatter } from '../../../infrastructure/ui/formatters';
-import { CallbackAction, FlowStep } from '../../../shared/constants';
-import { SessionData } from '../../../shared/types';
-import { SessionValidator } from '../../../services/session/session-validator.service';
+import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
+import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { CallbackAction, FlowStep } from '@shared/constants';
+import { SessionData } from '@shared/types';
+import { SessionValidator } from '@services/session/session-validator.service';
 import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;

@@ -1,5 +1,5 @@
 import { DnsRecordType } from '@cloudflare-bot/shared';
-import { FlowStep } from '../../constants';
+import { FlowStep } from '@shared/constants';
 
 export interface DomainSelectionPayload {
   zoneId: string;

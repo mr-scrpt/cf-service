@@ -5,7 +5,7 @@ import {
   LoggerLevel,
   Environment,
 } from '@cloudflare-bot/shared';
-import { env } from '../../shared/config/env.config';
+import { env } from '@shared/config/env.config';
 import { resolve } from 'path';
 
 const LOG_DIR = resolve(process.cwd(), 'logs');

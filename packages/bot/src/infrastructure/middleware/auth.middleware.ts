@@ -1,7 +1,7 @@
 import type { NextFunction, Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
-import { env } from '../../shared/config/env.config';
-import { logger } from '../../shared/utils/logger';
+import { env } from '@shared/config/env.config';
+import { logger } from '@shared/utils/logger';
 import { DIContainer } from '@cloudflare-bot/infrastructure';
 
 let container: DIContainer;

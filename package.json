@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev:bot": "pnpm --filter @cloudflare-bot/shared build && tsx watch --env-file=.env packages/bot/src/index.ts",
-    "dev:api": "docker compose up -d && pnpm --filter @cloudflare-bot/shared build && tsx watch --env-file=.env packages/api/src/index.ts",
+    "dev:bot": "pnpm --filter @cloudflare-bot/shared build && tsx watch --tsconfig packages/bot/tsconfig.json --env-file=.env packages/bot/src/index.ts",
+    "dev:api": "docker compose up -d && pnpm --filter @cloudflare-bot/shared build && tsx watch --tsconfig packages/api/tsconfig.json --env-file=.env packages/api/src/index.ts",
     "start:bot": "tsx --env-file=.env packages/bot/dist/index.js",
     "start:api": "docker compose up -d && tsx --env-file=.env packages/api/dist/index.js",
     "build": "pnpm -r run build",

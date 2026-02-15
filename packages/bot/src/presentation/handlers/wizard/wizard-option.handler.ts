@@ -1,6 +1,6 @@
-import { CallbackHandler, SessionContext } from '../../../infrastructure/routing';
-import { WizardEngine } from '../../../infrastructure/wizard';
-import { WizardOptionPayload } from '../../../shared/types/payloads';
+import { CallbackHandler, SessionContext } from '@infrastructure/routing';
+import { WizardEngine } from '@infrastructure/wizard';
+import { WizardOptionPayload } from '@shared/types/payloads';
 
 export class WizardSelectOptionHandler implements CallbackHandler<WizardOptionPayload> {
   constructor(private readonly wizardEngine: WizardEngine) {}

@@ -1,6 +1,6 @@
-import { SessionContext } from '../../infrastructure/routing';
-import { DeleteDnsFlow } from '../../application/flows';
-import { FlowStep } from '../../shared/constants';
+import { SessionContext } from '@infrastructure/routing';
+import { DeleteDnsFlow } from '@application/flows';
+import { FlowStep } from '@shared/constants';
 import { SessionValidator } from '../session/session-validator.service';
 
 interface DeleteStepHandler {

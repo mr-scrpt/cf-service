@@ -1,5 +1,5 @@
-import { FieldConfig, FieldInputType } from '../../domain/dns/strategies/field-config.interface';
-import { ValidationResult } from '../../domain/dns/strategies/dns-record-strategy.interface';
+import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
+import { ValidationResult } from '@domain/dns/strategies/dns-record-strategy.interface';
 
 export class WizardValidator {
   validate(fieldConfig: FieldConfig, input: string): ValidationResult {
