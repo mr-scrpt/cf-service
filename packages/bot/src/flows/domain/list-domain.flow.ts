@@ -3,7 +3,7 @@ import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { DomainFormatter } from '../../ui/formatters/domain-formatter';
 import { KeyboardBuilder } from '../../ui/components';
 import { SessionData } from '../../types';
-import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

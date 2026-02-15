@@ -8,7 +8,7 @@ import { SessionValidator } from '../../handlers/session-validators';
 import { MainMenu } from '../main-menu';
 import { DnsStrategyRegistry } from '../../strategies';
 import { FieldConfig, FieldInputType } from '../../strategies/field-config.interface';
-import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

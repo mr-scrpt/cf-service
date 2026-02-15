@@ -28,9 +28,3 @@ export class InvalidCommandFormatError extends BotError {
   }
 }
 
-// Re-export error utilities
-export * from './error-codes';
-export * from './error-messages';
-export * from './error-types';
-export * from './error-mapper';
-

@@ -7,7 +7,8 @@ import {
 import { Zone } from 'cloudflare/resources/zones/zones';
 import { DnsGatewayPort } from '../../../domain/ports';
 import { Domain, DnsRecord } from '../../../domain';
-import { InfrastructureError } from '../../../errors/infrastructure.error';
+import { CloudflareApiError, InfrastructureError } from '../../../errors/infrastructure.error';
+import { cloudflareErrorResponseSchema } from '../schemas/error-response.schema';
 import { CommonEnv } from '../../../config';
 import {
   RegisterDomainInput,
@@ -197,21 +198,16 @@ export class CloudflareGatewayAdapter implements DnsGatewayPort {
    * Enhanced error handler with better context
    */
   private handleError(error: unknown, context: string): never {
-    // Handle Cloudflare API errors specifically
     if (error instanceof Cloudflare.APIError) {
-      throw new InfrastructureError(
+      const parseResult = cloudflareErrorResponseSchema.safeParse(error.error);
+      
+      throw new CloudflareApiError(
         `${context}: ${error.message}`,
-        'CLOUDFLARE_API_ERROR',
-        {
-          status: error.status,
-          statusText: error.name, // APIError name is usually status text
-          headers: error.headers,
-          error: error.error,
-        },
+        error.status,
+        parseResult.success ? parseResult.data.errors : undefined
       );
     }
 
-    // Handle generic errors
     const message = error instanceof Error ? error.message : 'Unknown error';
     throw new InfrastructureError(
       `${context}: ${message}`,

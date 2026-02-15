@@ -7,4 +7,8 @@ export abstract class AppError extends Error {
     super(message);
     this.name = this.constructor.name;
   }
+
+  static isInstance(error: Error): error is AppError {
+    return error instanceof AppError;
+  }
 }

@@ -2,7 +2,7 @@ import { Context } from 'grammy';
 import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '../../constants';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 import { formatDomainsList } from './domain-messages.template';
 
 export class ListDomainsCommand implements BotCommand {
@@ -16,7 +16,7 @@ export class ListDomainsCommand implements BotCommand {
       const domains = await this.gateway.listDomains();
       await ctx.reply(formatDomainsList(domains), { parse_mode: 'HTML' });
     } catch (error) {
-      await ctx.reply(ErrorMapper.toUserMessage(error as Error));
+      await ctx.reply(TelegramErrorFormatter.format(error as Error), { parse_mode: 'HTML' });
     }
   }
 }

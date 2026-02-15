@@ -6,7 +6,7 @@ import {
 } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '../../constants';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 
 export class CreateDnsCommand implements BotCommand {
   readonly name = CommandName.DNS_CREATE;

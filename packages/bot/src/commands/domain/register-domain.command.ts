@@ -1,12 +1,12 @@
 import { Context } from 'grammy';
 import {
   DnsGatewayPort,
-  ValidationError,
   registerDomainSchema,
+  ZodErrorAdapter,
 } from '@cloudflare-bot/shared';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '../../constants';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 import { formatDomainRegistered } from './domain-messages.template';
 
 export class RegisterDomainCommand implements BotCommand {
@@ -21,8 +21,8 @@ export class RegisterDomainCommand implements BotCommand {
     const result = registerDomainSchema.safeParse({ name: match });
 
     if (!result.success) {
-      const error = ValidationError.fromZod(result.error);
-      await ctx.reply(ErrorMapper.toUserMessage(error));
+      const error = ZodErrorAdapter.toValidationError(result.error);
+      await ctx.reply(TelegramErrorFormatter.format(error), { parse_mode: 'HTML' });
       return;
     }
 
@@ -30,7 +30,7 @@ export class RegisterDomainCommand implements BotCommand {
       const domain = await this.gateway.registerDomain(result.data);
       await ctx.reply(formatDomainRegistered(domain), { parse_mode: 'HTML' });
     } catch (error) {
-      await ctx.reply(ErrorMapper.toUserMessage(error as Error));
+      await ctx.reply(TelegramErrorFormatter.format(error as Error), { parse_mode: 'HTML' });
     }
   }
 }

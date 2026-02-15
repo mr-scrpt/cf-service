@@ -1,28 +1,36 @@
 import { AppError } from './app-error';
+import type { CloudflareErrorDetails } from '../infrastructure/cloudflare/schemas/error-response.schema';
 
-/**
- * Infrastructure layer errors - external systems, APIs, databases
- */
 export class InfrastructureError extends AppError {
     constructor(message: string, code: string, meta?: Record<string, unknown>) {
         super(message, `INFRA.${code}`, meta);
     }
+
+    static isInstance(error: Error): error is InfrastructureError {
+        return error instanceof InfrastructureError;
+    }
 }
 
-// Cloudflare-specific errors
-
 export class CloudflareApiError extends InfrastructureError {
+    public readonly statusCode?: number;
+    public readonly cloudflareErrors?: CloudflareErrorDetails[];
+
     constructor(
         message: string,
-        public readonly statusCode?: number,
-        public readonly apiErrorCode?: string,
-        meta?: Record<string, unknown>
+        statusCode?: number,
+        cloudflareErrors?: CloudflareErrorDetails[]
     ) {
-        super(
-            message,
-            'CLOUDFLARE_API_ERROR',
-            { ...meta, statusCode, apiErrorCode }
-        );
+        super(message, 'CLOUDFLARE_API_ERROR');
+        this.statusCode = statusCode;
+        this.cloudflareErrors = cloudflareErrors;
+    }
+
+    getFirstError(): CloudflareErrorDetails | undefined {
+        return this.cloudflareErrors?.[0];
+    }
+
+    static isInstance(error: Error): error is CloudflareApiError {
+        return error instanceof CloudflareApiError;
     }
 }
 
@@ -37,11 +45,16 @@ export class RateLimitError extends InfrastructureError {
 }
 
 export class NetworkError extends InfrastructureError {
-    constructor(message: string, originalError?: Error) {
-        super(
-            `Network error: ${message}`,
-            'NETWORK_ERROR',
-            { originalError: originalError?.message }
-        );
+    public readonly originalError?: Error;
+    public readonly isTimeout: boolean;
+
+    constructor(message: string, originalError?: Error, isTimeout = false) {
+        super(`Network error: ${message}`, 'NETWORK_ERROR');
+        this.originalError = originalError;
+        this.isTimeout = isTimeout;
+    }
+
+    static isInstance(error: Error): error is NetworkError {
+        return error instanceof NetworkError;
     }
 }

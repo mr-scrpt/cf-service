@@ -5,7 +5,7 @@ import { DomainFormatter } from '../../ui/formatters/domain-formatter';
 import { MainMenu } from '../main-menu';
 import { SessionData } from '../../types';
 import { FieldInputType } from '../../strategies/field-config.interface';
-import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

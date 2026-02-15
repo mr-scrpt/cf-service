@@ -6,7 +6,7 @@ import { KeyboardBuilder } from '../../ui/components';
 import { CallbackAction } from '../../constants';
 import { DnsRecordFormatter } from '../../ui/formatters';
 import { SessionData } from '../../types';
-import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
+import { TelegramErrorFormatter } from '../../core/errors/telegram.formatter';
 import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;

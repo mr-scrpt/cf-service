@@ -16,6 +16,8 @@ export {
   createDnsRecordSchema,
   updateDnsRecordSchema,
 } from './validation';
+export * from './validation';
+export * from './validation/adapters';
 
 // Validation — inferred types (DTO)
 export type {
@@ -37,6 +39,8 @@ export {
   LoggerMode,
   LoggerLevel,
 } from './foundation/adapters/logger.adapter';
+export * from './infrastructure/cloudflare/adapters/gateway.adapter';
+export * from './infrastructure/cloudflare/schemas';
 
 // Foundation — Logging utilities
 export { createLoggingProxy } from './foundation/logging/logging-proxy';
