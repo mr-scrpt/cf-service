@@ -1,20 +1,18 @@
 import { Bot, Context, SessionFlavor } from 'grammy';
 import type { BotError } from 'grammy';
 import type { UserFromGetMe } from 'grammy/types';
-import { env } from './config/env.config';
-import { logger } from './utils/logger';
-import { authGuard, initAuthGuard } from './middleware/auth.middleware';
-import { requestLoggerMiddleware } from './middleware/request-logger.middleware';
-import { createUsernameSyncMiddleware } from './middleware/username-sync.middleware';
+import { env } from './shared/config/env.config';
+import { logger } from './shared/utils/logger';
+import { authGuard, initAuthGuard } from './infrastructure/middleware/auth.middleware';
+import { requestLoggerMiddleware } from './infrastructure/middleware/request-logger.middleware';
+import { createUsernameSyncMiddleware } from './infrastructure/middleware/username-sync.middleware';
 import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
 import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
-import { CommandModule } from './commands/base/command.module';
-import { bootstrapBot } from './bootstrap';
-import { SessionData } from './types';
-import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
-import { createBotLogger } from './config/logger.config';
-import { createRegistrationHandlers } from './handlers/registration.handler';
-import { CallbackAction } from './constants';
+import { CommandModule } from './presentation/commands/base/command.module';
+import { bootstrapBot } from './infrastructure/bootstrap';
+import { SessionData } from './shared/types';
+import { TelegramErrorFormatter } from './shared/core/errors/telegram.formatter';
+import { createBotLogger } from './shared/config/logger.config';
 
 async function main() {
   const config = loadConfig();
@@ -32,16 +30,11 @@ async function main() {
   const cloudflareGateway = new CloudflareGatewayAdapter(env);
   const bot = telegramAdapter.getBotTyped<BotContext>();
 
-  const { callbackRouter } = bootstrapBot(bot, cloudflareGateway);
+  bootstrapBot(bot, cloudflareGateway, container);
 
   bot.use(requestLoggerMiddleware);
   bot.use(authGuard);
   bot.use(createUsernameSyncMiddleware(container));
-
-  const registrationHandlers = createRegistrationHandlers(container);
-  callbackRouter.register(CallbackAction.REQUEST_ACCESS, {
-    handle: registrationHandlers.handleRequestAccess
-  });
 
   const commandModule = new CommandModule<BotContext>(cloudflareGateway);
   commandModule.getRegistry().setupBot(bot);
