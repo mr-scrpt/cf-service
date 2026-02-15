@@ -1,3 +1,5 @@
+import { InvalidDomainNameError } from '../errors/domain.error';
+
 export class DomainName {
   private constructor(private readonly value: string) {}
 
@@ -5,7 +7,7 @@ export class DomainName {
     const normalized = value.trim().toLowerCase();
     
     if (!this.isValid(normalized)) {
-      throw new Error(`Invalid domain name: ${value}`);
+      throw new InvalidDomainNameError(value);
     }
     
     return new DomainName(normalized);

@@ -1,4 +1,5 @@
-import { IUserRepository, UserNotFoundError } from '@cloudflare-bot/domain';
+import { IUserRepository } from '@cloudflare-bot/domain';
+import { UserNotFoundError } from '../../errors/application.error';
 
 export class RemoveUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}

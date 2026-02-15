@@ -1,9 +1,11 @@
+import { InvalidDomainIdError } from '../errors/domain.error';
+
 export class DomainId {
   private constructor(private readonly value: string) {}
 
   static create(value: string): DomainId {
     if (!value || value.trim().length === 0) {
-      throw new Error('DomainId cannot be empty');
+      throw new InvalidDomainIdError(value);
     }
     return new DomainId(value);
   }

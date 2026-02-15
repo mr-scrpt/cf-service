@@ -1,3 +1,5 @@
+import { InvalidEmailError } from '../errors/domain.error';
+
 export class Email {
   private constructor(private readonly value: string) {}
 
@@ -5,7 +7,7 @@ export class Email {
     const normalized = value.trim().toLowerCase();
     
     if (!this.isValid(normalized)) {
-      throw new Error(`Invalid email: ${value}`);
+      throw new InvalidEmailError(value);
     }
     
     return new Email(normalized);

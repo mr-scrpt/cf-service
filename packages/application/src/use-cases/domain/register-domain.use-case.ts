@@ -1,6 +1,7 @@
 import { DomainName, IDomainRepository } from '@cloudflare-bot/domain';
 import { ICloudflareGateway } from '../../ports/cloudflare-gateway.port';
 import { RegisterDomainDto, RegisterDomainResult, registerDomainDtoSchema } from '../../dto/register-domain.dto';
+import { DomainAlreadyRegisteredError } from '../../errors/application.error';
 
 export class RegisterDomainUseCase {
   constructor(
@@ -15,7 +16,7 @@ export class RegisterDomainUseCase {
     
     const existingDomain = await this.domainRepository.findByName(domainName);
     if (existingDomain) {
-      throw new Error('Domain already registered');
+      throw new DomainAlreadyRegisteredError(domainName.toString());
     }
     
     const domain = await this.cloudflareGateway.createZone(domainName);
