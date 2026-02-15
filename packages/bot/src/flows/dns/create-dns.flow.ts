@@ -6,7 +6,7 @@ import { KeyboardBuilder } from '../../ui/components';
 import { CallbackAction } from '../../constants';
 import { DnsRecordFormatter } from '../../ui/formatters';
 import { SessionData } from '../../types';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
 import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
@@ -49,8 +49,8 @@ export class CreateDnsFlow {
         reply_markup: keyboard.build(),
       });
     } catch (error) {
-      const errorMessage = ErrorMapper.toUserMessage(error as Error);
-      await ctx.reply(errorMessage);
+      const errorMessage = TelegramErrorFormatter.format(error as Error);
+      await ctx.reply(errorMessage, { parse_mode: 'HTML' });
       await this.mainMenu.show(ctx as SessionContext);
     }
   }
@@ -115,9 +115,10 @@ Select record type:
             reply_markup: keyboard.build(),
           });
         } catch (error) {
-          const errorMessage = ErrorMapper.toUserMessage(error as Error);
+          const errorMessage = TelegramErrorFormatter.format(error as Error);
           const keyboard = this.mainMenu.getMainMenuKeyboard();
           await ctx.reply(errorMessage, {
+            parse_mode: 'HTML',
             reply_markup: keyboard.build(),
           });
         }

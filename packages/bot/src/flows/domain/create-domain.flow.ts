@@ -5,7 +5,7 @@ import { DomainFormatter } from '../../ui/formatters/domain-formatter';
 import { MainMenu } from '../main-menu';
 import { SessionData } from '../../types';
 import { FieldInputType } from '../../strategies/field-config.interface';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -58,8 +58,8 @@ export class CreateDomainFlow {
       const message = this.formatter.formatDomainRegistered(domain);
       await ctx.reply(message, { parse_mode: 'HTML' });
     } catch (error) {
-      const errorMessage = ErrorMapper.toUserMessage(error as Error);
-      await ctx.reply(errorMessage);
+      const errorMessage = TelegramErrorFormatter.format(error as Error);
+      await ctx.reply(errorMessage, { parse_mode: 'HTML' });
     } finally {
       await this.mainMenu.show(ctx);
     }

@@ -3,7 +3,7 @@ import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { DomainFormatter } from '../../ui/formatters/domain-formatter';
 import { KeyboardBuilder } from '../../ui/components';
 import { SessionData } from '../../types';
-import { ErrorMapper } from '../../core/errors/error-mapper';
+import { TelegramErrorFormatter } from '../../core/errors/telegram-error-formatter';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -29,8 +29,9 @@ export class ListDomainFlow {
         reply_markup: keyboard.build(),
       });
     } catch (error) {
-      const errorMessage = ErrorMapper.toUserMessage(error as Error);
+      const errorMessage = TelegramErrorFormatter.format(error as Error);
       await ctx.reply(errorMessage, {
+        parse_mode: 'HTML',
         reply_markup: keyboard.build(),
       });
     }
