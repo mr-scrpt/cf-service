@@ -5,6 +5,7 @@ import { createWebhookRoutes } from './routes/webhooks.routes';
 import { createUserRoutes } from './routes/users.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { errorHandler } from './middleware/error-handler.middleware';
+import { API_PREFIX, ROUTES } from './constants/routes';
 
 async function main() {
   const config = loadConfig();
@@ -18,13 +19,13 @@ async function main() {
   app.use(cors());
   app.use(express.json());
   
-  app.get('/health', (req, res) => {
+  app.get(ROUTES.HEALTH, (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
   
-  app.use('/api', createWebhookRoutes(container));
+  app.use(API_PREFIX, createWebhookRoutes(container));
   
-  app.use('/api', authMiddleware(config.API_AUTH_TOKEN), createUserRoutes(container));
+  app.use(API_PREFIX, authMiddleware(config.API_AUTH_TOKEN), createUserRoutes(container));
   
   app.use(errorHandler);
   
