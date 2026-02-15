@@ -1,8 +1,10 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import type { DIContainer } from '@cloudflare-bot/infrastructure';
 import { ROUTES } from '../constants/routes';
-import type { TypedRequestBody, TypedRequestParams, ApiResponse } from '../types/express.types';
-import type { UserDto } from '@cloudflare-bot/application';
+import type { TypedRequestBody, TypedRequestParams } from '../types/express.types';
+import { UserService } from '../services/user.service';
+import { ResponseHelper } from '../utils/response.helper';
+import { ErrorMapper } from '../mappers/error.mapper';
 
 interface AddUserBody {
   telegramId: number;
@@ -15,67 +17,43 @@ interface UserParams extends Record<string, string> {
 
 export function createUserRoutes(container: DIContainer): Router {
   const router = Router();
-  const addUserUseCase = container.getAddUserUseCase();
-  const listUsersUseCase = container.getListUsersUseCase();
-  const removeUserUseCase = container.getRemoveUserUseCase();
-  const logger = container.getLogger();
+  
+  const userService = new UserService(
+    container.getAddUserUseCase(),
+    container.getListUsersUseCase(),
+    container.getRemoveUserUseCase(),
+    container.getLogger()
+  );
+  
+  const responseHelper = new ResponseHelper(new ErrorMapper());
 
   router.post(
     ROUTES.USERS.BASE,
-    async (req: TypedRequestBody<AddUserBody>, res: Response<ApiResponse<UserDto>>) => {
-      try {
-        const user = await addUserUseCase.execute({
-          telegramId: req.body.telegramId,
-          username: req.body.username,
-        });
-
-        res.status(201).json({ success: true, data: user });
-      } catch (error) {
-        logger.error('Add user failed', { 
-          telegramId: req.body.telegramId,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-        res.status(400).json({
-          success: false,
-          message: error instanceof Error ? error.message : 'Failed to add user',
-        });
-      }
+    async (req: TypedRequestBody<AddUserBody>, res) => {
+      const result = await userService.addUser({
+        telegramId: req.body.telegramId,
+        username: req.body.username,
+      });
+      responseHelper.send(res, result, { successStatus: 201 });
     }
   );
 
   router.get(
     ROUTES.USERS.BASE,
-    async (req, res: Response<ApiResponse<UserDto[]>>) => {
-      try {
-        const users = await listUsersUseCase.execute();
-        res.status(200).json({ success: true, data: users });
-      } catch (error) {
-        logger.error('List users failed', { 
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-        res.status(500).json({ success: false, message: 'Failed to list users' });
-      }
+    async (req, res) => {
+      const result = await userService.listUsers();
+      responseHelper.send(res, result);
     }
   );
 
   router.delete(
     ROUTES.USERS.BY_TELEGRAM_ID,
-    async (req: TypedRequestParams<UserParams>, res: Response<ApiResponse>) => {
-      try {
-        const telegramIdParam = req.params.telegramId;
-        const telegramId = parseInt(Array.isArray(telegramIdParam) ? telegramIdParam[0] : telegramIdParam, 10);
-        await removeUserUseCase.execute(telegramId);
-        res.status(200).json({ success: true, message: 'User removed' });
-      } catch (error) {
-        logger.error('Remove user failed', { 
-          telegramId: req.params.telegramId,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-        res.status(400).json({
-          success: false,
-          message: error instanceof Error ? error.message : 'Failed to remove user',
-        });
-      }
+    async (req: TypedRequestParams<UserParams>, res) => {
+      const telegramIdParam = req.params.telegramId;
+      const telegramId = parseInt(Array.isArray(telegramIdParam) ? telegramIdParam[0] : telegramIdParam, 10);
+      
+      const result = await userService.removeUser(telegramId);
+      responseHelper.sendMessage(res, result, 'User removed');
     }
   );
 

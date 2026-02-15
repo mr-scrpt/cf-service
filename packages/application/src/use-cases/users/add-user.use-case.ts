@@ -1,5 +1,6 @@
 import { User, UserId, IUserRepository } from '@cloudflare-bot/domain';
 import { AddUserDto, UserDto, addUserDtoSchema } from '../../dto/add-user.dto';
+import { UserAlreadyExistsError } from '../../errors/application.error';
 
 export class AddUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -9,6 +10,10 @@ export class AddUserUseCase {
     
     const existingUser = await this.userRepository.findByTelegramId(validated.telegramId);
     if (existingUser) {
+      if (existingUser.isAllowed()) {
+        throw new UserAlreadyExistsError(validated.telegramId);
+      }
+      
       existingUser.allow();
       await this.userRepository.save(existingUser);
       return this.toDto(existingUser);

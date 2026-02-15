@@ -1,41 +1,40 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request } from 'express';
 import type { DIContainer } from '@cloudflare-bot/infrastructure';
 import { ROUTES } from '../constants/routes';
-import type { ApiResponse } from '../types/express.types';
+import { WebhookService } from '../services/webhook.service';
+import { ResponseHelper } from '../utils/response.helper';
+import { ErrorMapper } from '../mappers/error.mapper';
 
 export function createWebhookRoutes(container: DIContainer): Router {
   const router = Router();
-  const sendNotificationUseCase = container.getSendWebhookNotificationUseCase();
-  const logger = container.getLogger();
+  
+  const webhookService = new WebhookService(
+    container.getSendWebhookNotificationUseCase(),
+    container.getLogger()
+  );
+  
+  const responseHelper = new ResponseHelper(new ErrorMapper());
 
   router.post(
     ROUTES.WEBHOOK.BASE,
-    async (req: Request, res: Response<ApiResponse>) => {
-      try {
-        await sendNotificationUseCase.execute({
-          method: req.method,
-          ip: req.ip || req.connection.remoteAddress || 'unknown',
-          headers: req.headers as Record<string, string | string[] | undefined>,
-          body: req.body,
-          timestamp: new Date(),
-        });
-
-        res.status(200).json({ success: true, message: 'Webhook received' });
-      } catch (error) {
-        logger.error('Webhook processing failed', { 
-          method: req.method,
-          ip: req.ip,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-        res.status(500).json({ success: false, message: 'Internal server error' });
-      }
+    async (req: Request, res) => {
+      const result = await webhookService.processWebhook({
+        method: req.method,
+        ip: req.ip || req.connection.remoteAddress || 'unknown',
+        headers: req.headers as Record<string, string | string[] | undefined>,
+        body: req.body,
+        timestamp: new Date(),
+      });
+      
+      responseHelper.sendMessage(res, result, 'Webhook processed');
     }
   );
 
   router.get(
     ROUTES.WEBHOOK.BASE,
-    (req: Request, res: Response<ApiResponse>) => {
-      res.status(200).json({ success: true, message: 'Webhook endpoint is alive' });
+    (req: Request, res) => {
+      container.getLogger().info('Webhook health check', { ip: req.ip });
+      res.status(200).json({ success: true, message: 'Webhook endpoint is active' });
     }
   );
 

@@ -74,4 +74,24 @@ export class DIContainer {
   getSendWebhookNotificationUseCase(): SendWebhookNotificationUseCase {
     return new SendWebhookNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
   }
+
+  getUserService(): any {
+    return {
+      addUserUseCase: this.getAddUserUseCase(),
+      listUsersUseCase: this.getListUsersUseCase(),
+      removeUserUseCase: this.getRemoveUserUseCase(),
+      logger: this.logger,
+    };
+  }
+
+  getWebhookService(): any {
+    return {
+      sendNotificationUseCase: this.getSendWebhookNotificationUseCase(),
+      logger: this.logger,
+    };
+  }
+
+  getResponseHelper(): any {
+    return { errorMapper: {} };
+  }
 }
