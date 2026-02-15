@@ -12,12 +12,14 @@ import { SessionData } from './types';
 import { TelegramErrorFormatter } from './core/errors/telegram.formatter';
 import { createBotLogger } from './config/logger.config';
 
-type BotContext = Context & SessionFlavor<SessionData>;
-const bot = new Bot<BotContext>(env.TELEGRAM_BOT_TOKEN);
-
 const config = loadConfig();
 const botLogger = createBotLogger(config.NODE_ENV);
 const container = new DIContainer(config, botLogger);
+
+const telegramAdapter = container.getTelegramAdapter();
+const bot = telegramAdapter.getBot() as any;
+
+type BotContext = Context & SessionFlavor<SessionData>;
 
 const cloudflareGateway = new CloudflareGatewayAdapter(env);
 
@@ -27,14 +29,14 @@ bot.use(requestLoggerMiddleware);
 bot.use(authGuard);
 bot.use(createUsernameSyncMiddleware(container));
 
-const commandModule = new CommandModule<BotContext>(cloudflareGateway);
+const commandModule = new CommandModule(cloudflareGateway);
 commandModule.getRegistry().setupBot(bot);
 
-bot.api.getMe().then((me) => {
+bot.api.getMe().then((me: any) => {
   logger.info('Bot started', { username: me.username, admin_id: env.ALLOWED_CHAT_ID });
 });
 
-bot.catch(async (err) => {
+bot.catch(async (err: any) => {
   const { ctx, error } = err;
   
   logger.error('Unhandled bot error', { 

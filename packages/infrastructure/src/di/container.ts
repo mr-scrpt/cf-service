@@ -16,15 +16,14 @@ import { IUserRepository, IDomainRepository } from '@cloudflare-bot/domain';
 import { MongoUserRepository, MongoDomainRepository } from '../database/repositories';
 import { MongooseDatabaseService } from '../database';
 import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
-import { TelegramNotifierAdapter, TelegramBotAdapter } from '../telegram';
+import { TelegramAdapter } from '../telegram';
 import { Env } from '../config/env.schema';
 
 export class DIContainer {
   private userRepository: IUserRepository;
   private domainRepository: IDomainRepository;
   private cloudflareGateway: ICloudflareGateway;
-  private notifier: INotifier;
-  private telegramBot: ITelegramBot;
+  private telegram: TelegramAdapter;
   private logger: ILogger;
   private databaseService: IDatabaseService;
 
@@ -37,8 +36,7 @@ export class DIContainer {
       config.CLOUDFLARE_API_TOKEN,
       config.CLOUDFLARE_ACCOUNT_ID
     );
-    this.notifier = new TelegramNotifierAdapter(config.TELEGRAM_BOT_TOKEN);
-    this.telegramBot = new TelegramBotAdapter(config.TELEGRAM_BOT_TOKEN);
+    this.telegram = new TelegramAdapter(config.TELEGRAM_BOT_TOKEN, logger);
   }
 
   getLogger(): ILogger {
@@ -53,8 +51,12 @@ export class DIContainer {
     return new RegisterDomainUseCase(this.cloudflareGateway, this.domainRepository);
   }
 
+  getTelegramAdapter(): TelegramAdapter {
+    return this.telegram;
+  }
+
   getAddUserUseCase(): AddUserUseCase {
-    return new AddUserUseCase(this.userRepository, this.telegramBot);
+    return new AddUserUseCase(this.userRepository, this.telegram);
   }
 
   getCheckUserAccessUseCase(): CheckUserAccessUseCase {
@@ -74,7 +76,7 @@ export class DIContainer {
   }
 
   getSendWebhookNotificationUseCase(): SendWebhookNotificationUseCase {
-    return new SendWebhookNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
+    return new SendWebhookNotificationUseCase(this.telegram, this.config.ALLOWED_CHAT_ID);
   }
 
   getUserService(): any {

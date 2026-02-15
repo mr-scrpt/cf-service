@@ -1,2 +1,1 @@
-export * from './notifier.adapter';
-export * from './bot.adapter';
+export * from './telegram.adapter';
