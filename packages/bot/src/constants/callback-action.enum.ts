@@ -16,6 +16,9 @@ export enum CallbackAction {
   DNS_DELETE_SELECT = 'dns:delete:select',
   DNS_DELETE_CONFIRM = 'dns:delete:confirm',
   
+  DOMAIN_CREATE = 'domain:create',
+  DOMAIN_LIST = 'domain:list',
+  
   WIZARD_NEXT = 'wizard:next',
   WIZARD_SKIP = 'wizard:skip',
   WIZARD_SELECT_OPTION = 'wizard:option',

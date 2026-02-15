@@ -6,6 +6,7 @@ import { KeyboardBuilder } from '../../ui/components';
 import { CallbackAction } from '../../constants';
 import { DnsRecordFormatter } from '../../ui/formatters';
 import { SessionData } from '../../types';
+import { ErrorMapper } from '../../core/errors/error-mapper';
 import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
@@ -48,8 +49,9 @@ export class CreateDnsFlow {
         reply_markup: keyboard.build(),
       });
     } catch (error) {
-      await ctx.reply('❌ Failed to load domains. Please try again.');
-      throw error;
+      const errorMessage = ErrorMapper.toUserMessage(error as Error);
+      await ctx.reply(errorMessage);
+      await this.mainMenu.show(ctx as SessionContext);
     }
   }
 
@@ -113,8 +115,11 @@ Select record type:
             reply_markup: keyboard.build(),
           });
         } catch (error) {
-          await ctx.reply(`❌ Failed to create DNS record: ${(error as Error).message}`);
-          throw error;
+          const errorMessage = ErrorMapper.toUserMessage(error as Error);
+          const keyboard = this.mainMenu.getMainMenuKeyboard();
+          await ctx.reply(errorMessage, {
+            reply_markup: keyboard.build(),
+          });
         }
       },
       onCancel: async (ctx: Context) => {

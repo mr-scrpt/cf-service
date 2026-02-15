@@ -8,6 +8,7 @@ import { SessionValidator } from '../../handlers/session-validators';
 import { MainMenu } from '../main-menu';
 import { DnsStrategyRegistry } from '../../strategies';
 import { FieldConfig, FieldInputType } from '../../strategies/field-config.interface';
+import { ErrorMapper } from '../../core/errors/error-mapper';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -235,8 +236,11 @@ export class EditDnsFlow {
         reply_markup: keyboard.build(),
       });
     } catch (error) {
-      await ctx.reply(`❌ Failed to update DNS record: ${(error as Error).message}`);
-      throw error;
+      const errorMessage = ErrorMapper.toUserMessage(error as Error);
+      const keyboard = this.mainMenu.getMainMenuKeyboard();
+      await ctx.reply(errorMessage, {
+        reply_markup: keyboard.build(),
+      });
     }
   }
 

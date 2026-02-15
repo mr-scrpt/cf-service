@@ -4,8 +4,8 @@ import { bootstrapDnsStrategies } from '../strategies';
 import { SessionManager } from '../session';
 import { WizardEngine, WizardValidator, WizardRenderer } from '../wizard';
 import { PaginationComponent, KeyboardBuilder } from '../ui/components';
-import { DnsRecordFormatter } from '../ui/formatters';
-import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, EditDnsFlow, MainMenu, DnsMenu } from '../flows';
+import { DnsRecordFormatter, DomainFormatter } from '../ui/formatters';
+import { CreateDnsFlow, DeleteDnsFlow, ListDnsFlow, EditDnsFlow, MainMenu, DnsMenu, DomainMenu, CreateDomainFlow, ListDomainFlow } from '../flows';
 import { CallbackRouter, TextInputRouter } from '../routing';
 import { CallbackAction, BotEvent } from '../constants';
 import {
@@ -21,6 +21,9 @@ import {
   DnsEditRecordHandler,
   DnsEditFieldHandler,
   DnsSaveAllHandler,
+  DomainMenuHandler,
+  DomainCreateHandler,
+  DomainListHandler,
   WizardSelectOptionHandler,
   WizardSkipHandler,
   WizardConfirmHandler,
@@ -40,19 +43,27 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
   const wizardEngine = new WizardEngine(sessionManager, wizardValidator, wizardRenderer);
   const pagination = new PaginationComponent();
   const formatter = new DnsRecordFormatter(strategyRegistry);
+  const domainFormatter = new DomainFormatter();
 
   const mainMenu = new MainMenu();
   const dnsMenu = new DnsMenu();
+  const domainMenu = new DomainMenu();
   const createFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenu);
   const listFlow = new ListDnsFlow(gateway, formatter, pagination);
   const deleteFlow = new DeleteDnsFlow(gateway, formatter, mainMenu);
   const editFlow = new EditDnsFlow(gateway, formatter, mainMenu, strategyRegistry);
+  
+  const createDomainFlow = new CreateDomainFlow(gateway, wizardEngine, domainFormatter, mainMenu);
+  const listDomainFlow = new ListDomainFlow(gateway, domainFormatter);
 
   const callbackRouter = new CallbackRouter();
   const textInputRouter = new TextInputRouter(wizardEngine, editFlow);
 
   callbackRouter.registerAll([
     { action: CallbackAction.DNS_MANAGEMENT, handler: new DnsManagementHandler(dnsMenu) },
+    { action: CallbackAction.DOMAIN_MANAGEMENT, handler: new DomainMenuHandler(domainMenu) },
+    { action: CallbackAction.DOMAIN_CREATE, handler: new DomainCreateHandler(createDomainFlow) },
+    { action: CallbackAction.DOMAIN_LIST, handler: new DomainListHandler(listDomainFlow) },
     {
       action: CallbackAction.DNS_CREATE_SELECT_DOMAIN,
       handler: new DnsCreateSelectDomainHandler(createFlow),
