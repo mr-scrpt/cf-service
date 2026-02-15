@@ -47,6 +47,29 @@ export const dnsRecordSchema = z.discriminatedUnion('type', [
   srvRecordSchema,
 ]);
 
+// --- Inferred Record Types (from schemas) ---
+
+export type StandardRecord = z.infer<typeof standardRecordSchema>;
+export type MXRecord = z.infer<typeof mxRecordSchema>;
+export type SRVRecord = z.infer<typeof srvRecordSchema>;
+
+// --- Field Key Types (for type-safe field access) ---
+
+// Base fields common to all records
+type BaseRecordFieldKey = keyof z.infer<typeof baseRecordSchema>;
+
+// Standard records (A, AAAA, CNAME, TXT, NS)
+export type StandardRecordFieldKey = keyof z.infer<typeof standardRecordSchema>;
+
+// MX Record
+export type MXRecordFieldKey = keyof z.infer<typeof mxRecordSchema>;
+
+// SRV Record  
+export type SRVRecordFieldKey = keyof z.infer<typeof srvRecordSchema>;
+
+// Union of all possible field keys
+export type DnsRecordFieldKey = StandardRecordFieldKey | MXRecordFieldKey | SRVRecordFieldKey;
+
 export const dnsRecordNameSchema = z
   .string()
   .min(1, 'Record name cannot be empty')

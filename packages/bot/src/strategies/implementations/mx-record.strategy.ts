@@ -1,9 +1,10 @@
 import {
   DnsRecordType,
-  DnsRecord,
   domainValueSchema,
   mxRecordSchema,
   COMMON_TTL_VALUES,
+  type MXRecord,
+  type MXRecordFieldKey,
 } from '@cloudflare-bot/shared';
 import { z } from 'zod';
 import {
@@ -22,7 +23,7 @@ interface MXRecordData {
   comment?: string;
 }
 
-export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData> {
+export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData, MXRecord, MXRecordFieldKey> {
   readonly type = DnsRecordType.MX;
   readonly displayName = 'MX Record';
   readonly icon = '📧';
@@ -89,25 +90,25 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData) {
+  toCreateInput(wizardData: WizardData<MXRecordData>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
-      name: wizardData.fields.name as string,
-      content: wizardData.fields.content as string,
-      priority: wizardData.fields.priority as number,
-      ttl: (wizardData.fields.ttl as number) ?? 3600,
+      name: wizardData.fields.name,
+      content: wizardData.fields.content,
+      priority: wizardData.fields.priority,
+      ttl: wizardData.fields.ttl,
       proxied: false,
-      comment: wizardData.fields.comment as string | undefined,
+      comment: wizardData.fields.comment,
     };
   }
 
-  getFieldValue(record: DnsRecord, fieldKey: string): unknown {
-    return (record as any)[fieldKey];
+  getFieldValue(record: MXRecord, fieldKey: MXRecordFieldKey): unknown {
+    return record[fieldKey as keyof MXRecord];
   }
 
-  applyFieldChanges(record: DnsRecord, changes: Record<string, unknown>): Partial<DnsRecord> {
-    return changes;
+  applyFieldChanges(record: MXRecord, changes: Partial<Record<MXRecordFieldKey, unknown>>): Partial<MXRecord> {
+    return changes as Partial<MXRecord>;
   }
 
   private formatTTL(ttl: number): string {

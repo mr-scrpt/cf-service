@@ -7,12 +7,12 @@ export interface ValidationResult {
   error?: string;
 }
 
-export interface WizardData {
+export interface WizardData<TFields = Record<string, unknown>> {
   zoneId: string;
-  fields: Record<string, unknown>;
+  fields: TFields;
 }
 
-export interface DnsRecordStrategy<TData = unknown, TRecord extends DnsRecord = DnsRecord> {
+export interface DnsRecordStrategy<TData = unknown, TRecord extends DnsRecord = DnsRecord, TFieldKey extends string = string> {
   readonly type: DnsRecordType;
   readonly displayName: string;
   readonly icon: string;
@@ -21,9 +21,9 @@ export interface DnsRecordStrategy<TData = unknown, TRecord extends DnsRecord = 
   getFieldConfigs(): FieldConfig[];
   validate(data: Partial<TData>): ValidationResult;
   formatSummary(data: TData): string;
-  toCreateInput(wizardData: WizardData): CreateDnsRecordInput;
+  toCreateInput(wizardData: WizardData<TData>): CreateDnsRecordInput;
   
-  // Field access and modification helpers - now type-safe per strategy
-  getFieldValue(record: TRecord, fieldKey: string): unknown;
-  applyFieldChanges(record: TRecord, changes: Record<string, unknown>): Partial<TRecord>;
+  // Field access and modification helpers - now type-safe with TFieldKey
+  getFieldValue(record: TRecord, fieldKey: TFieldKey): unknown;
+  applyFieldChanges(record: TRecord, changes: Partial<Record<TFieldKey, unknown>>): Partial<TRecord>;
 }

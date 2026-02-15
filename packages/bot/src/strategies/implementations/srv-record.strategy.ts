@@ -1,9 +1,10 @@
 import {
   DnsRecordType,
-  DnsRecord,
   domainValueSchema,
   srvRecordSchema,
   COMMON_TTL_VALUES,
+  type SRVRecord,
+  type SRVRecordFieldKey,
 } from '@cloudflare-bot/shared';
 import { z } from 'zod';
 import {
@@ -26,19 +27,13 @@ interface SRVRecordData {
   comment?: string;
 }
 
-type SRVRecord = Extract<DnsRecord, { type: 'SRV' }>;
-
-export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRecord> {
+export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRecord, SRVRecordFieldKey> {
   readonly type = DnsRecordType.SRV;
   readonly displayName = 'SRV Record';
   readonly icon = '🔌';
   readonly description = 'Service locator record';
   
-  private readonly dataFields = new Set<keyof SRVRecordData['data']>(['priority', 'weight', 'port', 'target']);
-
-  private isDataField(key: string): key is keyof SRVRecordData['data'] {
-    return this.dataFields.has(key as keyof SRVRecordData['data']);
-  }
+  private readonly dataFields = new Set(['priority', 'weight', 'port', 'target']);
 
   getFieldConfigs(): FieldConfig[] {
     return [
@@ -122,39 +117,29 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData) {
+  toCreateInput(wizardData: WizardData<SRVRecordData>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
-      name: wizardData.fields.name as string,
-      data: {
-        priority: wizardData.fields.priority as number,
-        weight: wizardData.fields.weight as number,
-        port: wizardData.fields.port as number,
-        target: wizardData.fields.target as string,
-      },
-      ttl: (wizardData.fields.ttl as number) ?? 3600,
+      name: wizardData.fields.name,
+      data: wizardData.fields.data,
+      ttl: wizardData.fields.ttl,
       proxied: false,
-      comment: wizardData.fields.comment as string | undefined,
+      comment: wizardData.fields.comment,
     };
   }
 
-  getFieldValue(record: SRVRecord, fieldKey: string): unknown {
-    if (this.isDataField(fieldKey)) {
-      return record.data[fieldKey];
-    }
-    return (record as any)[fieldKey];
+  getFieldValue(record: SRVRecord, fieldKey: SRVRecordFieldKey): unknown {
+    return this.dataFields.has(fieldKey) 
+      ? record.data[fieldKey as keyof typeof record.data]
+      : record[fieldKey as keyof SRVRecord];
   }
 
-  applyFieldChanges(record: SRVRecord, changes: Record<string, unknown>): Partial<SRVRecord> {
+  applyFieldChanges(record: SRVRecord, changes: Partial<Record<SRVRecordFieldKey, unknown>>): Partial<SRVRecord> {
     const entries = Object.entries(changes);
-    
-    const dataEntries = entries.filter(([key]) => this.isDataField(key));
-    const otherEntries = entries.filter(([key]) => !this.isDataField(key));
-    
     return {
-      ...Object.fromEntries(otherEntries),
-      data: { ...record.data, ...Object.fromEntries(dataEntries) },
+      ...Object.fromEntries(entries.filter(([k]) => !this.dataFields.has(k))),
+      data: { ...record.data, ...Object.fromEntries(entries.filter(([k]) => this.dataFields.has(k))) },
     };
   }
 

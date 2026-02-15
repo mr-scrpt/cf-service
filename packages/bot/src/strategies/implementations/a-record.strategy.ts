@@ -1,9 +1,10 @@
 import {
   DnsRecordType,
-  DnsRecord,
   ipv4Schema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
+  type StandardRecord,
+  type StandardRecordFieldKey,
 } from '@cloudflare-bot/shared';
 import {
   DnsRecordStrategy,
@@ -21,7 +22,7 @@ interface ARecordData {
   comment?: string;
 }
 
-export class ARecordStrategy implements DnsRecordStrategy<ARecordData> {
+export class ARecordStrategy implements DnsRecordStrategy<ARecordData, StandardRecord, StandardRecordFieldKey> {
   readonly type = DnsRecordType.A;
   readonly displayName = 'A Record';
   readonly icon = '🌐';
@@ -78,24 +79,24 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData) {
+  toCreateInput(wizardData: WizardData<ARecordData>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
-      name: wizardData.fields.name as string,
-      content: wizardData.fields.content as string,
-      ttl: (wizardData.fields.ttl as number) ?? 3600,
-      proxied: (wizardData.fields.proxied as boolean) ?? false,
-      comment: wizardData.fields.comment as string | undefined,
+      name: wizardData.fields.name,
+      content: wizardData.fields.content,
+      ttl: wizardData.fields.ttl,
+      proxied: wizardData.fields.proxied,
+      comment: wizardData.fields.comment,
     };
   }
 
-  getFieldValue(record: DnsRecord, fieldKey: string): unknown {
-    return (record as any)[fieldKey];
+  getFieldValue(record: StandardRecord, fieldKey: StandardRecordFieldKey): unknown {
+    return record[fieldKey as keyof StandardRecord];
   }
 
-  applyFieldChanges(record: DnsRecord, changes: Record<string, unknown>): Partial<DnsRecord> {
-    return changes;
+  applyFieldChanges(record: StandardRecord, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecord> {
+    return changes as Partial<StandardRecord>;
   }
 
   private formatTTL(ttl: number): string {

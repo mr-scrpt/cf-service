@@ -46,7 +46,18 @@ export * from './domain';
 
 // Re-export primitive schemas for external use
 export { zoneIdSchema } from './domain/domain.schema';
-export { dnsRecordNameSchema, dnsRecordContentSchema, ttlSchema } from './domain/dns-record.schema';
+export { 
+  dnsRecordNameSchema, 
+  dnsRecordContentSchema, 
+  ttlSchema,
+  type StandardRecord,
+  type MXRecord,
+  type SRVRecord,
+  type StandardRecordFieldKey,
+  type MXRecordFieldKey,
+  type SRVRecordFieldKey,
+  type DnsRecordFieldKey,
+} from './domain/dns-record.schema';
 
 // Errors
 export * from './errors';
