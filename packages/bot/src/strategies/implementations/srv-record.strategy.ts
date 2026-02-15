@@ -117,12 +117,17 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData<SRVRecordData>) {
+  toCreateInput(wizardData: WizardData<any>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
       name: wizardData.fields.name,
-      data: wizardData.fields.data,
+      data: {
+        priority: wizardData.fields.priority,
+        weight: wizardData.fields.weight,
+        port: wizardData.fields.port,
+        target: wizardData.fields.target,
+      },
       ttl: wizardData.fields.ttl,
       proxied: false,
       comment: wizardData.fields.comment,

@@ -10,6 +10,7 @@ import { CallbackRouter, TextInputRouter } from '../routing';
 import { CallbackAction, BotEvent } from '../constants';
 import {
   DnsManagementHandler,
+  DnsCreateSelectDomainHandler,
   DnsCreateSelectTypeHandler,
   DnsSelectTypeHandler,
   DnsListDomainHandler,
@@ -52,6 +53,10 @@ export function bootstrapBot(bot: Bot<Context & SessionFlavor<SessionData>>, gat
 
   callbackRouter.registerAll([
     { action: CallbackAction.DNS_MANAGEMENT, handler: new DnsManagementHandler(dnsMenu) },
+    {
+      action: CallbackAction.DNS_CREATE_SELECT_DOMAIN,
+      handler: new DnsCreateSelectDomainHandler(createFlow),
+    },
     {
       action: CallbackAction.DNS_CREATE_SELECT_TYPE,
       handler: new DnsCreateSelectTypeHandler(createFlow),
