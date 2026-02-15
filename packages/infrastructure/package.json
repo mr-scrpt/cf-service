@@ -1,0 +1,24 @@
+{
+  "name": "@cloudflare-bot/infrastructure",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@cloudflare-bot/domain": "workspace:*",
+    "@cloudflare-bot/application": "workspace:*",
+    "cloudflare": "^3.5.0",
+    "grammy": "^1.32.0",
+    "mongoose": "^8.8.4",
+    "winston": "^3.18.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}
