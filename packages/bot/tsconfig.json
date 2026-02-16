@@ -1,6 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "outDir": "dist",
     "rootDir": "src",
     "skipLibCheck": true,
@@ -14,5 +15,11 @@
     }
   },
   "include": ["src/**/*"],
-  "references": [{ "path": "../shared" }]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../shared" },
+    { "path": "../domain" },
+    { "path": "../application" },
+    { "path": "../infrastructure" }
+  ]
 }
