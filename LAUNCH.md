@@ -119,18 +119,19 @@ SESSION_SECRET=your_session_secret_min_32_characters_long  # Секрет для
 
 #### 🔑 Отримання Cloudflare API ключів
 
-⚠️ **Важливо:** Для роботи з доменами потрібні API ключі **рівня акаунту** (Account-level API Token), а не користувача.
+⚠️ **Важливо:** Для роботи з доменами потрібен **Custom API Token** з дозволами рівня акаунту та зони.
 
 **Як створити API Token:**
 
 1. Перейдіть в [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
 2. Натисніть **"Create Token"**
-3. Виберіть шаблон **"Edit zone DNS"** або створіть Custom Token
-4. **Обов'язкові дозволи:**
-   - `Zone` → `DNS` → `Edit`
-   - `Zone` → `Zone` → `Read`
-   - `Account` → `Account Settings` → `Read` (для роботи з доменами)
-5. Скопіюйте згенерований токен в `CLOUDFLARE_API_TOKEN`
+3. Виберіть **"Create Custom Token"**
+4. **Обов'язкові дозволи (всі в одному токені):**
+   - `Account` → `Zone` → `Edit` (для створення нових доменів)
+   - `Zone` → `DNS` → `Edit` (для управління DNS записами)
+   - `Zone` → `Zone` → `Read` (для читання інформації про зони)
+5. **Zone Resources:** Виберіть "All zones" або конкретні зони
+6. Скопіюйте згенерований токен в `CLOUDFLARE_API_TOKEN`
 
 **Account ID:**
 - Знайдіть на головній сторінці Cloudflare Dashboard (праворуч в sidebar)
@@ -155,29 +156,6 @@ SESSION_SECRET=your_session_secret_min_32_characters_long  # Секрет для
 **ALLOWED_CHAT_ID:**
 - Ваш особистий Telegram ID (адміністратор бота)
 - Отримати можна через [@userinfobot](https://t.me/userinfobot)
-
----
-
-**Система валідації оточення:**
-
-Проєкт використовує **Zod** для валідації environment variables при старті застосунку. Кожен пакет (bot, api, web) має свою схему валідації:
-
-```typescript
-// packages/bot/src/shared/config/env.config.ts
-const botEnvSchema = z.object({
-  TELEGRAM_BOT_TOKEN: z.string().min(1),
-  CLOUDFLARE_API_TOKEN: z.string().min(1),
-  // ...
-});
-
-export const env = botEnvSchema.parse(process.env); // ✅ Валідація при імпорті
-```
-
-**Переваги підходу:**
-- ✅ **Type-safe** - автоматичний вивід типів зі схеми
-- ✅ **Fail-fast** - застосунок не запуститься з невалідними env
-- ✅ **Централізація** - `env` об'єкт замість `process.env` по всьому коду
-- ✅ **Документація** - схема як source of truth для required змінних
 
 ### 3. Запуск MongoDB
 
@@ -272,18 +250,18 @@ pnpm start:web
 **Endpoints:**
 
 ```
-POST   /api/domains              # Реєстрація домену
-GET    /api/domains              # Список доменів
-GET    /api/domains/:id/records  # DNS записи домену
-POST   /api/domains/:id/records  # Створення DNS запису
-PUT    /api/records/:id          # Оновлення DNS запису
-DELETE /api/records/:id          # Видалення DNS запису
+GET    /health                                    # Health check (без авторизації)
 
-POST   /api/users                # Додавання користувача
-GET    /api/users                # Список користувачів
-DELETE /api/users/:telegramId   # Видалення користувача
+GET    /api/notify                                # Інфо про notification endpoint (без авторизації)
+POST   /api/notify                                # Відправка сповіщення в Telegram (без авторизації)
 
-POST   /api/notifications        # Відправка сповіщення
+GET    /api/users                                 # Список користувачів
+DELETE /api/users/:telegramId                     # Видалення користувача
+
+POST   /api/registration-requests                 # Створення запиту доступу
+GET    /api/registration-requests/pending         # Список запитів на розгляді
+POST   /api/registration-requests/:id/approve     # Схвалення запиту
+POST   /api/registration-requests/:id/reject      # Відхилення запиту
 ```
 
 #### 📮 Postman Collection
