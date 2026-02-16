@@ -1,22 +1,21 @@
-import { Context, SessionFlavor } from 'grammy';
+import { IDnsStrategyRegistry, IMainMenu } from '@application/ports';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { type DnsRecordData } from '@cloudflare-bot/domain';
-import { KeyboardBuilder } from '@infrastructure/ui/components';
-import { IDnsRecordFormatter, IMainMenu, IDnsStrategyRegistry } from '@application/ports';
-import { CallbackAction, FlowStep } from '@shared/constants';
-import { SessionData } from '@shared/types';
-import { SessionParser } from '@presentation/parsers';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { SessionParser } from '@presentation/parsers';
+import { CallbackAction } from '@shared/constants';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
+import { SessionData } from '@shared/types';
+import { Context, SessionFlavor } from 'grammy';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class EditDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly formatter: IDnsRecordFormatter,
     private readonly mainMenu: IMainMenu,
-    private readonly strategyRegistry: IDnsStrategyRegistry
+    private readonly strategyRegistry: IDnsStrategyRegistry,
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -52,7 +51,7 @@ export class EditDnsFlow {
 
     SessionParser.setSelectedZone(ctx, domain);
 
-    const records = await this.gateway.listDnsRecords(domain.id) as any;
+    const records = (await this.gateway.listDnsRecords(domain.id)) as any;
 
     if (records.length === 0) {
       await ctx.editMessageText('❌ No DNS records found for this domain.', {
@@ -70,7 +69,7 @@ export class EditDnsFlow {
       keyboard.addButton(
         `${strategy.icon} ${record.name} (${record.type})`,
         CallbackAction.DNS_EDIT_FIELD,
-        { idx: index }
+        { idx: index },
       );
     });
     keyboard.addNavigation({ back: true, cancel: true });
@@ -83,7 +82,11 @@ export class EditDnsFlow {
     });
   }
 
-  async showFieldSelector(ctx: SessionContext, recordIndex: number, useReply: boolean = false): Promise<void> {
+  async showFieldSelector(
+    ctx: SessionContext,
+    recordIndex: number,
+    useReply: boolean = false,
+  ): Promise<void> {
     const zone = SessionParser.getSelectedZone(ctx);
     const record = SessionParser.getRecordByIndex(ctx, recordIndex);
 
@@ -104,7 +107,11 @@ export class EditDnsFlow {
     const fieldConfigs = strategy.getFieldConfigs();
 
     const keyboard = this.buildFieldKeyboard(fieldConfigs, recordIndex);
-    const message = this.formatFieldSelectorMessage(record, fieldConfigs, ctx.session.editSession.pendingChanges);
+    const message = this.formatFieldSelectorMessage(
+      record,
+      fieldConfigs,
+      ctx.session.editSession.pendingChanges,
+    );
 
     if (useReply) {
       await ctx.reply(message, {
@@ -128,7 +135,7 @@ export class EditDnsFlow {
 
     const strategy = this.strategyRegistry.getStrategy(record.type);
     const fieldConfigs = strategy.getFieldConfigs();
-    const fieldConfig = fieldConfigs.find(f => f.key === fieldKey);
+    const fieldConfig = fieldConfigs.find((f) => f.key === fieldKey);
 
     if (!fieldConfig) {
       await ctx.reply('❌ Field not found. Please try again.');
@@ -158,20 +165,22 @@ export class EditDnsFlow {
     }
 
     const fieldConfig = editField.fieldConfig as FieldConfig;
-    
+
     // Parse input based on field type
     let parsedValue: unknown = newValue;
     if (fieldConfig.inputType === FieldInputType.NUMBER) {
       const num = Number(newValue);
       if (isNaN(num)) {
-        await ctx.reply(`❌ Invalid number format. Please enter a valid number:`, { parse_mode: 'HTML' });
+        await ctx.reply(`❌ Invalid number format. Please enter a valid number:`, {
+          parse_mode: 'HTML',
+        });
         return;
       }
       parsedValue = num;
     } else if (fieldConfig.inputType === FieldInputType.BOOLEAN) {
       parsedValue = newValue.toLowerCase() === 'true' || newValue === '1';
     }
-    
+
     const validation = fieldConfig.validationSchema.safeParse(parsedValue);
 
     if (!validation.success) {
@@ -186,7 +195,6 @@ export class EditDnsFlow {
 
     await this.showFieldSelector(ctx, editSession.recordIndex, true);
   }
-
 
   async saveAllChanges(ctx: SessionContext): Promise<void> {
     const editSession = ctx.session.editSession;
@@ -206,11 +214,11 @@ export class EditDnsFlow {
     try {
       // Prepare update payload - exclude 'id' as it's passed separately
       const { id, ...recordWithoutId } = record;
-      
+
       // Use strategy to apply field changes (handles nested structures like SRV)
       const strategy = this.strategyRegistry.getStrategy(record.type);
       const processedChanges = strategy.applyFieldChanges(record, editSession.pendingChanges);
-      
+
       const updatedRecord = {
         ...recordWithoutId,
         ...processedChanges,
@@ -243,13 +251,12 @@ export class EditDnsFlow {
 
   private buildFieldKeyboard(fieldConfigs: FieldConfig[], recordIndex: number): KeyboardBuilder {
     const keyboard = new KeyboardBuilder();
-    
+
     fieldConfigs.forEach((field) => {
-      keyboard.addButton(
-        `✏️ ${field.label}`,
-        CallbackAction.DNS_EDIT_FIELD,
-        { idx: recordIndex, field: field.key }
-      );
+      keyboard.addButton(`✏️ ${field.label}`, CallbackAction.DNS_EDIT_FIELD, {
+        idx: recordIndex,
+        field: field.key,
+      });
     });
 
     keyboard.addButton('💾 Save All Changes', CallbackAction.DNS_SAVE_ALL, { idx: recordIndex });
@@ -281,14 +288,14 @@ ${recordList}`;
   private formatFieldSelectorMessage(
     record: DnsRecordData,
     fieldConfigs: FieldConfig[],
-    pendingChanges: Record<string, unknown>
+    pendingChanges: Record<string, unknown>,
   ): string {
     const fieldList = fieldConfigs
       .map((f) => {
         const currentValue = this.getFieldCurrentValue(record, f.key);
         const hasPendingChange = f.key in pendingChanges;
         const indicator = hasPendingChange ? '✏️' : '•';
-        
+
         if (hasPendingChange) {
           const newValue = pendingChanges[f.key];
           return `${indicator} <b>${f.label}:</b> ${currentValue || 'Not set'} → ${newValue}`;
@@ -314,11 +321,11 @@ Select a field to edit:`;
   private formatFieldEditPrompt(fieldConfig: FieldConfig, currentValue: unknown): string {
     let prompt = `✏️ <b>Editing: ${fieldConfig.label}</b>\n\n`;
     prompt += `<b>Current value:</b> ${currentValue || 'Not set'}\n\n`;
-    
+
     if (fieldConfig.helpText) {
       prompt += `ℹ️ ${fieldConfig.helpText}\n\n`;
     }
-    
+
     if (fieldConfig.placeholder) {
       prompt += `📝 Example: ${fieldConfig.placeholder}\n`;
     }
@@ -330,7 +337,7 @@ Select a field to edit:`;
     // Use strategy to get field value (handles nested structures like SRV)
     const strategy = this.strategyRegistry.getStrategy(record.type);
     const value = strategy.getFieldValue(record, fieldKey);
-    
+
     if (value === undefined || value === null) {
       return 'Not set';
     }

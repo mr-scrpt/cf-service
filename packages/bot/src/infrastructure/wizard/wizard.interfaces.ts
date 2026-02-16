@@ -12,10 +12,10 @@ export interface WizardState {
   metadata: Record<string, unknown>;
 }
 
-export interface WizardConfig {
+export interface WizardConfig<TContext extends Context = Context> {
   steps: WizardStep[];
   metadata: Record<string, unknown>;
   confirmationPrompt?: string;
-  onComplete: (ctx: Context, fields: Record<string, unknown>) => Promise<void>;
-  onCancel?: (ctx: Context) => Promise<void>;
+  onComplete: (ctx: TContext, fields: Record<string, unknown>) => Promise<void>;
+  onCancel?: (ctx: TContext) => Promise<void>;
 }

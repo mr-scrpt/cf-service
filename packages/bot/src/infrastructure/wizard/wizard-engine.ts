@@ -17,7 +17,7 @@ export class WizardEngine implements IWizardEngine {
     private readonly renderer: WizardRenderer
   ) {}
 
-  async start(ctx: SessionContext, config: WizardConfig): Promise<void> {
+  async start(ctx: SessionContext, config: WizardConfig<SessionContext>): Promise<void> {
     const state: WizardState = {
       currentStepIndex: 0,
       fields: {},
@@ -31,7 +31,7 @@ export class WizardEngine implements IWizardEngine {
   }
 
   async handleTextInput(ctx: SessionContext, input: string): Promise<void> {
-    const config = await this.session.get<WizardConfig>(
+    const config = await this.session.get<WizardConfig<SessionContext>>(
       ctx,
       SessionKey.WIZARD_CONFIG
     );
@@ -57,7 +57,7 @@ export class WizardEngine implements IWizardEngine {
   }
 
   async handleOptionSelect(ctx: SessionContext, optionValue: unknown): Promise<void> {
-    const config = await this.session.get<WizardConfig>(
+    const config = await this.session.get<WizardConfig<SessionContext>>(
       ctx,
       SessionKey.WIZARD_CONFIG
     );
@@ -76,7 +76,7 @@ export class WizardEngine implements IWizardEngine {
   }
 
   async skip(ctx: SessionContext): Promise<void> {
-    const config = await this.session.get<WizardConfig>(
+    const config = await this.session.get<WizardConfig<SessionContext>>(
       ctx,
       SessionKey.WIZARD_CONFIG
     );
@@ -110,7 +110,7 @@ export class WizardEngine implements IWizardEngine {
   }
 
   async cancel(ctx: SessionContext): Promise<void> {
-    const config = await this.session.get<WizardConfig>(
+    const config = await this.session.get<WizardConfig<SessionContext>>(
       ctx,
       SessionKey.WIZARD_CONFIG
     );
@@ -127,7 +127,7 @@ export class WizardEngine implements IWizardEngine {
 
   private async saveFieldAndProceed(
     ctx: SessionContext,
-    config: WizardConfig,
+    config: WizardConfig<SessionContext>,
     state: WizardState,
     step: WizardStep,
     value: unknown
@@ -139,7 +139,7 @@ export class WizardEngine implements IWizardEngine {
 
   private async moveToNextStep(
     ctx: SessionContext,
-    config: WizardConfig,
+    config: WizardConfig<SessionContext>,
     state: WizardState
   ): Promise<void> {
     if (state.currentStepIndex < config.steps.length - 1) {
@@ -153,7 +153,7 @@ export class WizardEngine implements IWizardEngine {
 
   private async renderCurrentStep(
     ctx: SessionContext,
-    config: WizardConfig,
+    config: WizardConfig<SessionContext>,
     state: WizardState
   ): Promise<void> {
     const step = config.steps[state.currentStepIndex];
@@ -162,7 +162,7 @@ export class WizardEngine implements IWizardEngine {
 
   private async showConfirmation(
     ctx: SessionContext,
-    config: WizardConfig,
+    config: WizardConfig<SessionContext>,
     state: WizardState
   ): Promise<void> {
     await this.session.set(ctx, SessionKey.WIZARD_STATE, state);
@@ -170,7 +170,7 @@ export class WizardEngine implements IWizardEngine {
   }
 
   async confirm(ctx: SessionContext): Promise<void> {
-    const config = await this.session.get<WizardConfig>(ctx, SessionKey.WIZARD_CONFIG);
+    const config = await this.session.get<WizardConfig<SessionContext>>(ctx, SessionKey.WIZARD_CONFIG);
     const state = await this.session.get<WizardState>(ctx, SessionKey.WIZARD_STATE);
 
     if (!config || !state) {
@@ -182,7 +182,7 @@ export class WizardEngine implements IWizardEngine {
 
   private async complete(
     ctx: SessionContext,
-    config: WizardConfig,
+    config: WizardConfig<SessionContext>,
     state: WizardState
   ): Promise<void> {
     await this.session.clear(ctx, SessionKey.WIZARD_STATE);

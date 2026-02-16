@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { RegistrationService } from '@application/services/registration.service';
 import { ResponseHelper } from '@shared/utils/response.helper';
 import { RequestParamsParser } from '@presentation/parsers';
-import type { CreateRegistrationRequestDto, ReviewRegistrationRequestDto } from '@cloudflare-bot/application';
 
 export class RegistrationController {
   constructor(

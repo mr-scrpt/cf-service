@@ -1,7 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
 import type { IApiLogger } from '@shared/types/logger.types';
+import { NextFunction, Request, Response } from 'express';
 
-function sanitizeHeaders(headers: Record<string, string | string[] | undefined>): Record<string, string | string[] | undefined> {
+function sanitizeHeaders(
+  headers: Record<string, string | string[] | undefined>,
+): Record<string, string | string[] | undefined> {
   const sanitized = { ...headers };
   if (sanitized.authorization && typeof sanitized.authorization === 'string') {
     sanitized.authorization = sanitized.authorization.replace(/Bearer .+/, 'Bearer ***');
@@ -16,16 +18,16 @@ function sanitizeBody(body: unknown): unknown {
   if (!body || typeof body !== 'object') {
     return body;
   }
-  
+
   const sanitized = { ...(body as Record<string, unknown>) };
   const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'api_key'];
-  
-  sensitiveFields.forEach(field => {
+
+  sensitiveFields.forEach((field) => {
     if (sanitized[field]) {
       sanitized[field] = '***';
     }
   });
-  
+
   return sanitized;
 }
 
@@ -48,7 +50,7 @@ export function createRequestLoggerMiddleware(logger: IApiLogger) {
     const originalSend = res.send;
     let responseBody: unknown;
 
-    res.send = function(data: unknown): Response {
+    res.send = function (data: unknown): Response {
       responseBody = data;
       res.send = originalSend;
       return originalSend.call(this, data);
@@ -64,7 +66,10 @@ export function createRequestLoggerMiddleware(logger: IApiLogger) {
           url: req.originalUrl,
           statusCode,
           duration: `${duration}ms`,
-          body: responseBody && typeof responseBody === 'string' ? JSON.parse(responseBody) : responseBody,
+          body:
+            responseBody && typeof responseBody === 'string'
+              ? JSON.parse(responseBody)
+              : responseBody,
         });
       }
 

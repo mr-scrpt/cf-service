@@ -1,13 +1,11 @@
 import type {
-  Result,
-  CreateRegistrationRequestDto,
-  RegistrationRequestDto,
-  ReviewRegistrationRequestDto,
   AddUserDto,
-  UserDto,
-  DomainDto,
-  RegisterDomainDto,
+  CreateRegistrationRequestDto,
   NotificationPayloadDto,
+  RegistrationRequestDto,
+  Result,
+  ReviewRegistrationRequestDto,
+  UserDto,
 } from '@cloudflare-bot/application';
 
 export interface ICreateRegistrationRequestUseCase {

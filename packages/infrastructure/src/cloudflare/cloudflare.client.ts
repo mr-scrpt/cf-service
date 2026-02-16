@@ -28,6 +28,18 @@ export class CloudflareClient implements ICloudflareGateway {
     }
   }
 
+  async listZones(): Promise<Domain[]> {
+    try {
+      const response = await this.client.zones.list({
+        account: { id: this.accountId },
+      });
+
+      return response.result.map(zone => this.mapZoneToDomain(zone));
+    } catch (error) {
+      throw new Error(`Failed to list zones: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
   async createDnsRecord(params: {
     zoneId: string;
     type: string;

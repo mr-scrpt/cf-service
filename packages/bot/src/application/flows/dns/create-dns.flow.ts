@@ -95,13 +95,13 @@ Select record type:
   ): Promise<void> {
     const strategy = this.strategyRegistry.getStrategy(type);
 
-    const wizardConfig: WizardConfig = {
+    const wizardConfig: WizardConfig<SessionContext> = {
       steps: strategy.getFieldConfigs().map((fieldConfig) => ({
         fieldConfig,
       })),
       metadata: { zoneId, zoneName, type },
       confirmationPrompt: '⚠️ Создать DNS запись с этими данными?',
-      onComplete: async (ctx: Context, collectedData: Record<string, unknown>) => {
+      onComplete: async (ctx, collectedData) => {
         try {
           const createdRecord = await this.gateway.createDnsRecord(strategy.toCreateInput({ zoneId, fields: collectedData }) as any);
           const message = this.formatter.formatCreatedMessage(createdRecord as any);
@@ -120,11 +120,11 @@ Select record type:
           });
         }
       },
-      onCancel: async (ctx: Context) => {
+      onCancel: async (ctx) => {
         await ctx.reply('❌ DNS record creation cancelled');
       },
     };
 
-    await this.wizardEngine.start(ctx as SessionContext, wizardConfig);
+    await this.wizardEngine.start(ctx, wizardConfig);
   }
 }

@@ -1,11 +1,11 @@
-import { Context, SessionFlavor } from 'grammy';
+import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { type DnsRecordData } from '@cloudflare-bot/domain';
-import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
-import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
+import { SessionParser } from '@presentation/parsers';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
-import { SessionParser } from '@presentation/parsers';
+import { Context, SessionFlavor } from 'grammy';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -13,7 +13,7 @@ export class DeleteDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
     private readonly formatter: IDnsRecordFormatter,
-    private readonly mainMenu: IMainMenu
+    private readonly mainMenu: IMainMenu,
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -36,11 +36,10 @@ export class DeleteDnsFlow {
   private buildDomainKeyboard(domains: Array<{ name: string }>): KeyboardBuilder {
     const keyboard = new KeyboardBuilder();
     domains.forEach((domain, index) => {
-      keyboard.addButton(
-        domain.name,
-        CallbackAction.DNS_DELETE_SELECT,
-        { idx: index, step: FlowStep.SELECT_RECORD }
-      );
+      keyboard.addButton(domain.name, CallbackAction.DNS_DELETE_SELECT, {
+        idx: index,
+        step: FlowStep.SELECT_RECORD,
+      });
     });
     keyboard.addNavigation({ back: true });
     return keyboard;
@@ -53,7 +52,7 @@ export class DeleteDnsFlow {
       return;
     }
 
-    const records = await this.gateway.listDnsRecords(zone.zoneId) as DnsRecordData[];
+    const records = (await this.gateway.listDnsRecords(zone.zoneId)) as DnsRecordData[];
 
     if (records.length === 0) {
       await ctx.editMessageText('📭 No DNS records found for this domain.');
@@ -74,11 +73,10 @@ export class DeleteDnsFlow {
     const keyboard = new KeyboardBuilder();
     records.forEach((record, index) => {
       const label = this.formatter.formatListItem(record, index);
-      keyboard.addButton(
-        label,
-        CallbackAction.DNS_DELETE_SELECT,
-        { idx: index, step: FlowStep.CONFIRM }
-      );
+      keyboard.addButton(label, CallbackAction.DNS_DELETE_SELECT, {
+        idx: index,
+        step: FlowStep.CONFIRM,
+      });
     });
     keyboard.addNavigation({ back: true, cancel: true });
     return keyboard;
@@ -97,7 +95,7 @@ Select a record to delete:
     ctx: SessionContext,
     recordIndex: number,
     recordName: string,
-    recordType: string
+    recordType: string,
   ): Promise<void> {
     const zoneName = ctx.session.selectedZoneName;
     const keyboard = this.buildConfirmationKeyboard(recordIndex);
@@ -111,11 +109,7 @@ Select a record to delete:
 
   private buildConfirmationKeyboard(recordIndex: number): KeyboardBuilder {
     const keyboard = new KeyboardBuilder();
-    keyboard.addButton(
-      '⚠️ Yes, Delete',
-      CallbackAction.DNS_DELETE_CONFIRM,
-      { idx: recordIndex }
-    );
+    keyboard.addButton('⚠️ Yes, Delete', CallbackAction.DNS_DELETE_CONFIRM, { idx: recordIndex });
     keyboard.addNavigation({ back: true, cancel: true });
     return keyboard;
   }
@@ -123,7 +117,7 @@ Select a record to delete:
   private formatConfirmationMessage(
     zoneName: string,
     recordName: string,
-    recordType: string
+    recordType: string,
   ): string {
     return `
 🗑 <b>Delete DNS Record - Confirmation</b>

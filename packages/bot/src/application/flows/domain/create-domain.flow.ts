@@ -1,12 +1,12 @@
-import { Context, SessionFlavor } from 'grammy';
+import { IDomainFormatter, IWizardEngine } from '@application/ports';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { domainNameSchema } from '@cloudflare-bot/domain';
-import { IWizardEngine, IDomainFormatter } from '@application/ports';
+import { FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { WizardConfig } from '@infrastructure/wizard';
-import { MainMenuFlow } from '../main-menu.flow';
-import { SessionData } from '@shared/types';
-import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
+import { SessionData } from '@shared/types';
+import { Context, SessionFlavor } from 'grammy';
+import { MainMenuFlow } from '../main-menu.flow';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -19,11 +19,11 @@ export class CreateDomainFlow {
     private readonly gateway: IDnsGatewayPort,
     private readonly wizardEngine: IWizardEngine,
     private readonly formatter: IDomainFormatter,
-    private readonly mainMenu: MainMenuFlow
+    private readonly mainMenu: MainMenuFlow,
   ) {}
 
   async startWizard(ctx: SessionContext): Promise<void> {
-    const config: WizardConfig = {
+    const config: WizardConfig<SessionContext> = {
       steps: [
         {
           fieldConfig: {
@@ -41,20 +41,20 @@ export class CreateDomainFlow {
       metadata: {},
       confirmationPrompt: '⚠️ Register this domain on Cloudflare?',
       onComplete: async (ctx, fields) => {
-        await this.createDomain(ctx as SessionContext, fields.name as string);
+        await this.createDomain(ctx, fields);
       },
       onCancel: async (ctx) => {
         await ctx.reply('❌ Domain registration cancelled');
-        await this.mainMenu.show(ctx as SessionContext);
+        await this.mainMenu.show(ctx);
       },
     };
 
     await this.wizardEngine.start(ctx, config);
   }
 
-  private async createDomain(ctx: SessionContext, collectedData: any): Promise<void> {
+  private async createDomain(ctx: SessionContext, fields: Record<string, unknown>): Promise<void> {
     try {
-      const domain = await this.gateway.registerDomain({ domain: collectedData.name });
+      const domain = await this.gateway.registerDomain({ domain: fields.name as string });
       const message = this.formatter.formatDomainRegistered(domain);
       await ctx.reply(message, { parse_mode: 'HTML' });
     } catch (error) {

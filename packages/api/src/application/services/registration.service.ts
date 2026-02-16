@@ -1,13 +1,13 @@
 import {
-  CreateRegistrationRequestUseCase,
-  ListPendingRequestsUseCase,
   ApproveRegistrationRequestUseCase,
-  RejectRegistrationRequestUseCase,
   CreateRegistrationRequestDto,
-  ReviewRegistrationRequestDto,
-  RegistrationRequestDto,
+  CreateRegistrationRequestUseCase,
   ILogger,
+  ListPendingRequestsUseCase,
+  RegistrationRequestDto,
+  RejectRegistrationRequestUseCase,
   Result,
+  ReviewRegistrationRequestDto,
 } from '@cloudflare-bot/application';
 import { BaseService } from './base.service';
 
@@ -17,7 +17,7 @@ export class RegistrationService extends BaseService {
     private readonly listPendingRequestsUseCase: ListPendingRequestsUseCase,
     private readonly approveRequestUseCase: ApproveRegistrationRequestUseCase,
     private readonly rejectRequestUseCase: RejectRegistrationRequestUseCase,
-    protected readonly logger: ILogger
+    protected readonly logger: ILogger,
   ) {
     super(logger);
   }
@@ -26,22 +26,19 @@ export class RegistrationService extends BaseService {
     return this.execute(
       () => this.createRequestUseCase.execute(dto),
       'Create registration request',
-      { username: dto.username }
+      { username: dto.username },
     );
   }
 
   async listPending(): Promise<Result<RegistrationRequestDto[]>> {
-    return this.execute(
-      () => this.listPendingRequestsUseCase.execute(),
-      'List pending requests'
-    );
+    return this.execute(() => this.listPendingRequestsUseCase.execute(), 'List pending requests');
   }
 
   async approve(dto: ReviewRegistrationRequestDto): Promise<Result<void>> {
     return this.execute(
       () => this.approveRequestUseCase.execute(dto),
       'Approve registration request',
-      { requestId: dto.requestId }
+      { requestId: dto.requestId },
     );
   }
 
@@ -49,7 +46,7 @@ export class RegistrationService extends BaseService {
     return this.execute(
       () => this.rejectRequestUseCase.execute(dto),
       'Reject registration request',
-      { requestId: dto.requestId }
+      { requestId: dto.requestId },
     );
   }
 }

@@ -12,7 +12,8 @@ export class DnsGatewayAdapter implements IDnsGatewayPort {
   }
 
   async listDomains(): Promise<DomainDto[]> {
-    return [];
+    const domains = await this.cloudflareClient.listZones();
+    return domains.map(domain => this.mapDomainToDto(domain));
   }
 
   async createDnsRecord(input: CreateDnsRecordDto): Promise<DnsRecordDto> {

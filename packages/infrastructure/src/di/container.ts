@@ -79,7 +79,7 @@ export class DIContainer {
   }
 
   getAddUserUseCase(): AddUserUseCase {
-    return new AddUserUseCase(this.userRepository, this.telegramBot);
+    return new AddUserUseCase(this.userRepository);
   }
 
   getCheckUserAccessUseCase(): CheckUserAccessUseCase {

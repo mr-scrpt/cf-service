@@ -63,10 +63,10 @@ export class WizardRenderer {
     return { inline_keyboard: buttons };
   }
 
-  async renderConfirmation(
-    ctx: Context,
+  async renderConfirmation<TContext extends Context>(
+    ctx: TContext,
     state: WizardState,
-    config: WizardConfig
+    config: WizardConfig<TContext>
   ): Promise<void> {
     const summary = this.buildSummary(state, config);
     const keyboard = this.buildConfirmationKeyboard();
@@ -77,7 +77,7 @@ export class WizardRenderer {
     });
   }
 
-  private buildSummary(state: WizardState, config: WizardConfig): string {
+  private buildSummary<TContext extends Context>(state: WizardState, config: WizardConfig<TContext>): string {
     let message = '✅ <b>Проверьте данные перед созданием</b>\n\n';
 
     config.steps.forEach((step) => {

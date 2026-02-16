@@ -2,6 +2,7 @@ import { Domain, DnsRecord, DomainName } from '@cloudflare-bot/domain';
 
 export interface ICloudflareGateway {
   createZone(domainName: DomainName): Promise<Domain>;
+  listZones(): Promise<Domain[]>;
   
   createDnsRecord(params: {
     zoneId: string;

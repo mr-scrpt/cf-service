@@ -1,11 +1,20 @@
-import { IUserRepository, IRegistrationRequestRepository, RegistrationRequest } from '@cloudflare-bot/domain';
-import { CreateRegistrationRequestDto, RegistrationRequestDto, createRegistrationRequestDtoSchema } from '../../dto/registration-request.dto';
+import {
+  IUserRepository,
+  IRegistrationRequestRepository,
+  RegistrationRequest,
+} from '@cloudflare-bot/domain';
+
+import {
+  CreateRegistrationRequestDto,
+  RegistrationRequestDto,
+  createRegistrationRequestDtoSchema,
+} from '../../dto/registration-request.dto';
 import { UserAlreadyExistsError } from '../../errors/application.error';
 
 export class CreateRegistrationRequestUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly registrationRequestRepository: IRegistrationRequestRepository
+    private readonly registrationRequestRepository: IRegistrationRequestRepository,
   ) {}
 
   async execute(dto: CreateRegistrationRequestDto): Promise<RegistrationRequestDto> {
@@ -16,7 +25,9 @@ export class CreateRegistrationRequestUseCase {
       throw new UserAlreadyExistsError(validated.telegramId);
     }
 
-    const existingRequest = await this.registrationRequestRepository.findPendingByTelegramId(validated.telegramId);
+    const existingRequest = await this.registrationRequestRepository.findPendingByTelegramId(
+      validated.telegramId,
+    );
     if (existingRequest) {
       return this.toDto(existingRequest);
     }
