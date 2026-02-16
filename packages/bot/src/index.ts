@@ -1,91 +1,17 @@
-import { Bot, Context, SessionFlavor } from 'grammy';
-import type { BotError } from 'grammy';
-import type { UserFromGetMe } from 'grammy/types';
-import { env } from '@shared/config/env.config';
-import { logger } from '@shared/utils/logger';
-import { authGuard, initAuthGuard } from '@infrastructure/middleware/auth.middleware';
-import { requestLoggerMiddleware } from '@infrastructure/middleware/request-logger.middleware';
-import { createUsernameSyncMiddleware } from '@infrastructure/middleware/username-sync.middleware';
 import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
-import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
-import { CommandModule } from '@presentation/commands/base/command.module';
-import { bootstrapBot } from '@infrastructure/bootstrap';
-import { SessionData } from '@shared/types';
-import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
+import { logger } from '@shared/utils/logger';
 import { createBotLogger } from '@shared/config/logger.config';
+import { BotApplication } from '@infrastructure/bootstrap';
 
 async function main() {
   const config = loadConfig();
   const botLogger = createBotLogger(config.NODE_ENV);
   const container = new DIContainer(config, botLogger);
 
-  await container.getDatabaseService().connect();
-  logger.info('Database connected');
-
-  initAuthGuard(container);
-
-  type BotContext = Context & SessionFlavor<SessionData>;
-
-  const telegramAdapter = container.getTelegramAdapter();
-  const cloudflareGateway = new CloudflareGatewayAdapter(env);
-  const bot = telegramAdapter.getBotTyped<BotContext>();
-
-  bootstrapBot(bot, cloudflareGateway, container);
-
-  bot.use(requestLoggerMiddleware);
-  bot.use(authGuard);
-  bot.use(createUsernameSyncMiddleware(container));
-
-  const commandModule = new CommandModule<BotContext>(cloudflareGateway);
-  commandModule.getRegistry().setupBot(bot);
-
-  bot.api.getMe().then((me: UserFromGetMe) => {
-    logger.info('Bot started', { username: me.username, admin_id: env.ALLOWED_CHAT_ID });
-  });
-
-  bot.catch(async (err: BotError<Context>) => {
-  const { ctx, error } = err;
+  const app = new BotApplication(container);
   
-  logger.error('Unhandled bot error', { 
-    error: error instanceof Error ? error.message : String(error), 
-    stack: error instanceof Error ? error.stack : undefined,
-    chat_id: ctx?.chat?.id,
-    user_id: ctx?.from?.id,
-  });
-
-  if (ctx) {
-    try {
-      const errorMessage = TelegramErrorFormatter.format(error instanceof Error ? error : new Error(String(error)));
-      await ctx.reply(errorMessage, { parse_mode: 'HTML' });
-    } catch (replyError) {
-      logger.error('Failed to send error message', { error: replyError });
-      try {
-        await ctx.reply('❌ An unexpected error occurred. Please try again later.');
-      } catch {}
-    }
-    }
-  });
-
-  bot.start({
-    onStart: () => logger.info('🚀 Cloudflare Management Bot is running with new architecture...'),
-  });
-
-  process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Promise Rejection', { reason, promise });
-  });
-
-  process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception', { error: error.message, stack: error.stack });
-    bot.stop();
-    process.exit(1);
-  });
-
-  const stop = (signal: string) => {
-    console.log(`Stopping bot... (${signal})`);
-    bot.stop();
-  };
-  process.once('SIGINT', () => stop('SIGINT'));
-  process.once('SIGTERM', () => stop('SIGTERM'));
+  await app.initialize();
+  await app.start();
 }
 
 main().catch((error) => {

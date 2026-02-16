@@ -8,4 +8,6 @@ const apiEnvSchema = z.object({
   MONGODB_URI: z.string().min(1),
 });
 
+export type ApiEnv = z.infer<typeof apiEnvSchema>;
+
 export const env = apiEnvSchema.parse(process.env);
