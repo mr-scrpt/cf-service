@@ -1,8 +1,8 @@
 import * as path from 'path';
 import { LoggerConfigBuilder, WinstonLoggerAdapter } from '@cloudflare-bot/infrastructure';
-import type { ILogger } from '@cloudflare-bot/application';
 import { Environment, LogLevel } from '@cloudflare-bot/shared';
 import { API_PATHS } from './paths.config';
+import type { IApiLogger, RequestLogData, ResponseLogData } from '@shared/types/logger.types';
 
 const LOG_DIR = path.join(process.cwd(), API_PATHS.LOGS);
 const LOG_ROTATION = {
@@ -10,7 +10,7 @@ const LOG_ROTATION = {
   MAX_FILES: 5,
 };
 
-export function createApiLogger(env: string): ILogger & { logRequest?: (data: any) => void; logResponse?: (data: any) => void } {
+export function createApiLogger(env: string): IApiLogger {
   const level = env === Environment.PRODUCTION ? LogLevel.INFO : LogLevel.DEBUG;
   const consoleEnabled = env !== Environment.PRODUCTION;
 
@@ -27,7 +27,7 @@ export function createApiLogger(env: string): ILogger & { logRequest?: (data: an
   const logger = new WinstonLoggerAdapter(config);
 
   return Object.assign(logger, {
-    logRequest: (data: any) => logger.info('HTTP Request', data),
-    logResponse: (data: any) => logger.info('HTTP Response', data),
+    logRequest: (data: RequestLogData) => logger.info('HTTP Request', data),
+    logResponse: (data: ResponseLogData) => logger.info('HTTP Response', data),
   });
 }

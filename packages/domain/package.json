@@ -9,10 +9,11 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.8",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@types/uuid": "^11.0.0",
-    "uuid": "^13.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^4.3.6"
   }
 }

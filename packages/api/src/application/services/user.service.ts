@@ -12,11 +12,11 @@ export class UserService extends BaseService {
     super(logger);
   }
 
-  async addUser(dto: AddUserDto): Promise<Result<UserDto, Error>> {
+  async addUser(dto: AddUserDto, telegramId: number): Promise<Result<UserDto, Error>> {
     return this.execute(
-      () => this.addUserUseCase.execute(dto),
+      () => this.addUserUseCase.execute(dto, telegramId),
       'Add user',
-      { username: dto.username }
+      { username: dto.username, telegramId }
     );
   }
 

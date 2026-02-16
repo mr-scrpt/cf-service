@@ -1,9 +1,7 @@
 import { Context } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import {
-  registerDomainSchema,
-  ZodErrorAdapter,
-} from '@cloudflare-bot/shared';
+import { registerDomainSchema } from '@cloudflare-bot/domain';
+import { ZodErrorAdapter } from '@shared/adapters/zod-error.adapter';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '@shared/constants';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';

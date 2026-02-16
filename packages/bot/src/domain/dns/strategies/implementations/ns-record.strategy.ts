@@ -1,11 +1,5 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import {
-  domainValueSchema,
-  standardRecordSchema,
-  COMMON_TTL_VALUES,
-  type StandardRecord,
-  type StandardRecordFieldKey,
-} from '@cloudflare-bot/shared';
+import { DnsRecordType, domainValueSchema, standardRecordSchema, type StandardRecordData, type StandardRecordFieldKey } from '@cloudflare-bot/domain';
+import { COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
 import {
   DnsRecordStrategy,
   ValidationResult,
@@ -14,17 +8,17 @@ import {
 import { FieldConfig, FieldInputType } from '../field-config.interface';
 import { COMMON_FIELD_CONFIGS } from '../common-fields.config';
 
-interface NSRecordData {
+interface NSRecordWizardFields {
   name: string;
   content: string;
   ttl: number;
   comment?: string;
 }
 
-export class NSRecordStrategy implements DnsRecordStrategy<NSRecordData, StandardRecord, StandardRecordFieldKey> {
+export class NSRecordStrategy implements DnsRecordStrategy<NSRecordWizardFields, StandardRecordData, StandardRecordFieldKey> {
   readonly type = DnsRecordType.NS as const;
   readonly displayName = 'NS Record';
-  readonly icon = '🌐';
+  readonly icon = '';
   readonly description = 'Nameserver delegation';
 
   getFieldConfigs(): FieldConfig[] {
@@ -33,7 +27,7 @@ export class NSRecordStrategy implements DnsRecordStrategy<NSRecordData, Standar
       {
         key: 'content',
         label: 'Nameserver',
-        prompt: '🌐 Enter nameserver domain (e.g., ns1.example.com):',
+        prompt: ' Enter nameserver domain (e.g., ns1.example.com):',
         required: true,
         inputType: FieldInputType.TEXT,
         validationSchema: domainValueSchema,
@@ -44,7 +38,7 @@ export class NSRecordStrategy implements DnsRecordStrategy<NSRecordData, Standar
     ];
   }
 
-  validate(data: Partial<NSRecordData>): ValidationResult {
+  validate(data: Partial<NSRecordWizardFields>): ValidationResult {
     const result = standardRecordSchema.safeParse({
       ...data,
       type: this.type,
@@ -66,7 +60,7 @@ export class NSRecordStrategy implements DnsRecordStrategy<NSRecordData, Standar
     };
   }
 
-  formatSummary(data: NSRecordData): string {
+  formatSummary(data: NSRecordWizardFields): string {
     return `
 🌐 <b>${this.displayName}</b>
 
@@ -77,7 +71,7 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData<NSRecordData>) {
+  toCreateInput(wizardData: WizardData<NSRecordWizardFields>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
@@ -89,12 +83,12 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     };
   }
 
-  getFieldValue(record: StandardRecord, fieldKey: StandardRecordFieldKey): unknown {
-    return record[fieldKey as keyof StandardRecord];
+  getFieldValue(record: StandardRecordData, fieldKey: StandardRecordFieldKey): unknown {
+    return record[fieldKey as keyof StandardRecordData];
   }
 
-  applyFieldChanges(record: StandardRecord, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecord> {
-    return changes as Partial<StandardRecord>;
+  applyFieldChanges(record: StandardRecordData, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecordData> {
+    return changes as Partial<StandardRecordData>;
   }
 
   private formatTTL(ttl: number): string {

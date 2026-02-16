@@ -1,10 +1,10 @@
-import { DnsRecord } from '@cloudflare-bot/shared';
+import { type DnsRecordData } from '@cloudflare-bot/domain';
 import type { DomainDto } from '@cloudflare-bot/application';
 
 export interface IDnsRecordFormatter {
-  formatList(records: DnsRecord[]): string;
-  formatListItem(record: DnsRecord, index: number): string;
-  formatCreatedMessage(record: DnsRecord): string;
+  formatList(records: DnsRecordData[]): string;
+  formatListItem(record: DnsRecordData, index: number): string;
+  formatCreatedMessage(record: DnsRecordData): string;
 }
 
 export interface IDomainFormatter {

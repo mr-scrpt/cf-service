@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DomainStatus } from './constants.domain';
+import { DomainStatus } from '../entities/domain.entity';
 
 export const domainNameSchema = z
   .string()
@@ -15,6 +15,9 @@ export const zoneIdSchema = z
 export const domainSchema = z.object({
   id: z.string(),
   name: domainNameSchema,
-  status: z.enum(DomainStatus),
+  status: z.nativeEnum(DomainStatus),
   nameservers: z.array(z.string()),
 });
+
+export type DomainData = z.infer<typeof domainSchema>;
+export type DomainNameData = z.infer<typeof domainNameSchema>;

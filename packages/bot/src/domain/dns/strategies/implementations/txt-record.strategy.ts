@@ -1,11 +1,5 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import {
-  txtContentSchema,
-  standardRecordSchema,
-  COMMON_TTL_VALUES,
-  type StandardRecord,
-  type StandardRecordFieldKey,
-} from '@cloudflare-bot/shared';
+import { DnsRecordType, txtContentSchema, standardRecordSchema, type StandardRecordData, type StandardRecordFieldKey } from '@cloudflare-bot/domain';
+import { COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
 import {
   DnsRecordStrategy,
   ValidationResult,
@@ -14,14 +8,14 @@ import {
 import { FieldConfig, FieldInputType } from '../field-config.interface';
 import { COMMON_FIELD_CONFIGS } from '../common-fields.config';
 
-interface TXTRecordData {
+interface TXTRecordWizardFields {
   name: string;
   content: string;
   ttl: number;
   comment?: string;
 }
 
-export class TXTRecordStrategy implements DnsRecordStrategy<TXTRecordData, StandardRecord, StandardRecordFieldKey> {
+export class TXTRecordStrategy implements DnsRecordStrategy<TXTRecordWizardFields, StandardRecordData, StandardRecordFieldKey> {
   readonly type = DnsRecordType.TXT as const;
   readonly displayName = 'TXT Record';
   readonly icon = '📝';
@@ -45,7 +39,7 @@ export class TXTRecordStrategy implements DnsRecordStrategy<TXTRecordData, Stand
     ];
   }
 
-  validate(data: Partial<TXTRecordData>): ValidationResult {
+  validate(data: Partial<TXTRecordWizardFields>): ValidationResult {
     const result = standardRecordSchema.safeParse({
       ...data,
       type: this.type,
@@ -67,7 +61,7 @@ export class TXTRecordStrategy implements DnsRecordStrategy<TXTRecordData, Stand
     };
   }
 
-  formatSummary(data: TXTRecordData): string {
+  formatSummary(data: TXTRecordWizardFields): string {
     const truncatedContent =
       data.content.length > 100
         ? `${data.content.substring(0, 100)}...`
@@ -83,7 +77,7 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData<TXTRecordData>) {
+  toCreateInput(wizardData: WizardData<TXTRecordWizardFields>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
@@ -95,12 +89,12 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     };
   }
 
-  getFieldValue(record: StandardRecord, fieldKey: StandardRecordFieldKey): unknown {
-    return record[fieldKey as keyof StandardRecord];
+  getFieldValue(record: StandardRecordData, fieldKey: StandardRecordFieldKey): unknown {
+    return record[fieldKey as keyof StandardRecordData];
   }
 
-  applyFieldChanges(record: StandardRecord, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecord> {
-    return changes as Partial<StandardRecord>;
+  applyFieldChanges(record: StandardRecordData, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecordData> {
+    return changes as Partial<StandardRecordData>;
   }
 
   private formatTTL(ttl: number): string {

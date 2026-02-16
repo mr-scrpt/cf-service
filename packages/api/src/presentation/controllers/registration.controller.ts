@@ -22,7 +22,8 @@ export class RegistrationController {
 
   async createRequest(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.registrationService.createRequest(req.body as CreateRequestBody);
+      const body = req.body as CreateRequestBody;
+      const result = await this.registrationService.createRequest(body);
       this.responseHelper.send(res, result, { successStatus: 201 });
     } catch (error) {
       res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid request' });
@@ -41,11 +42,11 @@ export class RegistrationController {
   async approve(req: Request, res: Response): Promise<void> {
     try {
       const requestId = RequestParamsParser.getStringParam(req.params, 'requestId');
-      const { reviewedBy } = req.body as ReviewRequestBody;
+      const body = req.body as ReviewRequestBody;
       
       const result = await this.registrationService.approve({
         requestId,
-        reviewedBy,
+        reviewedBy: body.reviewedBy,
       });
       
       this.responseHelper.sendMessage(res, result, 'Registration request approved');
@@ -57,11 +58,11 @@ export class RegistrationController {
   async reject(req: Request, res: Response): Promise<void> {
     try {
       const requestId = RequestParamsParser.getStringParam(req.params, 'requestId');
-      const { reviewedBy } = req.body as ReviewRequestBody;
+      const body = req.body as ReviewRequestBody;
       
       const result = await this.registrationService.reject({
         requestId,
-        reviewedBy,
+        reviewedBy: body.reviewedBy,
       });
       
       this.responseHelper.sendMessage(res, result, 'Registration request rejected');

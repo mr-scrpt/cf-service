@@ -1,11 +1,5 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import {
-  domainValueSchema,
-  mxRecordSchema,
-  COMMON_TTL_VALUES,
-  type MXRecord,
-  type MXRecordFieldKey,
-} from '@cloudflare-bot/shared';
+import { DnsRecordType, domainValueSchema, mxRecordSchema, type MXRecordData, type MXRecordFieldKey } from '@cloudflare-bot/domain';
+import { COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
 import { z } from 'zod';
 import {
   DnsRecordStrategy,
@@ -15,7 +9,7 @@ import {
 import { FieldConfig, FieldInputType } from '../field-config.interface';
 import { COMMON_FIELD_CONFIGS } from '../common-fields.config';
 
-interface MXRecordData {
+interface MXWizardFields {
   name: string;
   content: string;
   priority: number;
@@ -23,7 +17,7 @@ interface MXRecordData {
   comment?: string;
 }
 
-export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData, MXRecord, MXRecordFieldKey> {
+export class MXRecordStrategy implements DnsRecordStrategy<MXWizardFields, MXRecordData, MXRecordFieldKey> {
   readonly type = DnsRecordType.MX as const;
   readonly displayName = 'MX Record';
   readonly icon = '📧';
@@ -56,7 +50,7 @@ export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData, MXRecor
     ];
   }
 
-  validate(data: Partial<MXRecordData>): ValidationResult {
+  validate(data: Partial<MXWizardFields>): ValidationResult {
     const result = mxRecordSchema.safeParse({
       ...data,
       type: this.type,
@@ -78,7 +72,7 @@ export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData, MXRecor
     };
   }
 
-  formatSummary(data: MXRecordData): string {
+  formatSummary(data: MXWizardFields): string {
     return `
 📧 <b>${this.displayName}</b>
 
@@ -90,7 +84,7 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     `.trim();
   }
 
-  toCreateInput(wizardData: WizardData<MXRecordData>) {
+  toCreateInput(wizardData: WizardData<MXWizardFields>) {
     return {
       zoneId: wizardData.zoneId,
       type: this.type,
@@ -103,12 +97,12 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     };
   }
 
-  getFieldValue(record: MXRecord, fieldKey: MXRecordFieldKey): unknown {
-    return record[fieldKey as keyof MXRecord];
+  getFieldValue(record: MXRecordData, fieldKey: MXRecordFieldKey): unknown {
+    return record[fieldKey as keyof MXRecordData];
   }
 
-  applyFieldChanges(record: MXRecord, changes: Partial<Record<MXRecordFieldKey, unknown>>): Partial<MXRecord> {
-    return changes as Partial<MXRecord>;
+  applyFieldChanges(record: MXRecordData, changes: Partial<Record<MXRecordFieldKey, unknown>>): Partial<MXRecordData> {
+    return changes as Partial<MXRecordData>;
   }
 
   private formatTTL(ttl: number): string {

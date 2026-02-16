@@ -8,3 +8,5 @@ export const userSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
 });
+
+export type UserData = z.infer<typeof userSchema>;

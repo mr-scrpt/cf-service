@@ -12,10 +12,11 @@ export class ResponseHelper {
     options?: { successStatus?: number }
   ): void {
     if (result.isSuccess) {
-      res.status(options?.successStatus || 200).json({
+      const response: ApiResponse<T> = {
         success: true,
         data: result.getValue(),
-      } as ApiResponse<T>);
+      };
+      res.status(options?.successStatus || 200).json(response);
       return;
     }
 
@@ -30,10 +31,11 @@ export class ResponseHelper {
     options?: { successStatus?: number }
   ): void {
     if (result.isSuccess) {
-      res.status(options?.successStatus || 200).json({
+      const response: ApiResponse = {
         success: true,
         message,
-      } as ApiResponse);
+      };
+      res.status(options?.successStatus || 200).json(response);
       return;
     }
 

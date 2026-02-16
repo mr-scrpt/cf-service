@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import {
-  standardRecordSchema,
-  mxRecordSchema,
-  srvRecordSchema,
-} from '../domain/dns-record.schema';
+import { standardRecordSchema, mxRecordSchema, srvRecordSchema } from '../dns-record.schema';
 
 export const createDnsRecordSchema = z.discriminatedUnion('type', [
   standardRecordSchema.omit({ id: true }),

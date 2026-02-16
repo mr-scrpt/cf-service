@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import type { ILogger } from '@cloudflare-bot/application';
+import type { IApiLogger } from '@shared/types/logger.types';
 
-function sanitizeHeaders(headers: Record<string, any>): Record<string, any> {
+function sanitizeHeaders(headers: Record<string, string | string[] | undefined>): Record<string, string | string[] | undefined> {
   const sanitized = { ...headers };
-  if (sanitized.authorization) {
+  if (sanitized.authorization && typeof sanitized.authorization === 'string') {
     sanitized.authorization = sanitized.authorization.replace(/Bearer .+/, 'Bearer ***');
   }
   if (sanitized.cookie) {
@@ -12,12 +12,12 @@ function sanitizeHeaders(headers: Record<string, any>): Record<string, any> {
   return sanitized;
 }
 
-function sanitizeBody(body: any): any {
+function sanitizeBody(body: unknown): unknown {
   if (!body || typeof body !== 'object') {
     return body;
   }
   
-  const sanitized = { ...body };
+  const sanitized = { ...(body as Record<string, unknown>) };
   const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'api_key'];
   
   sensitiveFields.forEach(field => {
@@ -29,7 +29,7 @@ function sanitizeBody(body: any): any {
   return sanitized;
 }
 
-export function createRequestLoggerMiddleware(logger: ILogger & { logRequest?: (data: any) => void; logResponse?: (data: any) => void }) {
+export function createRequestLoggerMiddleware(logger: IApiLogger) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const startTime = Date.now();
 
@@ -37,18 +37,18 @@ export function createRequestLoggerMiddleware(logger: ILogger & { logRequest?: (
       logger.logRequest({
         method: req.method,
         url: req.originalUrl,
-        headers: sanitizeHeaders(req.headers as Record<string, any>),
+        headers: sanitizeHeaders(req.headers),
         body: sanitizeBody(req.body),
-        query: req.query,
+        query: req.query as Record<string, unknown>,
         ip: req.ip || req.connection.remoteAddress,
         userAgent: req.get('user-agent'),
       });
     }
 
     const originalSend = res.send;
-    let responseBody: any;
+    let responseBody: unknown;
 
-    res.send = function(data: any): Response {
+    res.send = function(data: unknown): Response {
       responseBody = data;
       res.send = originalSend;
       return originalSend.call(this, data);
@@ -64,7 +64,7 @@ export function createRequestLoggerMiddleware(logger: ILogger & { logRequest?: (
           url: req.originalUrl,
           statusCode,
           duration: `${duration}ms`,
-          body: responseBody ? JSON.parse(responseBody) : null,
+          body: responseBody && typeof responseBody === 'string' ? JSON.parse(responseBody) : responseBody,
         });
       }
 

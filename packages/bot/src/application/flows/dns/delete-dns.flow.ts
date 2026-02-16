@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { DnsRecord } from '@cloudflare-bot/shared';
+import { type DnsRecordData } from '@cloudflare-bot/domain';
 import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
 import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
 import { CallbackAction, FlowStep } from '@shared/constants';
@@ -53,7 +53,7 @@ export class DeleteDnsFlow {
       return;
     }
 
-    const records = await this.gateway.listDnsRecords(zone.zoneId) as DnsRecord[];
+    const records = await this.gateway.listDnsRecords(zone.zoneId) as DnsRecordData[];
 
     if (records.length === 0) {
       await ctx.editMessageText('📭 No DNS records found for this domain.');
@@ -70,7 +70,7 @@ export class DeleteDnsFlow {
     });
   }
 
-  private buildRecordKeyboard(records: DnsRecord[]): KeyboardBuilder {
+  private buildRecordKeyboard(records: DnsRecordData[]): KeyboardBuilder {
     const keyboard = new KeyboardBuilder();
     records.forEach((record, index) => {
       const label = this.formatter.formatListItem(record, index);

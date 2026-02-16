@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { domainNameSchema } from '@cloudflare-bot/shared';
+import { domainNameSchema } from '@cloudflare-bot/domain';
 import { IWizardEngine, IDomainFormatter } from '@application/ports';
 import { WizardConfig } from '@infrastructure/wizard';
 import { MainMenuFlow } from '../main-menu.flow';

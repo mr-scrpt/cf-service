@@ -9,7 +9,7 @@ export class AddUserUseCase {
     private readonly telegramBot: ITelegramBot
   ) {}
 
-  async execute(dto: AddUserDto): Promise<UserDto> {
+  async execute(dto: AddUserDto, telegramId: number): Promise<UserDto> {
     const validated = addUserDtoSchema.parse(dto);
     
     const existingUser = await this.userRepository.findByUsername(validated.username);
@@ -24,17 +24,11 @@ export class AddUserUseCase {
       return this.toDto(existingUser);
     }
     
-    const telegramUser = await this.telegramBot.getUserByUsername(validated.username);
-    
-    if (!telegramUser) {
-      throw new UserNotFoundError(validated.username);
-    }
-    
-    const userId = UserId.fromTelegramId(telegramUser.id);
+    const userId = UserId.fromTelegramId(telegramId);
     const user = User.create({
       id: userId,
-      telegramId: telegramUser.id,
-      username: telegramUser.username,
+      telegramId: telegramId,
+      username: validated.username,
     });
     
     user.allow();

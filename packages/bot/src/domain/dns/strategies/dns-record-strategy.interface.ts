@@ -1,5 +1,4 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import { CreateDnsRecordInput, DnsRecord } from '@cloudflare-bot/shared';
+import { DnsRecordType, type CreateDnsRecordInput, type DnsRecordData } from '@cloudflare-bot/domain';
 import { FieldConfig } from './field-config.interface';
 
 export interface ValidationResult {
@@ -13,7 +12,7 @@ export interface WizardData<TFields = Record<string, unknown>> {
   fields: TFields;
 }
 
-export interface DnsRecordStrategy<TData = unknown, TRecord extends DnsRecord = DnsRecord, TFieldKey extends string = string> {
+export interface DnsRecordStrategy<TData = unknown, TRecord extends DnsRecordData = DnsRecordData, TFieldKey extends string = string> {
   readonly type: DnsRecordType;
   readonly displayName: string;
   readonly icon: string;

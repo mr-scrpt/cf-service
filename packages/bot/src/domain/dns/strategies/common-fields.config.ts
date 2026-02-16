@@ -1,8 +1,5 @@
-import {
-  dnsRecordNameSchema,
-  ttlSchema,
-  COMMON_TTL_VALUES,
-} from '@cloudflare-bot/shared';
+import { dnsRecordNameSchema, ttlSchema } from '@cloudflare-bot/domain';
+import { COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
 import { z } from 'zod';
 import { FieldConfig, FieldInputType } from './field-config.interface';
 

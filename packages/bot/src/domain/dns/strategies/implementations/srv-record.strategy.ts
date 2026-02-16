@@ -1,11 +1,5 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import {
-  domainValueSchema,
-  srvRecordSchema,
-  COMMON_TTL_VALUES,
-  type SRVRecord,
-  type SRVRecordFieldKey,
-} from '@cloudflare-bot/shared';
+import { DnsRecordType, domainValueSchema, srvRecordSchema, type SRVRecordData, type SRVRecordFieldKey } from '@cloudflare-bot/domain';
+import { COMMON_TTL_VALUES } from '@cloudflare-bot/shared';
 import { z } from 'zod';
 import {
   DnsRecordStrategy,
@@ -15,7 +9,7 @@ import {
 import { FieldConfig, FieldInputType } from '../field-config.interface';
 import { COMMON_FIELD_CONFIGS } from '../common-fields.config';
 
-interface SRVRecordData {
+interface SRVWizardFields {
   name: string;
   data: {
     priority: number;
@@ -27,7 +21,7 @@ interface SRVRecordData {
   comment?: string;
 }
 
-export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRecord, SRVRecordFieldKey> {
+export class SRVRecordStrategy implements DnsRecordStrategy<SRVWizardFields, SRVRecordData, SRVRecordFieldKey> {
   readonly type = DnsRecordType.SRV as const;
   readonly displayName = 'SRV Record';
   readonly icon = '🔌';
@@ -81,7 +75,7 @@ export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRe
     ];
   }
 
-  validate(data: Partial<SRVRecordData>): ValidationResult {
+  validate(data: Partial<SRVWizardFields>): ValidationResult {
     const result = srvRecordSchema.safeParse({
       ...data,
       type: this.type,
@@ -103,7 +97,7 @@ export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRe
     };
   }
 
-  formatSummary(data: SRVRecordData): string {
+  formatSummary(data: SRVWizardFields): string {
     return `
 🔌 <b>${this.displayName}</b>
 
@@ -134,13 +128,13 @@ ${data.comment ? `💬 ${data.comment}` : ''}
     };
   }
 
-  getFieldValue(record: SRVRecord, fieldKey: SRVRecordFieldKey): unknown {
+  getFieldValue(record: SRVRecordData, fieldKey: SRVRecordFieldKey): unknown {
     return this.dataFields.has(fieldKey) 
       ? record.data[fieldKey as keyof typeof record.data]
-      : record[fieldKey as keyof SRVRecord];
+      : record[fieldKey as keyof SRVRecordData];
   }
 
-  applyFieldChanges(record: SRVRecord, changes: Partial<Record<SRVRecordFieldKey, unknown>>): Partial<SRVRecord> {
+  applyFieldChanges(record: SRVRecordData, changes: Partial<Record<SRVRecordFieldKey, unknown>>): Partial<SRVRecordData> {
     const entries = Object.entries(changes);
     return {
       ...Object.fromEntries(entries.filter(([k]) => !this.dataFields.has(k))),

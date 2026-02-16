@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { DnsRecord } from '@cloudflare-bot/shared';
+import { type DnsRecordData } from '@cloudflare-bot/domain';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { IDnsRecordFormatter, IMainMenu, IDnsStrategyRegistry } from '@application/ports';
 import { CallbackAction, FlowStep } from '@shared/constants';
@@ -263,7 +263,7 @@ export class EditDnsFlow {
 Select a domain:`;
   }
 
-  private formatRecordSelectorMessage(zoneName: string, records: DnsRecord[]): string {
+  private formatRecordSelectorMessage(zoneName: string, records: DnsRecordData[]): string {
     const recordList = records
       .map((r, i) => {
         const content = (r as any).content || (r as any).data?.target || 'N/A';
@@ -279,7 +279,7 @@ ${recordList}`;
   }
 
   private formatFieldSelectorMessage(
-    record: DnsRecord,
+    record: DnsRecordData,
     fieldConfigs: FieldConfig[],
     pendingChanges: Record<string, unknown>
   ): string {
@@ -326,7 +326,7 @@ Select a field to edit:`;
     return prompt;
   }
 
-  private getFieldCurrentValue(record: DnsRecord, fieldKey: string): unknown {
+  private getFieldCurrentValue(record: DnsRecordData, fieldKey: string): unknown {
     // Use strategy to get field value (handles nested structures like SRV)
     const strategy = this.strategyRegistry.getStrategy(record.type);
     const value = strategy.getFieldValue(record, fieldKey);

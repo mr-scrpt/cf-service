@@ -1,9 +1,7 @@
 import { Context } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import {
-  ValidationError,
-  createDnsRecordSchema,
-} from '@cloudflare-bot/shared';
+import { ValidationError } from '@cloudflare-bot/shared';
+import { createDnsRecordSchema } from '@cloudflare-bot/domain';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '@shared/constants';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';

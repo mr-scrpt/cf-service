@@ -1,11 +1,10 @@
-import { DnsRecordType } from '@cloudflare-bot/domain';
-import { DnsRecord } from '@cloudflare-bot/shared';
+import { DnsRecordType, type DnsRecordData } from '@cloudflare-bot/domain';
 import { IDnsStrategyRegistry, IDnsRecordFormatter } from '@application/ports';
 
 export class DnsRecordFormatter implements IDnsRecordFormatter {
   constructor(private readonly strategyRegistry: IDnsStrategyRegistry) {}
 
-  formatList(records: DnsRecord[]): string {
+  formatList(records: DnsRecordData[]): string {
     if (records.length === 0) {
       return '📭 No DNS records found';
     }
@@ -13,21 +12,25 @@ export class DnsRecordFormatter implements IDnsRecordFormatter {
     return records.map((record, i) => this.formatListItem(record, i)).join('\n\n');
   }
 
-  formatListItem(record: DnsRecord, index: number): string {
+  formatListItem(record: DnsRecordData, index: number): string {
     const strategy = this.strategyRegistry.getStrategy(record.type);
     return `${index + 1}. ${strategy.icon} ${record.name} (${record.type})`;
   }
 
-  formatDetails(record: DnsRecord): string {
+  private formatRecordDetails(record: DnsRecordData): string {
     const strategy = this.strategyRegistry.getStrategy(record.type);
     return strategy.formatSummary(record);
   }
 
-  formatCreatedMessage(record: DnsRecord): string {
-    return `✅ <b>DNS Record Created!</b>\n\n${this.formatDetails(record)}`;
+  formatDetails(record: DnsRecordData): string {
+    return this.formatRecordDetails(record);
   }
 
-  formatUpdatedMessage(record: DnsRecord): string {
+  formatCreatedMessage(record: DnsRecordData): string {
+    return `✅ <b>DNS Record Created!</b>\n\n${this.formatRecordDetails(record)}`;
+  }
+
+  formatUpdatedMessage(record: DnsRecordData): string {
     return `✅ <b>DNS Record Updated!</b>\n\n${this.formatDetails(record)}`;
   }
 
