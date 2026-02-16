@@ -86,7 +86,7 @@ ${data.comment ? `💬 ${data.comment}` : ''}
   }
 
   getFieldValue(record: StandardRecordData, fieldKey: StandardRecordFieldKey): unknown {
-    return record[fieldKey as keyof StandardRecordData];
+    return record[fieldKey];
   }
 
   applyFieldChanges(record: StandardRecordData, changes: Partial<Record<StandardRecordFieldKey, unknown>>): Partial<StandardRecordData> {

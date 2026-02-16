@@ -98,7 +98,7 @@ ${data.comment ? `💬 ${data.comment}` : ''}
   }
 
   getFieldValue(record: MXRecordData, fieldKey: MXRecordFieldKey): unknown {
-    return record[fieldKey as keyof MXRecordData];
+    return record[fieldKey];
   }
 
   applyFieldChanges(record: MXRecordData, changes: Partial<Record<MXRecordFieldKey, unknown>>): Partial<MXRecordData> {
