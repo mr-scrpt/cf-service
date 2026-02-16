@@ -1,11 +1,6 @@
-import { Domain } from '@cloudflare-bot/shared';
+import type { DomainDto } from '@cloudflare-bot/application';
 
-/**
- * Template helpers for Domain command responses
- * Keeps formatting logic separate from command logic
- */
-
-export function formatDomainRegistered(domain: Domain): string {
+export function formatDomainRegistered(domain: DomainDto): string {
     const nsServers = domain.nameservers.join('\n• ');
 
     return (
@@ -17,7 +12,7 @@ export function formatDomainRegistered(domain: Domain): string {
     );
 }
 
-export function formatDomainsList(domains: Domain[]): string {
+export function formatDomainsList(domains: DomainDto[]): string {
     if (domains.length === 0) {
         return '📋 No domains found.';
     }

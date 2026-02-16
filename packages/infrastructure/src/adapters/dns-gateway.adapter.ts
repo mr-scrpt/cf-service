@@ -59,14 +59,24 @@ export class DnsGatewayAdapter implements IDnsGatewayPort {
   }
 
   private mapDnsRecordToDto(record: DnsRecord): DnsRecordDto {
-    return {
+    const baseRecord = {
       id: record.id,
       zoneId: record.zoneId,
-      type: record.type,
+      type: record.type as DnsRecordType,
       name: record.name,
       content: record.content,
       ttl: record.ttl,
       proxied: record.proxied,
-    } as DnsRecordDto;
+    };
+    
+    if (record.type === DnsRecordType.MX && 'priority' in record) {
+      return { ...baseRecord, priority: (record as any).priority };
+    }
+    
+    if (record.type === DnsRecordType.SRV && 'data' in record) {
+      return { ...baseRecord, data: (record as any).data };
+    }
+    
+    return baseRecord;
   }
 }

@@ -25,7 +25,7 @@ export class BotApplication {
   private initializers: BotInitializer[];
 
   constructor(private readonly container: DIContainer) {
-    const telegramAdapter = container.getTelegramAdapter();
+    const telegramAdapter = this.container.getTelegramAdapter();
     this.bot = telegramAdapter.getBotTyped<BotContext>();
     this.lifecycleManager = new LifecycleManager();
     

@@ -1,8 +1,8 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { domainNameSchema } from '@cloudflare-bot/shared';
-import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
-import { DomainFormatter } from '@infrastructure/ui/formatters/domain-formatter';
+import { IWizardEngine, WizardConfig } from '@infrastructure/wizard';
+import { IDomainFormatter } from '@infrastructure/ui/formatters';
 import { MainMenu } from '../main-menu';
 import { SessionData } from '@shared/types';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
@@ -17,8 +17,8 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class CreateDomainFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly wizardEngine: WizardEngine,
-    private readonly formatter: DomainFormatter,
+    private readonly wizardEngine: IWizardEngine,
+    private readonly formatter: IDomainFormatter,
     private readonly mainMenu: MainMenu
   ) {}
 

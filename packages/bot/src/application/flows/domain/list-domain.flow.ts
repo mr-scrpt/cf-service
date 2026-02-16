@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { DomainFormatter } from '@infrastructure/ui/formatters/domain-formatter';
+import { IDomainFormatter } from '@infrastructure/ui/formatters';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { SessionData } from '@shared/types';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
@@ -14,7 +14,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class ListDomainFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly formatter: DomainFormatter
+    private readonly formatter: IDomainFormatter
   ) {}
 
   async showDomainsList(ctx: SessionContext): Promise<void> {

@@ -1,8 +1,8 @@
-import { SessionContext } from '@infrastructure/routing';
-import { Domain, DnsRecord } from '@cloudflare-bot/shared';
+import { SessionContext } from '@shared/types/bot-context.type';
+import { DomainDto, DnsRecordDto } from '@cloudflare-bot/application';
 
 export class SessionValidator {
-  static getDomainByIndex(ctx: SessionContext, idx: number): Domain | null {
+  static getDomainByIndex(ctx: SessionContext, idx: number): DomainDto | null {
     const domains = ctx.session.tempDomains;
     if (!domains || !domains[idx]) {
       return null;
@@ -10,7 +10,7 @@ export class SessionValidator {
     return domains[idx];
   }
 
-  static getRecordByIndex(ctx: SessionContext, idx: number): DnsRecord | null {
+  static getRecordByIndex(ctx: SessionContext, idx: number): DnsRecordDto | null {
     const records = ctx.session.tempRecords;
     if (!records || !records[idx]) {
       return null;
@@ -26,7 +26,7 @@ export class SessionValidator {
     return { zoneId: selectedZoneId, zoneName: selectedZoneName };
   }
 
-  static setSelectedZone(ctx: SessionContext, domain: Domain): void {
+  static setSelectedZone(ctx: SessionContext, domain: DomainDto): void {
     ctx.session.selectedZoneId = domain.id;
     ctx.session.selectedZoneName = domain.name;
   }

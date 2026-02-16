@@ -1,11 +1,12 @@
-import { Domain } from '@cloudflare-bot/shared';
+import type { DomainDto } from '@cloudflare-bot/application';
+import { IDomainFormatter } from './domain-formatter.interface';
 
 /**
  * Domain formatter - formats domain information for bot messages
  * Follows the same pattern as DnsRecordFormatter
  */
-export class DomainFormatter {
-  formatDomainRegistered(domain: Domain): string {
+export class DomainFormatter implements IDomainFormatter {
+  formatDomainRegistered(domain: DomainDto): string {
     const nsServers = domain.nameservers.join('\n• ');
 
     return `✅ <b>Domain registered successfully!</b>
@@ -20,7 +21,7 @@ export class DomainFormatter {
 ⚠️ <b>Important:</b> Update your domain registrar with these nameservers to activate Cloudflare.`;
   }
 
-  formatDomainsList(domains: Domain[]): string {
+  formatDomainsList(domains: DomainDto[]): string {
     if (domains.length === 0) {
       return '📋 <b>No domains found.</b>\n\nRegister a domain to get started.';
     }

@@ -2,12 +2,12 @@ import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { DnsRecord } from '@cloudflare-bot/shared';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
-import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
 import { SessionValidator } from '@services/session/session-validator.service';
-import { MainMenu } from '../main-menu';
-import { DnsStrategyRegistry } from '@domain/dns/strategies';
+import { IMainMenu } from '../main-menu.interface';
+import { IDnsStrategyRegistry } from '@domain/dns/strategies';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 
@@ -16,9 +16,9 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class EditDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly formatter: DnsRecordFormatter,
-    private readonly mainMenu: MainMenu,
-    private readonly strategyRegistry: DnsStrategyRegistry
+    private readonly formatter: IDnsRecordFormatter,
+    private readonly mainMenu: IMainMenu,
+    private readonly strategyRegistry: IDnsStrategyRegistry
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
@@ -68,7 +68,7 @@ export class EditDnsFlow {
 
     const keyboard = new KeyboardBuilder();
     records.forEach((record: any, index: number) => {
-      const strategy = this.strategyRegistry.getStrategy(record.type as any);
+      const strategy = this.strategyRegistry.getStrategy(record.type);
       keyboard.addButton(
         `${strategy.icon} ${record.name} (${record.type})`,
         CallbackAction.DNS_EDIT_FIELD,
@@ -144,11 +144,8 @@ export class EditDnsFlow {
     };
 
     const currentValue = this.getFieldCurrentValue(record, fieldKey);
-    const message = this.formatFieldEditPrompt(fieldConfig, currentValue);
-
-    await ctx.editMessageText(message, {
-      parse_mode: 'HTML',
-    });
+    const prompt = this.formatFieldEditPrompt(fieldConfig, currentValue);
+    await ctx.editMessageText(prompt, { parse_mode: 'HTML' });
 
     await ctx.reply('💬 Please enter the new value:', { parse_mode: 'HTML' });
   }

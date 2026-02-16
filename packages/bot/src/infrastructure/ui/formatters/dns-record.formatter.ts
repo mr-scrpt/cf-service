@@ -1,9 +1,10 @@
 import { DnsRecordType } from '@cloudflare-bot/domain';
 import { DnsRecord } from '@cloudflare-bot/shared';
-import { DnsStrategyRegistry } from '@domain/dns/strategies';
+import { IDnsStrategyRegistry } from '@domain/dns/strategies/dns-strategy-registry.interface';
+import { IDnsRecordFormatter } from './dns-record-formatter.interface';
 
-export class DnsRecordFormatter {
-  constructor(private readonly strategyRegistry: DnsStrategyRegistry) {}
+export class DnsRecordFormatter implements IDnsRecordFormatter {
+  constructor(private readonly strategyRegistry: IDnsStrategyRegistry) {}
 
   formatList(records: DnsRecord[]): string {
     if (records.length === 0) {

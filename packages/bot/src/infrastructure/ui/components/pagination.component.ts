@@ -1,22 +1,9 @@
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'grammy/types';
 import { CallbackAction } from '@shared/constants';
 
-export interface PaginationConfig<T> {
-  items: T[];
-  pageSize: number;
-  currentPage: number;
-  renderItem: (item: T, index: number) => string;
-  renderEmpty?: () => string;
-}
+import { IPaginationComponent, PaginationConfig, PaginationResult } from './pagination.interface';
 
-export interface PaginationResult {
-  message: string;
-  hasNext: boolean;
-  hasPrev: boolean;
-  totalPages: number;
-}
-
-export class PaginationComponent {
+export class PaginationComponent implements IPaginationComponent {
   paginate<T>(config: PaginationConfig<T>): PaginationResult {
     const { items, pageSize, currentPage, renderItem, renderEmpty } = config;
 

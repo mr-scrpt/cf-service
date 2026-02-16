@@ -5,7 +5,9 @@ import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
-export class MainMenu {
+import { IMainMenu } from './main-menu.interface';
+
+export class MainMenu implements IMainMenu {
   async show(ctx: SessionContext): Promise<void> {
     const keyboard = this.buildMainMenuKeyboard();
     const message = this.formatMainMenuMessage();

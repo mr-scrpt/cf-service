@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { ConversationFlavor } from '@grammyjs/conversations';
-import { Domain, DnsRecord } from '@cloudflare-bot/shared';
+import { DomainDto, DnsRecordDto } from '@cloudflare-bot/application';
 
 export interface WizardState {
   currentStepIndex: number;
@@ -28,10 +28,10 @@ export interface SessionData {
   selected_domain?: string;
   current_flow?: string;
   pagination_state?: PaginationState;
-  tempDomains?: Domain[];
+  tempDomains?: DomainDto[];
   selectedZoneId?: string;
   selectedZoneName?: string;
-  tempRecords?: DnsRecord[];
+  tempRecords?: DnsRecordDto[];
   currentPage?: number;
   editField?: {
     recordIndex: number;
@@ -45,4 +45,5 @@ export interface SessionData {
   selectedZone?: { zoneId: string; zoneName: string };
 }
 
+export type SessionContext = Context & SessionFlavor<SessionData>;
 export type BotContext = Context & SessionFlavor<SessionData> & ConversationFlavor<Context>;

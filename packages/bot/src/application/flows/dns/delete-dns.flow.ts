@@ -1,20 +1,20 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { DnsRecord } from '@cloudflare-bot/shared';
+import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { IMainMenu } from '../main-menu.interface';
 import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
-import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
 import { SessionValidator } from '@services/session/session-validator.service';
-import { MainMenu } from '../main-menu';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class DeleteDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly formatter: DnsRecordFormatter,
-    private readonly mainMenu: MainMenu
+    private readonly formatter: IDnsRecordFormatter,
+    private readonly mainMenu: IMainMenu
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {

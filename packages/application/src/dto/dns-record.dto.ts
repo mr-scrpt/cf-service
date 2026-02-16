@@ -1,7 +1,9 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
+
 export interface StandardDnsRecordDto {
   id: string;
   zoneId: string;
-  type: string;
+  type: DnsRecordType;
   name: string;
   content: string;
   ttl: number;
@@ -13,7 +15,7 @@ export interface StandardDnsRecordDto {
 export interface MXDnsRecordDto {
   id: string;
   zoneId: string;
-  type: string;
+  type: DnsRecordType.MX;
   name: string;
   content: string;
   ttl: number;
@@ -26,7 +28,7 @@ export interface MXDnsRecordDto {
 export interface SRVDnsRecordDto {
   id: string;
   zoneId: string;
-  type: string;
+  type: DnsRecordType.SRV;
   name: string;
   ttl: number;
   proxied: boolean;
@@ -44,7 +46,7 @@ export type DnsRecordDto = StandardDnsRecordDto | MXDnsRecordDto | SRVDnsRecordD
 
 export interface CreateDnsRecordDto {
   zoneId: string;
-  type: string;
+  type: DnsRecordType;
   name: string;
   content?: string;
   ttl: number;
@@ -62,7 +64,7 @@ export interface CreateDnsRecordDto {
 
 export interface UpdateDnsRecordDto {
   zoneId: string;
-  type?: string;
+  type?: DnsRecordType;
   name?: string;
   content?: string;
   ttl?: number;

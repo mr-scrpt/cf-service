@@ -8,7 +8,9 @@ import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
-export class WizardEngine {
+import { IWizardEngine } from './wizard-engine.interface';
+
+export class WizardEngine implements IWizardEngine {
   constructor(
     private readonly session: SessionManager,
     private readonly validator: WizardValidator,

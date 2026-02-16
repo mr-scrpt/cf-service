@@ -1,24 +1,24 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsRecordType } from '@cloudflare-bot/domain';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { DnsStrategyRegistry } from '@domain/dns/strategies';
-import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
+import { IDnsStrategyRegistry } from '@domain/dns/strategies';
+import { IWizardEngine, WizardConfig } from '@infrastructure/wizard';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { CallbackAction } from '@shared/constants';
-import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
+import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { SessionData } from '@shared/types';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
-import { MainMenu } from '../main-menu';
+import { IMainMenu } from '../main-menu.interface';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class CreateDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
-    private readonly strategyRegistry: DnsStrategyRegistry,
-    private readonly wizardEngine: WizardEngine,
-    private readonly formatter: DnsRecordFormatter,
-    private readonly mainMenu: MainMenu
+    private readonly strategyRegistry: IDnsStrategyRegistry,
+    private readonly wizardEngine: IWizardEngine,
+    private readonly formatter: IDnsRecordFormatter,
+    private readonly mainMenu: IMainMenu
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {

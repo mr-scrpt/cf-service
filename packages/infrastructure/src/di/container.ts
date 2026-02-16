@@ -28,7 +28,8 @@ export class DIContainer {
   private domainRepository: IDomainRepository;
   private registrationRequestRepository: IRegistrationRequestRepository;
   private cloudflareGateway: ICloudflareGateway;
-  private telegram: TelegramAdapter;
+  private notifier: INotifier;
+  private telegramBot: ITelegramBot;
   private logger: ILogger;
   private databaseService: IDatabaseService;
 
@@ -42,7 +43,10 @@ export class DIContainer {
       config.CLOUDFLARE_API_TOKEN,
       config.CLOUDFLARE_ACCOUNT_ID
     );
-    this.telegram = new TelegramAdapter(config.TELEGRAM_BOT_TOKEN, logger);
+    
+    const telegramAdapter = new TelegramAdapter(config.TELEGRAM_BOT_TOKEN, logger);
+    this.notifier = telegramAdapter;
+    this.telegramBot = telegramAdapter;
   }
 
   getLogger(): ILogger {
@@ -57,8 +61,17 @@ export class DIContainer {
     return new RegisterDomainUseCase(this.cloudflareGateway, this.domainRepository);
   }
 
+  getNotifier(): INotifier {
+    return this.notifier;
+  }
+
+  getTelegramBot(): ITelegramBot {
+    return this.telegramBot;
+  }
+
   getTelegramAdapter(): TelegramAdapter {
-    return this.telegram;
+    const telegramAdapter = new TelegramAdapter(this.config.TELEGRAM_BOT_TOKEN, this.logger);
+    return telegramAdapter;
   }
 
   getCloudflareGateway(): ICloudflareGateway {
@@ -66,7 +79,7 @@ export class DIContainer {
   }
 
   getAddUserUseCase(): AddUserUseCase {
-    return new AddUserUseCase(this.userRepository, this.telegram);
+    return new AddUserUseCase(this.userRepository, this.telegramBot);
   }
 
   getCheckUserAccessUseCase(): CheckUserAccessUseCase {
@@ -86,7 +99,7 @@ export class DIContainer {
   }
 
   getSendWebhookNotificationUseCase(): SendWebhookNotificationUseCase {
-    return new SendWebhookNotificationUseCase(this.telegram, this.config.ALLOWED_CHAT_ID);
+    return new SendWebhookNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
   }
 
   getCreateRegistrationRequestUseCase(): CreateRegistrationRequestUseCase {
@@ -98,11 +111,11 @@ export class DIContainer {
   }
 
   getApproveRegistrationRequestUseCase(): ApproveRegistrationRequestUseCase {
-    return new ApproveRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository, this.telegram);
+    return new ApproveRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository, this.notifier);
   }
 
   getRejectRegistrationRequestUseCase(): RejectRegistrationRequestUseCase {
-    return new RejectRegistrationRequestUseCase(this.registrationRequestRepository, this.telegram);
+    return new RejectRegistrationRequestUseCase(this.registrationRequestRepository, this.notifier);
   }
 
   getRegistrationRequestRepository(): IRegistrationRequestRepository {
