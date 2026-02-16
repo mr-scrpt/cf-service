@@ -117,6 +117,47 @@ ADMIN_PASSWORD=admin123                     # Пароль для адмін-п�
 SESSION_SECRET=your_session_secret_min_32_characters_long  # Секрет для сесій (min 32 символи)
 ```
 
+#### 🔑 Отримання Cloudflare API ключів
+
+⚠️ **Важливо:** Для роботи з доменами потрібні API ключі **рівня акаунту** (Account-level API Token), а не користувача.
+
+**Як створити API Token:**
+
+1. Перейдіть в [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
+2. Натисніть **"Create Token"**
+3. Виберіть шаблон **"Edit zone DNS"** або створіть Custom Token
+4. **Обов'язкові дозволи:**
+   - `Zone` → `DNS` → `Edit`
+   - `Zone` → `Zone` → `Read`
+   - `Account` → `Account Settings` → `Read` (для роботи з доменами)
+5. Скопіюйте згенерований токен в `CLOUDFLARE_API_TOKEN`
+
+**Account ID:**
+- Знайдіть на головній сторінці Cloudflare Dashboard (праворуч в sidebar)
+- Або у налаштуваннях будь-якої зони
+
+#### 🔌 Порти за замовчуванням
+
+Після запуску сервіси будуть доступні на наступних портах:
+
+- **REST API:** `http://localhost:3000` (можна змінити через `API_PORT`)
+- **Web Panel:** `http://localhost:5050`
+- **MongoDB:** `localhost:27017`
+- **Telegram Bot:** Не використовує порт (підключення через Telegram API)
+
+#### 📱 Telegram Bot Token
+
+1. Відкрийте [@BotFather](https://t.me/BotFather) в Telegram
+2. Відправте команду `/newbot`
+3. Слідуйте інструкціям для створення бота
+4. Скопіюйте отриманий токен в `TELEGRAM_BOT_TOKEN`
+
+**ALLOWED_CHAT_ID:**
+- Ваш особистий Telegram ID (адміністратор бота)
+- Отримати можна через [@userinfobot](https://t.me/userinfobot)
+
+---
+
 **Система валідації оточення:**
 
 Проєкт використовує **Zod** для валідації environment variables при старті застосунку. Кожен пакет (bot, api, web) має свою схему валідації:
