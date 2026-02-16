@@ -1,7 +1,6 @@
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'grammy/types';
 import { CallbackAction } from '@shared/constants';
-
-import { IPaginationComponent, PaginationConfig, PaginationResult } from './pagination.interface';
+import { IPaginationComponent, PaginationConfig, PaginationResult } from '@application/ports';
 
 export class PaginationComponent implements IPaginationComponent {
   paginate<T>(config: PaginationConfig<T>): PaginationResult {

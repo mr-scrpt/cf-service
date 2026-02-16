@@ -1,10 +1,6 @@
 import type { DomainDto } from '@cloudflare-bot/application';
-import { IDomainFormatter } from './domain-formatter.interface';
+import { IDomainFormatter } from '@application/ports';
 
-/**
- * Domain formatter - formats domain information for bot messages
- * Follows the same pattern as DnsRecordFormatter
- */
 export class DomainFormatter implements IDomainFormatter {
   formatDomainRegistered(domain: DomainDto): string {
     const nsServers = domain.nameservers.join('\n• ');

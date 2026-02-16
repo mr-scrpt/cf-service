@@ -1,9 +1,9 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { domainNameSchema } from '@cloudflare-bot/shared';
-import { IWizardEngine, WizardConfig } from '@infrastructure/wizard';
-import { IDomainFormatter } from '@infrastructure/ui/formatters';
-import { MainMenu } from '../main-menu';
+import { IWizardEngine, IDomainFormatter } from '@application/ports';
+import { WizardConfig } from '@infrastructure/wizard';
+import { MainMenuFlow } from '../main-menu.flow';
 import { SessionData } from '@shared/types';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
@@ -19,7 +19,7 @@ export class CreateDomainFlow {
     private readonly gateway: IDnsGatewayPort,
     private readonly wizardEngine: IWizardEngine,
     private readonly formatter: IDomainFormatter,
-    private readonly mainMenu: MainMenu
+    private readonly mainMenu: MainMenuFlow
   ) {}
 
   async startWizard(ctx: SessionContext): Promise<void> {

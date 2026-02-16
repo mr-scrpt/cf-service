@@ -1,14 +1,12 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsRecordType } from '@cloudflare-bot/domain';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { IDnsStrategyRegistry } from '@domain/dns/strategies';
-import { IWizardEngine, WizardConfig } from '@infrastructure/wizard';
+import { IDnsStrategyRegistry, IWizardEngine, IDnsRecordFormatter, IMainMenu } from '@application/ports';
+import { WizardConfig } from '@infrastructure/wizard';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { CallbackAction } from '@shared/constants';
-import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { SessionData } from '@shared/types';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
-import { IMainMenu } from '../main-menu.interface';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

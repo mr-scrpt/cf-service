@@ -1,7 +1,6 @@
 import { DnsRecordType } from '@cloudflare-bot/domain';
 import { DnsRecord } from '@cloudflare-bot/shared';
-import { IDnsStrategyRegistry } from '@domain/dns/strategies/dns-strategy-registry.interface';
-import { IDnsRecordFormatter } from './dns-record-formatter.interface';
+import { IDnsStrategyRegistry, IDnsRecordFormatter } from '@application/ports';
 
 export class DnsRecordFormatter implements IDnsRecordFormatter {
   constructor(private readonly strategyRegistry: IDnsStrategyRegistry) {}

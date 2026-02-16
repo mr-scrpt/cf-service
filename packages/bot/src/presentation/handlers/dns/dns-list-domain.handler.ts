@@ -1,7 +1,7 @@
 import { CallbackHandler, SessionContext } from '@infrastructure/routing';
 import { ListDnsFlow } from '@application/flows';
 import { DomainIndexPayload } from '@shared/types/payloads';
-import { SessionValidator } from '@services/session/session-validator.service';
+import { SessionValidator } from '@application/services/session-validator';
 
 export class DnsListDomainHandler implements CallbackHandler<DomainIndexPayload> {
   constructor(private readonly listFlow: ListDnsFlow) {}

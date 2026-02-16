@@ -1,5 +1,5 @@
 import { Context } from 'grammy';
-import { WizardConfig } from './wizard.interfaces';
+import { WizardConfig } from '@infrastructure/wizard/wizard.interfaces';
 
 export interface IWizardEngine {
   start(ctx: Context, config: WizardConfig): Promise<void>;

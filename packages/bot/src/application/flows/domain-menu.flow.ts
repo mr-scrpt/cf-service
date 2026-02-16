@@ -9,7 +9,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
  * Domain Menu - entry point for domain management operations
  * Follows the same pattern as DnsMenu
  */
-export class DomainMenu {
+export class DomainMenuFlow {
   async showMenu(ctx: SessionContext): Promise<void> {
     const keyboard = this.buildDomainMenuKeyboard();
     const message = this.formatDomainMenuMessage();

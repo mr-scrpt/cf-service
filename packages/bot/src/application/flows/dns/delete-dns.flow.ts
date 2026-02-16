@@ -1,12 +1,11 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { DnsRecord } from '@cloudflare-bot/shared';
-import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
-import { IMainMenu } from '../main-menu.interface';
+import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
 import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
-import { SessionValidator } from '@services/session/session-validator.service';
+import { SessionValidator } from '@application/services/session-validator';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 

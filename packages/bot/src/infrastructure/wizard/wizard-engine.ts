@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { SessionManager } from '@services/session';
+import { SessionManager } from '@infrastructure/session/session-manager';
 import { SessionKey } from '@shared/constants';
 import { WizardConfig, WizardState, WizardStep } from './wizard.interfaces';
 import { WizardValidator } from './wizard-validator';
@@ -8,7 +8,7 @@ import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
-import { IWizardEngine } from './wizard-engine.interface';
+import { IWizardEngine } from '@application/ports';
 
 export class WizardEngine implements IWizardEngine {
   constructor(

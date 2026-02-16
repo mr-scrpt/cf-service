@@ -1,7 +1,7 @@
 import { SessionContext } from '@infrastructure/routing';
-import { DeleteDnsFlow } from '@application/flows';
+import { DeleteDnsFlow } from './delete-dns.flow';
 import { FlowStep } from '@shared/constants';
-import { SessionValidator } from '../session/session-validator.service';
+import { SessionValidator } from '@application/services/session-validator';
 
 interface DeleteStepHandler {
   handle(ctx: SessionContext, payload: { idx?: number }): Promise<void>;

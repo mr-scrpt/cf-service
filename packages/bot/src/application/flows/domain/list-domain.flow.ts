@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { IDomainFormatter } from '@infrastructure/ui/formatters';
+import { IDomainFormatter } from '@application/ports';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { SessionData } from '@shared/types';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';

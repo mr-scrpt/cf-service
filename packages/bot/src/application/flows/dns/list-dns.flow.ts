@@ -1,7 +1,7 @@
 import { Context, SessionFlavor } from 'grammy';
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
-import { IDnsRecordFormatter } from '@infrastructure/ui/formatters';
-import { IPaginationComponent, KeyboardBuilder } from '@infrastructure/ui/components';
+import { IDnsRecordFormatter, IPaginationComponent } from '@application/ports';
+import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { CallbackAction } from '@shared/constants';
 import { SessionData } from '@shared/types';
 import { PaginationBuilder } from './pagination-builder';

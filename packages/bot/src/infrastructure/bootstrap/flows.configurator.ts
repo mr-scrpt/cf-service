@@ -1,4 +1,5 @@
 import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IWizardEngine, IDnsStrategyRegistry } from '@application/ports';
 import { WizardEngine } from '@infrastructure/wizard';
 import { DnsRecordFormatter, DomainFormatter } from '@infrastructure/ui/formatters';
 import { PaginationComponent } from '@infrastructure/ui/components';
@@ -7,18 +8,18 @@ import {
   DeleteDnsFlow, 
   ListDnsFlow, 
   EditDnsFlow, 
-  MainMenu, 
-  DnsMenu, 
-  DomainMenu, 
+  MainMenuFlow, 
+  DnsMenuFlow, 
+  DomainMenuFlow, 
   CreateDomainFlow, 
   ListDomainFlow 
 } from '@application/flows';
 import { DnsStrategyRegistry } from '@domain/dns/strategies';
 
 export interface ApplicationFlows {
-  mainMenu: MainMenu;
-  dnsMenu: DnsMenu;
-  domainMenu: DomainMenu;
+  mainMenu: MainMenuFlow;
+  dnsMenu: DnsMenuFlow;
+  domainMenu: DomainMenuFlow;
   createDnsFlow: CreateDnsFlow;
   listDnsFlow: ListDnsFlow;
   deleteDnsFlow: DeleteDnsFlow;
@@ -30,16 +31,16 @@ export interface ApplicationFlows {
 export class FlowsConfigurator {
   createFlows(
     gateway: IDnsGatewayPort,
-    strategyRegistry: DnsStrategyRegistry,
-    wizardEngine: WizardEngine
+    strategyRegistry: IDnsStrategyRegistry,
+    wizardEngine: IWizardEngine
   ): ApplicationFlows {
     const pagination = new PaginationComponent();
     const formatter = new DnsRecordFormatter(strategyRegistry);
     const domainFormatter = new DomainFormatter();
 
-    const mainMenu = new MainMenu();
-    const dnsMenu = new DnsMenu();
-    const domainMenu = new DomainMenu();
+    const mainMenu = new MainMenuFlow();
+    const dnsMenu = new DnsMenuFlow();
+    const domainMenu = new DomainMenuFlow();
 
     const createDnsFlow = new CreateDnsFlow(gateway, strategyRegistry, wizardEngine, formatter, mainMenu);
     const listDnsFlow = new ListDnsFlow(gateway, formatter, pagination);

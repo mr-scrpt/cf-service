@@ -1,5 +1,5 @@
 import { BotInitializer, InitializationContext } from '@infrastructure/bootstrap/initialization-context.interface';
-import { SessionManager } from '@services/session';
+import { SessionManager } from '@infrastructure/session/session-manager';
 import { WizardEngine, WizardValidator, WizardRenderer } from '@infrastructure/wizard';
 
 export class InfrastructureInitializer implements BotInitializer {

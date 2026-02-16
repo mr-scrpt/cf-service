@@ -1,6 +1,6 @@
 import { DnsRecordType } from '@cloudflare-bot/domain';
 import { DnsRecordStrategy } from './dns-record-strategy.interface';
-import { IDnsStrategyRegistry } from './dns-strategy-registry.interface';
+import { IDnsStrategyRegistry } from '@application/ports';
 
 export class DnsStrategyRegistry implements IDnsStrategyRegistry {
   private strategies = new Map<DnsRecordType, DnsRecordStrategy>();

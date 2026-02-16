@@ -5,7 +5,7 @@ import { SessionData } from '@shared/types';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
-export class DnsMenu {
+export class DnsMenuFlow {
   async showMenu(ctx: SessionContext): Promise<void> {
     const keyboard = this.buildDnsMenuKeyboard();
     const message = this.formatDnsMenuMessage();

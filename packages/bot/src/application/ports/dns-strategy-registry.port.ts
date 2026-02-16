@@ -1,5 +1,5 @@
 import { DnsRecordType } from '@cloudflare-bot/domain';
-import { DnsRecordStrategy } from './dns-record-strategy.interface';
+import { DnsRecordStrategy } from '@domain/dns/strategies/dns-record-strategy.interface';
 
 export interface IDnsStrategyRegistry {
   register(strategy: DnsRecordStrategy): void;
