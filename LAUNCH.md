@@ -268,16 +268,7 @@ POST   /api/notifications        # Відправка сповіщення
 
 > ⭐ **Основна документація:** Детальний опис архітектурних рішень, патернів проєктування та технічних підходів.
 
-**Читати:** [**README.md**](./README.md) 🇺🇦 (основна версія - архітектура)
-
-*Також доступно:* [LAUNCH_ru.md](./LAUNCH_ru.md) 🇷🇺 (російська версія інструкції)
-
-**Описувані теми в архітектурній документації:**
-- Domain-Driven Design (DDD), Clean Architecture, Hexagonal Architecture
-- Design Patterns: Strategy, Factory, Builder, State Machine, Repository
-- TypeScript Project References, Result Pattern, Wizard Engine
-- Ports & Adapters, Environment Validation з Zod
-- Логування, DI Container, та інші технічні рішення
+**Читати:** [**README.md**](./README.md) 🇺🇦
 
 ### 📖 Інструкція по запуску
 
