@@ -5,7 +5,7 @@ import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { IDnsRecordFormatter, IMainMenu, IDnsStrategyRegistry } from '@application/ports';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
-import { SessionValidator } from '@application/services/session-validator';
+import { SessionParser } from '@presentation/parsers';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
 
@@ -44,13 +44,13 @@ export class EditDnsFlow {
   }
 
   async showRecords(ctx: SessionContext, domainIndex: number): Promise<void> {
-    const domain = SessionValidator.getDomainByIndex(ctx, domainIndex);
+    const domain = SessionParser.getDomainByIndex(ctx, domainIndex);
     if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
       return;
     }
 
-    SessionValidator.setSelectedZone(ctx, domain);
+    SessionParser.setSelectedZone(ctx, domain);
 
     const records = await this.gateway.listDnsRecords(domain.id) as any;
 
@@ -84,8 +84,8 @@ export class EditDnsFlow {
   }
 
   async showFieldSelector(ctx: SessionContext, recordIndex: number, useReply: boolean = false): Promise<void> {
-    const zone = SessionValidator.getSelectedZone(ctx);
-    const record = SessionValidator.getRecordByIndex(ctx, recordIndex);
+    const zone = SessionParser.getSelectedZone(ctx);
+    const record = SessionParser.getRecordByIndex(ctx, recordIndex);
 
     if (!zone || !record) {
       await ctx.reply('❌ Record not found. Please try again.');
@@ -120,7 +120,7 @@ export class EditDnsFlow {
   }
 
   async editField(ctx: SessionContext, recordIndex: number, fieldKey: string): Promise<void> {
-    const record = SessionValidator.getRecordByIndex(ctx, recordIndex);
+    const record = SessionParser.getRecordByIndex(ctx, recordIndex);
     if (!record) {
       await ctx.reply('❌ Record not found. Please try again.');
       return;
@@ -190,8 +190,8 @@ export class EditDnsFlow {
 
   async saveAllChanges(ctx: SessionContext): Promise<void> {
     const editSession = ctx.session.editSession;
-    const zone = SessionValidator.getSelectedZone(ctx);
-    const record = SessionValidator.getRecordByIndex(ctx, editSession!.recordIndex);
+    const zone = SessionParser.getSelectedZone(ctx);
+    const record = SessionParser.getRecordByIndex(ctx, editSession!.recordIndex);
 
     if (!editSession || !zone || !record) {
       await ctx.reply('❌ Edit session expired. Please try again.');

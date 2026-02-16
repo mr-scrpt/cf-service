@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { Result } from '@cloudflare-bot/application';
-import type { ApiResponse } from '../types/express.types';
-import { ErrorMapper } from '../mappers/error.mapper';
+import type { ApiResponse } from '@shared/types/express.types';
+import { ErrorMapper } from '@infrastructure/mappers/error.mapper';
 
 export class ResponseHelper {
   constructor(private errorMapper: ErrorMapper) {}

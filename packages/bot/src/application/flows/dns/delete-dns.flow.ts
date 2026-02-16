@@ -5,7 +5,7 @@ import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
 import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
 import { CallbackAction, FlowStep } from '@shared/constants';
 import { SessionData } from '@shared/types';
-import { SessionValidator } from '@application/services/session-validator';
+import { SessionParser } from '@presentation/parsers';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
 
@@ -47,7 +47,7 @@ export class DeleteDnsFlow {
   }
 
   async showRecordSelector(ctx: SessionContext): Promise<void> {
-    const zone = SessionValidator.getSelectedZone(ctx);
+    const zone = SessionParser.getSelectedZone(ctx);
     if (!zone) {
       await ctx.reply('❌ Domain not selected. Please try again.');
       return;
@@ -139,8 +139,8 @@ Are you sure you want to delete this record?
   }
 
   async deleteRecord(ctx: SessionContext, recordIndex: number): Promise<void> {
-    const zone = SessionValidator.getSelectedZone(ctx);
-    const record = SessionValidator.getRecordByIndex(ctx, recordIndex);
+    const zone = SessionParser.getSelectedZone(ctx);
+    const record = SessionParser.getRecordByIndex(ctx, recordIndex);
 
     if (!zone || !record) {
       await ctx.reply('❌ Record not found. Please try again.');

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Environment } from '@cloudflare-bot/shared';
-import { env } from '../config/env.config';
+import { env } from '@shared/config/env.config';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   res.status(500).json({

@@ -1,7 +1,7 @@
 import { SessionContext } from '@shared/types/bot-context.type';
 import { DomainDto, DnsRecordDto } from '@cloudflare-bot/application';
 
-export class SessionValidator {
+export class SessionParser {
   static getDomainByIndex(ctx: SessionContext, idx: number): DomainDto | null {
     const domains = ctx.session.tempDomains;
     if (!domains || !domains[idx]) {

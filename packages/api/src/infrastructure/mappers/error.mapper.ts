@@ -1,5 +1,5 @@
 import { UserAlreadyExistsError, UserNotFoundError } from '@cloudflare-bot/application';
-import type { ApiResponse } from '../types/express.types';
+import type { ApiResponse } from '@shared/types/express.types';
 
 export class ErrorMapper {
   map(error: Error): { status: number; body: ApiResponse } {

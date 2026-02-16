@@ -1,9 +1,9 @@
 import { ApiInitializer, InitializationContext } from '../initialization-context.interface';
-import { createWebhookRoutes } from '../../../routes/webhooks.routes';
-import { createUserRoutes } from '../../../routes/users.routes';
-import { createRegistrationRoutes } from '../../../routes/registration.routes';
-import { authMiddleware } from '../../../middleware/auth.middleware';
-import { API_PREFIX, ROUTES } from '../../../constants/routes';
+import { createRegistrationRoutes } from '@infrastructure/http/routes/registration.routes';
+import { createUserRoutes } from '@infrastructure/http/routes/users.routes';
+import { createWebhookRoutes } from '@infrastructure/http/routes/webhooks.routes';
+import { authMiddleware } from '@infrastructure/http/middleware/auth.middleware';
+import { API_PREFIX, ROUTES } from '@shared/constants/routes';
 
 export class RoutesInitializer implements ApiInitializer {
   async initialize(context: InitializationContext): Promise<void> {

@@ -1,7 +1,7 @@
 import { CallbackHandler, SessionContext } from '@infrastructure/routing';
 import { ListDnsFlow } from '@application/flows';
 import { DomainIndexPayload } from '@shared/types/payloads';
-import { SessionValidator } from '@application/services/session-validator';
+import { SessionParser } from '@presentation/parsers';
 
 export class DnsListDomainHandler implements CallbackHandler<DomainIndexPayload> {
   constructor(private readonly listFlow: ListDnsFlow) {}
@@ -12,13 +12,13 @@ export class DnsListDomainHandler implements CallbackHandler<DomainIndexPayload>
       return;
     }
 
-    const domain = SessionValidator.getDomainByIndex(ctx, payload.idx);
+    const domain = SessionParser.getDomainByIndex(ctx, payload.idx);
     if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
       return;
     }
     
-    SessionValidator.setSelectedZone(ctx, domain);
+    SessionParser.setSelectedZone(ctx, domain);
     await this.listFlow.showRecords(ctx, 0);
   }
 }

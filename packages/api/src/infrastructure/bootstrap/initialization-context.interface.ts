@@ -1,7 +1,7 @@
 import { Application } from 'express';
 import { DIContainer } from '@cloudflare-bot/infrastructure';
 import { ILogger } from '@cloudflare-bot/application';
-import { ApiEnv } from '../../config/env.config';
+import { ApiEnv } from '@shared/config/env.config';
 
 export interface InitializationContext {
   container: DIContainer;

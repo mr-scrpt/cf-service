@@ -1,7 +1,7 @@
 import { SessionContext } from '@infrastructure/routing';
 import { DeleteDnsFlow } from './delete-dns.flow';
 import { FlowStep } from '@shared/constants';
-import { SessionValidator } from '@application/services/session-validator';
+import { SessionParser } from '@presentation/parsers';
 
 interface DeleteStepHandler {
   handle(ctx: SessionContext, payload: { idx?: number }): Promise<void>;
@@ -16,13 +16,13 @@ class SelectRecordStepHandler implements DeleteStepHandler {
       return;
     }
 
-    const domain = SessionValidator.getDomainByIndex(ctx, payload.idx);
+    const domain = SessionParser.getDomainByIndex(ctx, payload.idx);
     if (!domain) {
       await ctx.reply('❌ Domain not found. Please try again.');
       return;
     }
 
-    SessionValidator.setSelectedZone(ctx, domain);
+    SessionParser.setSelectedZone(ctx, domain);
     await this.deleteFlow.showRecordSelector(ctx);
   }
 }
@@ -36,7 +36,7 @@ class ConfirmStepHandler implements DeleteStepHandler {
       return;
     }
 
-    const record = SessionValidator.getRecordByIndex(ctx, payload.idx);
+    const record = SessionParser.getRecordByIndex(ctx, payload.idx);
     if (!record) {
       await ctx.reply('❌ Record not found. Please try again.');
       return;

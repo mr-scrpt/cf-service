@@ -1,7 +1,7 @@
 import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
-import { createApiLogger } from './config/logger.config';
-import { ApiApplication } from './infrastructure/bootstrap';
-import { env } from './config/env.config';
+import { createApiLogger } from '@shared/config/logger.config';
+import { ApiApplication } from '@infrastructure/bootstrap';
+import { env } from '@shared/config/env.config';
 
 async function main() {
   const config = loadConfig();
