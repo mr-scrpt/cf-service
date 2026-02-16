@@ -12,10 +12,8 @@ export class UserController {
 
   async addUser(req: Request, res: Response): Promise<void> {
     try {
-      const { username } = req.body;
       const telegramId = RequestParamsParser.getNumberParam(req.params, 'telegramId');
-      
-      const result = await this.userService.addUser({ username }, telegramId);
+      const result = await this.userService.addUser(req.body, telegramId);
       this.responseHelper.send(res, result, { successStatus: 201 });
     } catch (error) {
       res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid request' });

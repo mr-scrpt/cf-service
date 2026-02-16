@@ -21,14 +21,10 @@ export class RejectRegistrationRequestUseCase {
 
     await this.registrationRequestRepository.delete(requestId);
 
-    try {
-      await this.notifier.sendMessage(
-        request.telegramId,
-        '❌ <b>Access Denied</b>\n\nYour registration request has been rejected.',
-        { parse_mode: 'HTML' }
-      );
-    } catch (error) {
-      console.error('Failed to notify user about rejection:', error);
-    }
+    await this.notifier.sendMessage(
+      request.telegramId,
+      '❌ <b>Access Denied</b>\n\nYour registration request has been rejected.',
+      { parse_mode: 'HTML' }
+    );
   }
 }

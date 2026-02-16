@@ -27,6 +27,7 @@ export abstract class BaseService {
       
       this.logger.error(`${operationName} failed`, {
         error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
         code: errorCode,
         ...context,
       });

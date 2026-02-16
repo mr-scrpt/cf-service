@@ -32,14 +32,10 @@ export class ApproveRegistrationRequestUseCase {
 
     await this.registrationRequestRepository.delete(requestId);
 
-    try {
-      await this.notifier.sendMessage(
-        request.telegramId,
-        '✅ <b>Access Approved!</b>\n\nYour registration request has been approved. You can now use the bot.',
-        { parse_mode: 'HTML' }
-      );
-    } catch (error) {
-      console.error('Failed to notify user about approval:', error);
-    }
+    await this.notifier.sendMessage(
+      request.telegramId,
+      '✅ <b>Access Approved!</b>\n\nYour registration request has been approved. You can now use the bot.',
+      { parse_mode: 'HTML' }
+    );
   }
 }

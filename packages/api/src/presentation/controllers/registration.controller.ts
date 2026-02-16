@@ -2,17 +2,7 @@ import { Request, Response } from 'express';
 import { RegistrationService } from '@application/services/registration.service';
 import { ResponseHelper } from '@shared/utils/response.helper';
 import { RequestParamsParser } from '@presentation/parsers';
-
-interface CreateRequestBody {
-  telegramId: number;
-  username: string;
-  firstName: string;
-  lastName?: string;
-}
-
-interface ReviewRequestBody {
-  reviewedBy: string;
-}
+import type { CreateRegistrationRequestDto, ReviewRegistrationRequestDto } from '@cloudflare-bot/application';
 
 export class RegistrationController {
   constructor(
@@ -22,8 +12,7 @@ export class RegistrationController {
 
   async createRequest(req: Request, res: Response): Promise<void> {
     try {
-      const body = req.body as CreateRequestBody;
-      const result = await this.registrationService.createRequest(body);
+      const result = await this.registrationService.createRequest(req.body);
       this.responseHelper.send(res, result, { successStatus: 201 });
     } catch (error) {
       res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid request' });
@@ -42,11 +31,11 @@ export class RegistrationController {
   async approve(req: Request, res: Response): Promise<void> {
     try {
       const requestId = RequestParamsParser.getStringParam(req.params, 'requestId');
-      const body = req.body as ReviewRequestBody;
+      const { reviewedBy } = req.body;
       
       const result = await this.registrationService.approve({
         requestId,
-        reviewedBy: body.reviewedBy,
+        reviewedBy,
       });
       
       this.responseHelper.sendMessage(res, result, 'Registration request approved');
@@ -58,11 +47,11 @@ export class RegistrationController {
   async reject(req: Request, res: Response): Promise<void> {
     try {
       const requestId = RequestParamsParser.getStringParam(req.params, 'requestId');
-      const body = req.body as ReviewRequestBody;
+      const { reviewedBy } = req.body;
       
       const result = await this.registrationService.reject({
         requestId,
-        reviewedBy: body.reviewedBy,
+        reviewedBy,
       });
       
       this.responseHelper.sendMessage(res, result, 'Registration request rejected');
