@@ -1,4 +1,5 @@
-import { CreateDnsRecordInput, DnsRecord, DnsRecordType } from '@cloudflare-bot/shared';
+import { DnsRecordType } from '@cloudflare-bot/domain';
+import { CreateDnsRecordInput, DnsRecord } from '@cloudflare-bot/shared';
 import { FieldConfig } from './field-config.interface';
 
 export interface ValidationResult {

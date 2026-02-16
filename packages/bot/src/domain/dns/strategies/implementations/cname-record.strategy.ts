@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   domainValueSchema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -23,7 +23,7 @@ interface CNAMERecordData {
 }
 
 export class CNAMERecordStrategy implements DnsRecordStrategy<CNAMERecordData, StandardRecord, StandardRecordFieldKey> {
-  readonly type = DnsRecordType.CNAME;
+  readonly type = DnsRecordType.CNAME as const;
   readonly displayName = 'CNAME Record';
   readonly icon = '🔗';
   readonly description = 'Alias to another domain';

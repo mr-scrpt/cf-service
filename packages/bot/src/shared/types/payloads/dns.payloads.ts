@@ -1,4 +1,4 @@
-import { DnsRecordType } from '@cloudflare-bot/shared';
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import { FlowStep } from '@shared/constants';
 
 export interface DomainSelectionPayload {

@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   domainValueSchema,
   srvRecordSchema,
   COMMON_TTL_VALUES,
@@ -28,7 +28,7 @@ interface SRVRecordData {
 }
 
 export class SRVRecordStrategy implements DnsRecordStrategy<SRVRecordData, SRVRecord, SRVRecordFieldKey> {
-  readonly type = DnsRecordType.SRV;
+  readonly type = DnsRecordType.SRV as const;
   readonly displayName = 'SRV Record';
   readonly icon = '🔌';
   readonly description = 'Service locator record';

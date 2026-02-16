@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DnsRecordType } from './constants.domain';
+import { DnsRecordType } from '@cloudflare-bot/domain';
 
 const baseRecordSchema = z.object({
   id: z.string(),
@@ -13,24 +13,18 @@ const baseRecordSchema = z.object({
 
 // Standard records (A, AAAA, CNAME, TXT, NS)
 export const standardRecordSchema = baseRecordSchema.extend({
-  type: z.enum([
-    DnsRecordType.A,
-    DnsRecordType.AAAA,
-    DnsRecordType.CNAME,
-    DnsRecordType.TXT,
-    DnsRecordType.NS,
-  ]),
+  type: z.nativeEnum(DnsRecordType).refine(
+    (val) => [DnsRecordType.A, DnsRecordType.AAAA, DnsRecordType.CNAME, DnsRecordType.TXT, DnsRecordType.NS].includes(val)
+  ),
   content: z.string().min(1),
 });
 
-// MX Record - requires priority
 export const mxRecordSchema = baseRecordSchema.extend({
   type: z.literal(DnsRecordType.MX),
   content: z.string().min(1),
   priority: z.number().int().min(0).max(65535),
 });
 
-// SRV Record - complex data structure
 export const srvRecordSchema = baseRecordSchema.extend({
   type: z.literal(DnsRecordType.SRV),
   data: z.object({

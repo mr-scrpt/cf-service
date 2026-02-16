@@ -79,6 +79,12 @@ importers:
 
   packages/bot:
     dependencies:
+      '@cloudflare-bot/application':
+        specifier: workspace:*
+        version: link:../application
+      '@cloudflare-bot/domain':
+        specifier: workspace:*
+        version: link:../domain
       '@cloudflare-bot/infrastructure':
         specifier: workspace:*
         version: link:../infrastructure
@@ -148,6 +154,9 @@ importers:
 
   packages/shared:
     dependencies:
+      '@cloudflare-bot/domain':
+        specifier: workspace:*
+        version: link:../domain
       cloudflare:
         specifier: ^5.2.0
         version: 5.2.0

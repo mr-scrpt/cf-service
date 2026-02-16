@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   ipv4Schema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -23,7 +23,7 @@ interface ARecordData {
 }
 
 export class ARecordStrategy implements DnsRecordStrategy<ARecordData, StandardRecord, StandardRecordFieldKey> {
-  readonly type = DnsRecordType.A;
+  readonly type = DnsRecordType.A as const;
   readonly displayName = 'A Record';
   readonly icon = '🌐';
   readonly description = 'Maps domain to IPv4 address';

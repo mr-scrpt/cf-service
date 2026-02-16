@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   domainValueSchema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -22,7 +22,7 @@ interface NSRecordData {
 }
 
 export class NSRecordStrategy implements DnsRecordStrategy<NSRecordData, StandardRecord, StandardRecordFieldKey> {
-  readonly type = DnsRecordType.NS;
+  readonly type = DnsRecordType.NS as const;
   readonly displayName = 'NS Record';
   readonly icon = '🌐';
   readonly description = 'Nameserver delegation';

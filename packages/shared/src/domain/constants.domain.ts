@@ -1,16 +1,3 @@
-// Single Source of Truth for DNS Record Types
-export const DnsRecordType = {
-  A: 'A',
-  AAAA: 'AAAA',
-  CNAME: 'CNAME',
-  MX: 'MX',
-  TXT: 'TXT',
-  NS: 'NS',
-  SRV: 'SRV',
-} as const;
-
-export type DnsRecordType = (typeof DnsRecordType)[keyof typeof DnsRecordType];
-
 // Single Source of Truth for Domain Statuses
 export const DomainStatus = {
   Active: 'active',
@@ -33,16 +20,14 @@ export const ZoneType = {
 
 export type ZoneType = (typeof ZoneType)[keyof typeof ZoneType];
 
+import { DnsRecordType } from '@cloudflare-bot/domain';
+
 export const TTL_VALUES = {
   MIN: 60,
   MAX: 86400,
   AUTO: 1,
 } as const;
 
-/**
- * Proxiable DNS record types
- * Source of truth: DnsRecordType
- */
 export const PROXIABLE_TYPES = [
   DnsRecordType.A,
   DnsRecordType.AAAA,

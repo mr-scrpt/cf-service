@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   ipv6Schema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -23,7 +23,7 @@ interface AAAARecordData {
 }
 
 export class AAAARecordStrategy implements DnsRecordStrategy<AAAARecordData, StandardRecord, StandardRecordFieldKey> {
-  readonly type = DnsRecordType.AAAA;
+  readonly type = DnsRecordType.AAAA as const;
   readonly displayName = 'AAAA Record';
   readonly icon = '🌐';
   readonly description = 'Maps domain to IPv6 address';

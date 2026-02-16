@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   txtContentSchema,
   standardRecordSchema,
   COMMON_TTL_VALUES,
@@ -22,7 +22,7 @@ interface TXTRecordData {
 }
 
 export class TXTRecordStrategy implements DnsRecordStrategy<TXTRecordData, StandardRecord, StandardRecordFieldKey> {
-  readonly type = DnsRecordType.TXT;
+  readonly type = DnsRecordType.TXT as const;
   readonly displayName = 'TXT Record';
   readonly icon = '📝';
   readonly description = 'Text record for verification and metadata';

@@ -1,5 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort, DnsRecordType } from '@cloudflare-bot/shared';
+import { DnsRecordType } from '@cloudflare-bot/domain';
+import { DnsGatewayPort } from '@cloudflare-bot/shared';
 import { DnsStrategyRegistry } from '@domain/dns/strategies';
 import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
 import { KeyboardBuilder } from '@infrastructure/ui/components';

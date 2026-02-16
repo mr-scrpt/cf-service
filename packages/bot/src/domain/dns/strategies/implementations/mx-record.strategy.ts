@@ -1,5 +1,5 @@
+import { DnsRecordType } from '@cloudflare-bot/domain';
 import {
-  DnsRecordType,
   domainValueSchema,
   mxRecordSchema,
   COMMON_TTL_VALUES,
@@ -24,7 +24,7 @@ interface MXRecordData {
 }
 
 export class MXRecordStrategy implements DnsRecordStrategy<MXRecordData, MXRecord, MXRecordFieldKey> {
-  readonly type = DnsRecordType.MX;
+  readonly type = DnsRecordType.MX as const;
   readonly displayName = 'MX Record';
   readonly icon = '📧';
   readonly description = 'Mail server configuration';

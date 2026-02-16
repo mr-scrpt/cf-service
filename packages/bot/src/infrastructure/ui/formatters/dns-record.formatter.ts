@@ -1,4 +1,5 @@
-import { DnsRecord, DnsRecordType } from '@cloudflare-bot/shared';
+import { DnsRecordType } from '@cloudflare-bot/domain';
+import { DnsRecord } from '@cloudflare-bot/shared';
 import { DnsStrategyRegistry } from '@domain/dns/strategies';
 
 export class DnsRecordFormatter {

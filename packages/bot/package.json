@@ -10,8 +10,10 @@
     "start": "tsx dist/index.js"
   },
   "dependencies": {
-    "@cloudflare-bot/shared": "workspace:*",
+    "@cloudflare-bot/application": "workspace:*",
+    "@cloudflare-bot/domain": "workspace:*",
     "@cloudflare-bot/infrastructure": "workspace:*",
+    "@cloudflare-bot/shared": "workspace:*",
     "@grammyjs/conversations": "^2.1.1",
     "grammy": "^1.40.0",
     "zod": "^4.3.6"

@@ -2,7 +2,7 @@
 export { commonEnvSchema, type CommonEnv } from './config';
 
 // Domain — constants
-export { DnsRecordType, DomainStatus } from './domain';
+export { DomainStatus } from './domain';
 
 // Domain — schemas & entities
 export { domainNameSchema, domainSchema, type Domain } from './domain';
