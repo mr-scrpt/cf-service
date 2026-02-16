@@ -4,13 +4,9 @@ import { WizardEngine, WizardValidator, WizardRenderer } from '@infrastructure/w
 
 export class InfrastructureInitializer implements BotInitializer {
   async initialize(context: InitializationContext): Promise<void> {
-    if (!context.dependencies) {
-      context.dependencies = {};
-    }
-    
     const sessionManager = new SessionManager();
     const wizardValidator = new WizardValidator();
     const wizardRenderer = new WizardRenderer();
-    context.dependencies.wizardEngine = new WizardEngine(sessionManager, wizardValidator, wizardRenderer);
+    context.wizardEngine = new WizardEngine(sessionManager, wizardValidator, wizardRenderer);
   }
 }

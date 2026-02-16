@@ -5,7 +5,7 @@ import { SaveAllPayload } from '@shared/types/payloads';
 export class DnsSaveAllHandler implements CallbackHandler<SaveAllPayload> {
   constructor(private readonly editFlow: EditDnsFlow) {}
 
-  async handle(ctx: SessionContext, payload: SaveAllPayload): Promise<void> {
+  async handle(ctx: SessionContext, _: SaveAllPayload): Promise<void> {
     await this.editFlow.saveAllChanges(ctx);
   }
 }

@@ -1,7 +1,7 @@
 //  packages/bot/src/infrastructure/bootstrap/handlers.configurator.ts
 import { DIContainer } from '@cloudflare-bot/infrastructure';
 import { CallbackHandler, CallbackRouter, TextInputRouter } from '@infrastructure/routing';
-import { WizardEngine } from '@infrastructure/wizard';
+import { IWizardEngine } from '@application/ports';
 import {
   DnsCreateSelectDomainHandler,
   DnsCreateSelectTypeHandler,
@@ -30,7 +30,7 @@ import { CallbackAction } from '@shared/constants';
 import { ApplicationFlows } from './flows.configurator';
 
 export class HandlersConfigurator {
-  configureHandlers(flows: ApplicationFlows, wizardEngine: WizardEngine, container: DIContainer) {
+  configureHandlers(flows: ApplicationFlows, wizardEngine: IWizardEngine, container: DIContainer) {
     const callbackRouter = new CallbackRouter();
     const textInputRouter = new TextInputRouter(wizardEngine, flows.editDnsFlow);
 

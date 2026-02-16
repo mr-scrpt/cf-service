@@ -8,10 +8,17 @@ export class RoutingInitializer implements BotInitializer {
     const middlewareConfigurator = new MiddlewareConfigurator();
     middlewareConfigurator.configureMiddleware(context.bot, context.container);
 
+    if (!context.flows) {
+      throw new Error('flows not initialized');
+    }
+    if (!context.wizardEngine) {
+      throw new Error('wizardEngine not initialized');
+    }
+
     const handlersConfigurator = new HandlersConfigurator();
     const { callbackRouter, textInputRouter } = handlersConfigurator.configureHandlers(
-      context.dependencies!.flows,
-      context.dependencies!.wizardEngine,
+      context.flows,
+      context.wizardEngine,
       context.container
     );
 

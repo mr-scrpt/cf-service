@@ -1,8 +1,8 @@
 import { CallbackHandler, SessionContext } from '@infrastructure/routing';
-import { WizardEngine } from '@infrastructure/wizard';
+import { IWizardEngine } from '@application/ports';
 
 export class NavigationCancelHandler implements CallbackHandler<unknown> {
-  constructor(private readonly wizardEngine: WizardEngine) {}
+  constructor(private readonly wizardEngine: IWizardEngine) {}
 
   async handle(ctx: SessionContext): Promise<void> {
     const isActive = await this.wizardEngine.isActive(ctx);

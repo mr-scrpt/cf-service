@@ -1,14 +1,16 @@
-import { IRegistrationRequestRepository, RegistrationRequest, RequestId, RequestStatus } from '@cloudflare-bot/domain';
-import { RegistrationRequestModel, IRegistrationRequestDocument } from '../models/registration-request.model';
+import {
+  IRegistrationRequestRepository,
+  RegistrationRequest,
+  RequestId,
+  RequestStatus,
+} from '@cloudflare-bot/domain';
+
+import { RegistrationRequestModel, IRegistrationRequestDocument } from '../models';
 
 export class MongoRegistrationRequestRepository implements IRegistrationRequestRepository {
   async save(request: RegistrationRequest): Promise<void> {
     const doc = this.toPersistence(request);
-    await RegistrationRequestModel.findByIdAndUpdate(
-      doc._id,
-      doc,
-      { upsert: true, new: true }
-    );
+    await RegistrationRequestModel.findByIdAndUpdate(doc._id, doc, { upsert: true, new: true });
   }
 
   async findById(id: RequestId): Promise<RegistrationRequest | null> {
@@ -22,16 +24,16 @@ export class MongoRegistrationRequestRepository implements IRegistrationRequestR
   }
 
   async findPendingByTelegramId(telegramId: number): Promise<RegistrationRequest | null> {
-    const doc = await RegistrationRequestModel.findOne({ 
+    const doc = await RegistrationRequestModel.findOne({
       telegramId,
-      status: RequestStatus.PENDING 
+      status: RequestStatus.PENDING,
     });
     return doc ? this.toDomain(doc) : null;
   }
 
   async findByStatus(status: RequestStatus): Promise<RegistrationRequest[]> {
     const docs = await RegistrationRequestModel.find({ status }).sort({ requestedAt: -1 });
-    return docs.map(doc => this.toDomain(doc));
+    return docs.map((doc) => this.toDomain(doc));
   }
 
   async delete(id: RequestId): Promise<void> {

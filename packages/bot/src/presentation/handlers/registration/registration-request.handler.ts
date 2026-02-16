@@ -1,8 +1,9 @@
 import { CallbackHandler, SessionContext } from '@infrastructure/routing/callback-handler.interface';
 import { logger } from '@shared/utils/logger';
+import { CreateRegistrationRequestUseCase } from '@cloudflare-bot/application';
 
 export class RegistrationRequestHandler implements CallbackHandler<void> {
-  constructor(private readonly createRequestUseCase: any) {}
+  constructor(private readonly createRequestUseCase: CreateRegistrationRequestUseCase) {}
 
   async handle(ctx: SessionContext): Promise<void> {
     const userId = ctx.from?.id;

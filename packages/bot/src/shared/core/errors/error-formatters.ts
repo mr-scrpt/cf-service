@@ -1,5 +1,10 @@
-import { ValidationError, InfrastructureError, AppError, CloudflareApiError, NetworkError } from '@cloudflare-bot/shared';
-import type { CloudflareErrorDetails } from '@cloudflare-bot/shared';
+import {
+  AppError,
+  CloudflareApiError,
+  InfrastructureError,
+  NetworkError,
+  ValidationError,
+} from '@cloudflare-bot/shared';
 import { ERROR_EMOJI_MAP } from './error-emoji';
 
 export function formatValidationError(error: ValidationError): string {

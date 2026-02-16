@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { SessionData } from '@shared/types';
-import { WizardEngine } from '@infrastructure/wizard';
+import { IWizardEngine } from '@application/ports';
 import { EditDnsFlow } from '@application/flows';
 
 type SessionContext = Context & SessionFlavor<SessionData>;
@@ -14,7 +14,7 @@ export class TextInputRouter {
   private handlers: TextInputHandler[] = [];
 
   constructor(
-    private readonly wizardEngine: WizardEngine,
+    private readonly wizardEngine: IWizardEngine,
     private readonly editFlow: EditDnsFlow
   ) {
     this.registerHandlers();

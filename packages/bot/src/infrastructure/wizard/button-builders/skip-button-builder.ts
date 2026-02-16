@@ -11,7 +11,7 @@ export class SkipButtonBuilder implements WizardButtonBuilder {
     return !step.fieldConfig.required;
   }
 
-  build(step: WizardStep): InlineKeyboardButton[][] {
+  build(_: WizardStep): InlineKeyboardButton[][] {
     return [[CommonButtons.skip()]];
   }
 }

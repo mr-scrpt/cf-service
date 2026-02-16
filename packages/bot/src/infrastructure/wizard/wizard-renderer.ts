@@ -1,13 +1,13 @@
-import { Context } from 'grammy';
-import { InlineKeyboardMarkup, InlineKeyboardButton } from 'grammy/types';
-import { WizardStep, WizardState, WizardConfig } from './wizard.interfaces';
 import { CommonButtons } from '@infrastructure/ui/components/common-buttons';
+import { Context } from 'grammy';
+import { InlineKeyboardMarkup } from 'grammy/types';
 import {
-  WizardButtonBuilder,
-  SelectButtonBuilder,
   BooleanButtonBuilder,
+  SelectButtonBuilder,
   SkipButtonBuilder,
+  WizardButtonBuilder,
 } from './button-builders';
+import { WizardConfig, WizardState, WizardStep } from './wizard.interfaces';
 
 export class WizardRenderer {
   private readonly buttonBuilders: WizardButtonBuilder[] = [
@@ -20,7 +20,7 @@ export class WizardRenderer {
     ctx: Context,
     step: WizardStep,
     state: WizardState,
-    totalSteps: number
+    totalSteps: number,
   ): Promise<void> {
     const message = this.buildMessage(step, state, totalSteps);
     const keyboard = this.buildKeyboard(step);
@@ -31,11 +31,7 @@ export class WizardRenderer {
     });
   }
 
-  private buildMessage(
-    step: WizardStep,
-    state: WizardState,
-    totalSteps: number
-  ): string {
+  private buildMessage(step: WizardStep, state: WizardState, totalSteps: number): string {
     const progress = `[${state.currentStepIndex + 1}/${totalSteps}]`;
     const label = `<b>${step.fieldConfig.label}</b>`;
     const prompt = step.customMessage || step.fieldConfig.prompt;
@@ -66,7 +62,7 @@ export class WizardRenderer {
   async renderConfirmation<TContext extends Context>(
     ctx: TContext,
     state: WizardState,
-    config: WizardConfig<TContext>
+    config: WizardConfig<TContext>,
   ): Promise<void> {
     const summary = this.buildSummary(state, config);
     const keyboard = this.buildConfirmationKeyboard();
@@ -77,7 +73,10 @@ export class WizardRenderer {
     });
   }
 
-  private buildSummary<TContext extends Context>(state: WizardState, config: WizardConfig<TContext>): string {
+  private buildSummary<TContext extends Context>(
+    state: WizardState,
+    config: WizardConfig<TContext>,
+  ): string {
     let message = '✅ <b>Проверьте данные перед созданием</b>\n\n';
 
     config.steps.forEach((step) => {
@@ -107,5 +106,4 @@ export class WizardRenderer {
       inline_keyboard: [[CommonButtons.confirm()], [CommonButtons.cancel()]],
     };
   }
-
 }

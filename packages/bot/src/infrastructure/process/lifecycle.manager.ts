@@ -24,10 +24,10 @@ export class LifecycleManager {
           );
           await ctx.reply(errorMessage, { parse_mode: 'HTML' });
         } catch (replyError) {
-          logger.error('Failed to send error message', { error: replyError });
-          try {
-            await ctx.reply('❌ An unexpected error occurred. Please try again later.');
-          } catch {}
+          logger.error('Failed to send error message to user', { 
+            error: replyError instanceof Error ? replyError.message : String(replyError),
+            stack: replyError instanceof Error ? replyError.stack : undefined
+          });
         }
       }
     });

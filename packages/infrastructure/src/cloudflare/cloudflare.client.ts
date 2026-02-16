@@ -1,15 +1,15 @@
-import Cloudflare from 'cloudflare';
-import type { Zone } from 'cloudflare/resources/zones/zones';
-import type { Record as CloudflareSDKRecord } from 'cloudflare/resources/dns/records';
 import { ICloudflareGateway } from '@cloudflare-bot/application';
-import { Domain, DomainId, DomainName, DomainStatus, DnsRecord, DnsRecordType } from '@cloudflare-bot/domain';
+import { DnsRecord, DnsRecordType, Domain, DomainId, DomainName } from '@cloudflare-bot/domain';
+import Cloudflare from 'cloudflare';
+import type { Record as CloudflareSDKRecord } from 'cloudflare/resources/dns/records';
+import type { Zone } from 'cloudflare/resources/zones/zones';
 
 export class CloudflareClient implements ICloudflareGateway {
   private client: Cloudflare;
 
   constructor(
     private readonly apiToken: string,
-    private readonly accountId: string
+    private readonly accountId: string,
   ) {
     this.client = new Cloudflare({ apiToken });
   }
@@ -24,7 +24,9 @@ export class CloudflareClient implements ICloudflareGateway {
 
       return this.mapZoneToDomain(zone);
     } catch (error) {
-      throw new Error(`Failed to create zone: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create zone: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -34,9 +36,11 @@ export class CloudflareClient implements ICloudflareGateway {
         account: { id: this.accountId },
       });
 
-      return response.result.map(zone => this.mapZoneToDomain(zone));
+      return response.result.map((zone) => this.mapZoneToDomain(zone));
     } catch (error) {
-      throw new Error(`Failed to list zones: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to list zones: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -60,7 +64,9 @@ export class CloudflareClient implements ICloudflareGateway {
 
       return this.mapRecordToDomain(record, params.zoneId);
     } catch (error) {
-      throw new Error(`Failed to create DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -87,7 +93,9 @@ export class CloudflareClient implements ICloudflareGateway {
 
       return this.mapRecordToDomain(record, params.zoneId);
     } catch (error) {
-      throw new Error(`Failed to update DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to update DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -95,17 +103,21 @@ export class CloudflareClient implements ICloudflareGateway {
     try {
       await this.client.dns.records.delete(recordId, { zone_id: zoneId });
     } catch (error) {
-      throw new Error(`Failed to delete DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to delete DNS record: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
   async listDnsRecords(zoneId: string): Promise<DnsRecord[]> {
     try {
       const response = await this.client.dns.records.list({ zone_id: zoneId });
-      
-      return response.result.map(record => this.mapRecordToDomain(record, zoneId));
+
+      return response.result.map((record) => this.mapRecordToDomain(record, zoneId));
     } catch (error) {
-      throw new Error(`Failed to list DNS records: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to list DNS records: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -126,7 +138,7 @@ export class CloudflareClient implements ICloudflareGateway {
       name: record.name,
       content: String(record.content),
       ttl: record.ttl!,
-      proxied: ('proxied' in record ? (record.proxied ?? false) : false),
+      proxied: 'proxied' in record ? (record.proxied ?? false) : false,
     });
   }
 }
