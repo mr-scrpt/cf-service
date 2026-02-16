@@ -23,30 +23,30 @@
     ],
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ],
       "@/app/*": [
-        "./app/*"
+        "./src/app/*"
       ],
       "@/widgets/*": [
-        "./widgets/*"
+        "./src/widgets/*"
       ],
       "@/features/*": [
-        "./features/*"
+        "./src/features/*"
       ],
       "@/entities/*": [
-        "./entities/*"
+        "./src/entities/*"
       ],
       "@/shared/*": [
-        "./shared/*"
+        "./src/shared/*"
       ]
     },
     "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
