@@ -18,20 +18,36 @@ export class RegistrationRequestHandler implements CallbackHandler<void> {
       return;
     }
 
-    await this.createRequestUseCase.execute({
-      telegramId: userId,
-      username,
-      firstName,
-      lastName: lastName || null,
-    });
+    try {
+      await this.createRequestUseCase.execute({
+        telegramId: userId,
+        username,
+        firstName,
+        lastName: lastName || null,
+      });
 
-    logger.info('Registration request created', { userId, username });
+      logger.info('Registration request created', { userId, username });
 
-    await ctx.editMessageText(
-      '✅ <b>Request Submitted</b>\n\n' +
-      'Your access request has been submitted to the admin.\n\n' +
-      'You will be notified once it\'s reviewed.',
-      { parse_mode: 'HTML' }
-    );
+      await ctx.editMessageText(
+        '✅ <b>Request Submitted</b>\n\n' +
+        'Your access request has been submitted to the admin.\n\n' +
+        'You will be notified once it\'s reviewed.',
+        { parse_mode: 'HTML' }
+      );
+    } catch (error) {
+      logger.error('Failed to create registration request', { 
+        userId, 
+        username, 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      await ctx.editMessageText(
+        '❌ <b>Error</b>\n\n' +
+        'Failed to submit your request. Please try again later.\n\n' +
+        `<code>${error instanceof Error ? error.message : 'Unknown error'}</code>`,
+        { parse_mode: 'HTML' }
+      );
+    }
   }
 }

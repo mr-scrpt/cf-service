@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000"
+      "value": "http://localhost:4050"
     },
     {
       "key": "api_auth_token",
@@ -31,24 +31,24 @@
       "response": []
     },
     {
-      "name": "Webhook",
+      "name": "Notifications",
       "item": [
         {
-          "name": "Check Webhook Status",
+          "name": "Get Notification Info",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/webhook",
+              "raw": "{{base_url}}/api/notify",
               "host": ["{{base_url}}"],
-              "path": ["api", "webhook"]
+              "path": ["api", "notify"]
             },
-            "description": "Check if webhook endpoint is alive - no authentication required"
+            "description": "Get notification endpoint info and your IP - no authentication required"
           },
           "response": []
         },
         {
-          "name": "Send Webhook",
+          "name": "Send Notification",
           "request": {
             "method": "POST",
             "header": [
@@ -59,14 +59,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"event\": \"test\",\n  \"data\": {\n    \"message\": \"Test webhook payload\"\n  }\n}"
+              "raw": "{\n  \"event\": \"deployment\",\n  \"status\": \"success\",\n  \"message\": \"Application deployed successfully\",\n  \"version\": \"1.2.3\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/webhook",
+              "raw": "{{base_url}}/api/notify",
               "host": ["{{base_url}}"],
-              "path": ["api", "webhook"]
+              "path": ["api", "notify"]
             },
-            "description": "Send webhook notification - no authentication required"
+            "description": "Send notification to Telegram - includes IP, headers, and body in message - no authentication required"
           },
           "response": []
         }
@@ -75,33 +75,6 @@
     {
       "name": "Users",
       "item": [
-        {
-          "name": "Add User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{api_auth_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"john_doe\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/users",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users"]
-            },
-            "description": "Allow user by username (user must have interacted with bot first) - requires authentication"
-          },
-          "response": []
-        },
         {
           "name": "List Users",
           "request": {
@@ -223,12 +196,12 @@
               "variable": [
                 {
                   "key": "requestId",
-                  "value": "paste-request-uuid-here",
-                  "description": "Registration request UUID from pending list"
+                  "value": "0544c8b7-0e9a-49fa-879b-a370844c83ab",
+                  "description": "Registration request UUID from pending list (copy from GET pending requests response)"
                 }
               ]
             },
-            "description": "Approve a pending registration request - creates User and notifies user via Telegram - requires authentication"
+            "description": "Approve a pending registration request - creates User, deletes the request, and notifies user via Telegram - requires authentication"
           },
           "response": []
         },
@@ -257,12 +230,12 @@
               "variable": [
                 {
                   "key": "requestId",
-                  "value": "paste-request-uuid-here",
-                  "description": "Registration request UUID from pending list"
+                  "value": "0544c8b7-0e9a-49fa-879b-a370844c83ab",
+                  "description": "Registration request UUID from pending list (copy from GET pending requests response)"
                 }
               ]
             },
-            "description": "Reject a pending registration request - notifies user via Telegram - requires authentication"
+            "description": "Reject a pending registration request - deletes the request and notifies user via Telegram - requires authentication"
           },
           "response": []
         }

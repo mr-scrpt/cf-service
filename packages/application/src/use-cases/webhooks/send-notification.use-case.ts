@@ -1,20 +1,20 @@
 import { INotifier } from '../../ports/notifier.port';
-import { WebhookPayloadDto } from '../../dto/webhook-payload.dto';
+import { NotificationPayloadDto } from '../../dto/notification-payload.dto';
 
-export class SendWebhookNotificationUseCase {
+export class SendNotificationUseCase {
   constructor(
     private readonly notifier: INotifier,
     private readonly adminChatId: number
   ) {}
 
-  async execute(payload: WebhookPayloadDto): Promise<void> {
+  async execute(payload: NotificationPayloadDto): Promise<void> {
     const message = this.formatMessage(payload);
     await this.notifier.sendMessage(this.adminChatId, message, { parse_mode: 'HTML' });
   }
 
-  private formatMessage(payload: WebhookPayloadDto): string {
+  private formatMessage(payload: NotificationPayloadDto): string {
     const lines = [
-      '<b>🔔 Webhook Received</b>',
+      '<b>🔔 Notification Received</b>',
       '',
       `<b>Method:</b> ${payload.method}`,
       `<b>IP:</b> <code>${payload.ip}</code>`,

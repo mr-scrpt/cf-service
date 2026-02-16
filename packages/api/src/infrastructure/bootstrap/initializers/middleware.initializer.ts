@@ -5,6 +5,7 @@ import { createRequestLoggerMiddleware } from '@infrastructure/http/middleware/r
 
 export class MiddlewareInitializer implements ApiInitializer {
   async initialize(context: InitializationContext): Promise<void> {
+    context.app.set('trust proxy', true);
     context.app.use(cors());
     context.app.use(express.json());
     context.app.use(createRequestLoggerMiddleware(context.logger));

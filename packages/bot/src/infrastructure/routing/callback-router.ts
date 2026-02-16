@@ -39,7 +39,13 @@ export class CallbackRouter {
       payload: parsed.payload 
     });
 
-    const handler = this.handlers.get(parsed.action as CallbackAction);
+    if (!this.isValidCallbackAction(parsed.action)) {
+      logger.warn('Invalid callback action', { action: parsed.action });
+      await ctx.answerCallbackQuery({ text: '❌ Invalid action' });
+      return;
+    }
+
+    const handler = this.handlers.get(parsed.action);
 
     if (!handler) {
       logger.warn('No handler found for action', { 
@@ -89,6 +95,10 @@ export class CallbackRouter {
       // If parsing fails, treat entire string as action
       return { action: data, payload: undefined };
     }
+  }
+
+  private isValidCallbackAction(action: string): action is CallbackAction {
+    return Object.values(CallbackAction).includes(action as CallbackAction);
   }
 
   has(action: CallbackAction): boolean {

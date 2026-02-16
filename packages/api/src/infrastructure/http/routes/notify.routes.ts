@@ -3,13 +3,18 @@ import type { DIContainer } from '@cloudflare-bot/infrastructure';
 import { ROUTES } from '@shared/constants/routes';
 import { ControllerFactory } from '@infrastructure/factories';
 
-export function createWebhookRoutes(container: DIContainer): Router {
+export function createNotifyRoutes(container: DIContainer): Router {
   const router = Router();
   
-  const controller = ControllerFactory.createWebhookController(container);
+  const controller = ControllerFactory.createNotificationController(container);
+
+  router.get(
+    ROUTES.NOTIFY.BASE,
+    (req, res) => controller.getInfo(req, res)
+  );
 
   router.post(
-    ROUTES.WEBHOOK.BASE,
+    ROUTES.NOTIFY.BASE,
     (req, res) => controller.handleNotification(req, res)
   );
 

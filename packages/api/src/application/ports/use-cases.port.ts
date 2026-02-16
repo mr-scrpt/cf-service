@@ -5,7 +5,9 @@ import type {
   ReviewRegistrationRequestDto,
   AddUserDto,
   UserDto,
-  WebhookPayloadDto,
+  DomainDto,
+  RegisterDomainDto,
+  NotificationPayloadDto,
 } from '@cloudflare-bot/application';
 
 export interface ICreateRegistrationRequestUseCase {
@@ -36,6 +38,6 @@ export interface IRemoveUserUseCase {
   execute(telegramId: number): Promise<Result<void>>;
 }
 
-export interface ISendWebhookNotificationUseCase {
-  execute(dto: WebhookPayloadDto): Promise<Result<void>>;
+export interface ISendNotificationUseCase {
+  execute(dto: NotificationPayloadDto): Promise<Result<void>>;
 }

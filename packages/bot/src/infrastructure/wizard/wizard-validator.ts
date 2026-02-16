@@ -6,13 +6,14 @@ export class WizardValidator {
     let parsedInput: unknown = input;
 
     if (fieldConfig.inputType === FieldInputType.NUMBER) {
-      parsedInput = Number(input);
-      if (isNaN(parsedInput as number)) {
+      const numValue = Number(input);
+      if (isNaN(numValue)) {
         return {
           success: false,
           error: 'Invalid number format',
         };
       }
+      parsedInput = numValue;
     } else if (fieldConfig.inputType === FieldInputType.BOOLEAN) {
       parsedInput = input.toLowerCase() === 'true' || input === '1';
     }

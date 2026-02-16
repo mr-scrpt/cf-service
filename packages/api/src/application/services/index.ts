@@ -1,3 +1,3 @@
-export * from './base.service';
+export * from './registration.service';
 export * from './user.service';
-export * from './webhook.service';
+export * from './notification.service';

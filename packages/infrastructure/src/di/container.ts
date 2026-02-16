@@ -6,7 +6,7 @@ import {
   CheckUserAccessUseCase,
   ListUsersUseCase,
   RemoveUserUseCase,
-  SendWebhookNotificationUseCase,
+  SendNotificationUseCase,
   SyncUsernameUseCase,
   CreateRegistrationRequestUseCase,
   ListPendingRequestsUseCase,
@@ -98,8 +98,8 @@ export class DIContainer {
     return new SyncUsernameUseCase(this.userRepository);
   }
 
-  getSendWebhookNotificationUseCase(): SendWebhookNotificationUseCase {
-    return new SendWebhookNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
+  getSendNotificationUseCase(): SendNotificationUseCase {
+    return new SendNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
   }
 
   getCreateRegistrationRequestUseCase(): CreateRegistrationRequestUseCase {
@@ -131,9 +131,9 @@ export class DIContainer {
     };
   }
 
-  getWebhookService() {
+  getNotificationService() {
     return {
-      sendNotificationUseCase: this.getSendWebhookNotificationUseCase(),
+      sendNotificationUseCase: this.getSendNotificationUseCase(),
       logger: this.logger,
     };
   }

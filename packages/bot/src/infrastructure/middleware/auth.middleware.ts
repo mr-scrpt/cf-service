@@ -16,17 +16,25 @@ export async function authGuard(ctx: Context, next: NextFunction): Promise<void>
   const username = ctx.from?.username;
   const firstName = ctx.from?.first_name || '';
   const lastName = ctx.from?.last_name;
+  const callbackData = ctx.callbackQuery?.data;
   
   logger.debug('authGuard check', { 
     chatId, 
     userId,
     username,
+    callbackData,
     allowedChatId: env.ALLOWED_CHAT_ID 
   });
   
   if (!chatId) {
     logger.debug('No chatId, skipping auth check');
     return next();
+  }
+
+  if (callbackData === 'request_access') {
+    logger.debug('REQUEST_ACCESS callback, bypassing auth check');
+    await next();
+    return;
   }
 
   if (!username) {

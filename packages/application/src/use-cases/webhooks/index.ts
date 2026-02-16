@@ -1,1 +1,1 @@
-export * from './send-notification.use-case';
+export { SendNotificationUseCase } from './send-notification.use-case';

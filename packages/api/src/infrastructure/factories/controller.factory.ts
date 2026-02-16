@@ -1,10 +1,10 @@
 import type { DIContainer } from '@cloudflare-bot/infrastructure';
 import { RegistrationController } from '@presentation/controllers/registration.controller';
 import { UserController } from '@presentation/controllers/user.controller';
-import { WebhookController } from '@presentation/controllers/webhook.controller';
+import { NotificationController } from '@presentation/controllers/notification.controller';
 import { RegistrationService } from '@application/services/registration.service';
 import { UserService } from '@application/services/user.service';
-import { WebhookService } from '@application/services/webhook.service';
+import { NotificationService } from '@application/services/notification.service';
 import { ResponseHelper } from '@shared/utils/response.helper';
 import { ErrorMapper } from '@infrastructure/mappers/error.mapper';
 
@@ -49,15 +49,12 @@ export class ControllerFactory {
     );
   }
 
-  static createWebhookController(container: DIContainer): WebhookController {
-    const webhookService = new WebhookService(
-      container.getSendWebhookNotificationUseCase(),
+  static createNotificationController(container: DIContainer): NotificationController {
+    const notificationService = new NotificationService(
+      container.getSendNotificationUseCase(),
       container.getLogger()
     );
 
-    return new WebhookController(
-      webhookService,
-      this.getResponseHelper()
-    );
+    return new NotificationController(notificationService, this.getResponseHelper());
   }
 }

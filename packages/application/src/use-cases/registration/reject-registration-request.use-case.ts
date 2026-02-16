@@ -19,8 +19,7 @@ export class RejectRegistrationRequestUseCase {
       throw new RegistrationRequestNotFoundError(validated.requestId);
     }
 
-    request.reject(validated.reviewedBy);
-    await this.registrationRequestRepository.save(request);
+    await this.registrationRequestRepository.delete(requestId);
 
     try {
       await this.notifier.sendMessage(

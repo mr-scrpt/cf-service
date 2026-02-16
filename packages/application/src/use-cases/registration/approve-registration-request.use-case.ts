@@ -20,9 +20,6 @@ export class ApproveRegistrationRequestUseCase {
       throw new RegistrationRequestNotFoundError(validated.requestId);
     }
 
-    request.approve(validated.reviewedBy);
-    await this.registrationRequestRepository.save(request);
-
     const userId = UserId.fromTelegramId(request.telegramId);
     const user = User.create({
       id: userId,
@@ -32,6 +29,8 @@ export class ApproveRegistrationRequestUseCase {
 
     user.allow();
     await this.userRepository.save(user);
+
+    await this.registrationRequestRepository.delete(requestId);
 
     try {
       await this.notifier.sendMessage(

@@ -3,8 +3,8 @@ export const API_PREFIX = '/api' as const;
 export const ROUTES = {
   HEALTH: '/health',
   
-  WEBHOOK: {
-    BASE: '/webhook',
+  NOTIFY: {
+    BASE: '/notify',
   },
   
   USERS: {
