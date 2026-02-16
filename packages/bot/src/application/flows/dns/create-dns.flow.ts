@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsRecordType } from '@cloudflare-bot/domain';
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { DnsStrategyRegistry } from '@domain/dns/strategies';
 import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
@@ -14,7 +14,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class CreateDnsFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly strategyRegistry: DnsStrategyRegistry,
     private readonly wizardEngine: WizardEngine,
     private readonly formatter: DnsRecordFormatter,
@@ -103,15 +103,13 @@ Select record type:
       })),
       metadata: { zoneId, zoneName, type },
       confirmationPrompt: '⚠️ Создать DNS запись с этими данными?',
-      onComplete: async (ctx: Context, fields: Record<string, unknown>) => {
+      onComplete: async (ctx: Context, collectedData: Record<string, unknown>) => {
         try {
-          const input = strategy.toCreateInput({ zoneId, fields });
-          const record = await this.gateway.createDnsRecord(input);
-
-          const successMessage = this.formatter.formatCreatedMessage(record);
+          const createdRecord = await this.gateway.createDnsRecord(strategy.toCreateInput({ zoneId, fields: collectedData }) as any);
+          const message = this.formatter.formatCreatedMessage(createdRecord as any);
           const keyboard = this.mainMenu.getMainMenuKeyboard();
 
-          await ctx.reply(successMessage, {
+          await ctx.reply(message, {
             parse_mode: 'HTML',
             reply_markup: keyboard.build(),
           });

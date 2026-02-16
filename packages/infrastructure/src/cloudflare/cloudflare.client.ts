@@ -4,7 +4,7 @@ import type { Record as CloudflareSDKRecord } from 'cloudflare/resources/dns/rec
 import { ICloudflareGateway } from '@cloudflare-bot/application';
 import { Domain, DomainId, DomainName, DomainStatus, DnsRecord, DnsRecordType } from '@cloudflare-bot/domain';
 
-export class CloudflareAdapter implements ICloudflareGateway {
+export class CloudflareClient implements ICloudflareGateway {
   private client: Cloudflare;
 
   constructor(

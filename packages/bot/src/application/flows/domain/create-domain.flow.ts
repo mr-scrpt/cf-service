@@ -1,5 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort, domainNameSchema } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { domainNameSchema } from '@cloudflare-bot/shared';
 import { WizardEngine, WizardConfig } from '@infrastructure/wizard';
 import { DomainFormatter } from '@infrastructure/ui/formatters/domain-formatter';
 import { MainMenu } from '../main-menu';
@@ -15,7 +16,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
  */
 export class CreateDomainFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly wizardEngine: WizardEngine,
     private readonly formatter: DomainFormatter,
     private readonly mainMenu: MainMenu
@@ -51,10 +52,9 @@ export class CreateDomainFlow {
     await this.wizardEngine.start(ctx, config);
   }
 
-  private async createDomain(ctx: SessionContext, name: string): Promise<void> {
+  private async createDomain(ctx: SessionContext, collectedData: any): Promise<void> {
     try {
-      const domain = await this.gateway.registerDomain({ name });
-      
+      const domain = await this.gateway.registerDomain({ domain: collectedData.name });
       const message = this.formatter.formatDomainRegistered(domain);
       await ctx.reply(message, { parse_mode: 'HTML' });
     } catch (error) {

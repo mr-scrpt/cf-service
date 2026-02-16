@@ -1,4 +1,4 @@
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { Context } from 'grammy';
 import { BotCommand } from './command.interface';
 import { CommandRegistry } from './command.registry';
@@ -16,7 +16,7 @@ import { StartCommand } from '@presentation/commands/general/start.command';
 export class CommandModule<C extends Context = Context> {
   private readonly registry = new CommandRegistry<C>();
 
-  constructor(private readonly gateway: DnsGatewayPort) {
+  constructor(private readonly gateway: IDnsGatewayPort) {
     this.registerCommands();
   }
 

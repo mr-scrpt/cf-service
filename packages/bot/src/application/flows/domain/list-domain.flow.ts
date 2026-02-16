@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { DomainFormatter } from '@infrastructure/ui/formatters/domain-formatter';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { SessionData } from '@shared/types';
@@ -13,7 +13,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
  */
 export class ListDomainFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly formatter: DomainFormatter
   ) {}
 

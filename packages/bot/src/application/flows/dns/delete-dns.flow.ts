@@ -1,5 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { DnsRecord } from '@cloudflare-bot/shared';
 import { KeyboardBuilder, CommonButtons } from '@infrastructure/ui/components';
 import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { CallbackAction, FlowStep } from '@shared/constants';
@@ -11,7 +12,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class DeleteDnsFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly formatter: DnsRecordFormatter,
     private readonly mainMenu: MainMenu
   ) {}
@@ -53,7 +54,7 @@ export class DeleteDnsFlow {
       return;
     }
 
-    const records = await this.gateway.listDnsRecords(zone.zoneId);
+    const records = await this.gateway.listDnsRecords(zone.zoneId) as DnsRecord[];
 
     if (records.length === 0) {
       await ctx.editMessageText('📭 No DNS records found for this domain.');
@@ -149,7 +150,7 @@ Are you sure you want to delete this record?
 
     await this.gateway.deleteDnsRecord(record.id, zone.zoneId);
 
-    const successMessage = this.formatter.formatDeletedMessage(record.name, record.type);
+    const successMessage = this.formatRecordListMessage((zone as any).zoneName);
     const keyboard = this.mainMenu.getMainMenuKeyboard();
 
     await ctx.editMessageText(successMessage, {

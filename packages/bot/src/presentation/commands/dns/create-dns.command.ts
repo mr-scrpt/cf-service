@@ -1,6 +1,6 @@
 import { Context } from 'grammy';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import {
-  DnsGatewayPort,
   ValidationError,
   createDnsRecordSchema,
 } from '@cloudflare-bot/shared';
@@ -12,7 +12,7 @@ export class CreateDnsCommand implements BotCommand {
   readonly name = CommandName.DNS_CREATE;
   readonly description = 'Create DNS record';
 
-  constructor(private readonly gateway: DnsGatewayPort) { }
+  constructor(private readonly gateway: IDnsGatewayPort) { }
 
   async execute(ctx: Context): Promise<void> {
     await ctx.reply(

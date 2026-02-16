@@ -19,7 +19,7 @@ import {
 import { IUserRepository, IDomainRepository, IRegistrationRequestRepository } from '@cloudflare-bot/domain';
 import { MongoUserRepository, MongoDomainRepository, MongoRegistrationRequestRepository } from '../database/repositories';
 import { MongooseDatabaseService } from '../database';
-import { CloudflareAdapter } from '../cloudflare/cloudflare.adapter';
+import { CloudflareClient } from '../cloudflare/cloudflare.client';
 import { TelegramAdapter } from '../telegram';
 import { Env } from '../config/env.schema';
 
@@ -38,7 +38,7 @@ export class DIContainer {
     this.userRepository = new MongoUserRepository();
     this.domainRepository = new MongoDomainRepository();
     this.registrationRequestRepository = new MongoRegistrationRequestRepository();
-    this.cloudflareGateway = new CloudflareAdapter(
+    this.cloudflareGateway = new CloudflareClient(
       config.CLOUDFLARE_API_TOKEN,
       config.CLOUDFLARE_ACCOUNT_ID
     );

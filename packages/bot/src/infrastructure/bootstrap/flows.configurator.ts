@@ -1,4 +1,4 @@
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { WizardEngine } from '@infrastructure/wizard';
 import { DnsRecordFormatter, DomainFormatter } from '@infrastructure/ui/formatters';
 import { PaginationComponent } from '@infrastructure/ui/components';
@@ -29,7 +29,7 @@ export interface ApplicationFlows {
 
 export class FlowsConfigurator {
   createFlows(
-    gateway: DnsGatewayPort,
+    gateway: IDnsGatewayPort,
     strategyRegistry: DnsStrategyRegistry,
     wizardEngine: WizardEngine
   ): ApplicationFlows {

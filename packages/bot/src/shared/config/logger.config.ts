@@ -1,9 +1,10 @@
 import * as path from 'path';
+const { join, dirname } = path;
 import { LoggerConfigBuilder, WinstonLoggerAdapter } from '@cloudflare-bot/infrastructure';
 import { Environment, LogLevel } from '@cloudflare-bot/shared';
 import { BOT_PATHS } from './paths.config';
 
-const LOG_DIR = path.join(process.cwd(), BOT_PATHS.LOGS);
+const LOG_DIR = join(process.cwd(), BOT_PATHS.LOGS);
 const LOG_ROTATION = {
   MAX_SIZE: 5242880,
   MAX_FILES: 5,

@@ -1,5 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort, DnsRecord } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { DnsRecord } from '@cloudflare-bot/shared';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { CallbackAction, FlowStep } from '@shared/constants';
@@ -14,7 +15,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class EditDnsFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly formatter: DnsRecordFormatter,
     private readonly mainMenu: MainMenu,
     private readonly strategyRegistry: DnsStrategyRegistry
@@ -53,7 +54,7 @@ export class EditDnsFlow {
 
     SessionValidator.setSelectedZone(ctx, domain);
 
-    const records = await this.gateway.listDnsRecords(domain.id);
+    const records = await this.gateway.listDnsRecords(domain.id) as any;
 
     if (records.length === 0) {
       await ctx.editMessageText('❌ No DNS records found for this domain.', {
@@ -66,8 +67,8 @@ export class EditDnsFlow {
     ctx.session.tempRecords = records;
 
     const keyboard = new KeyboardBuilder();
-    records.forEach((record, index) => {
-      const strategy = this.strategyRegistry.getStrategy(record.type);
+    records.forEach((record: any, index: number) => {
+      const strategy = this.strategyRegistry.getStrategy(record.type as any);
       keyboard.addButton(
         `${strategy.icon} ${record.name} (${record.type})`,
         CallbackAction.DNS_EDIT_FIELD,

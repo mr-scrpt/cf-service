@@ -1,5 +1,9 @@
 import { AppError } from './app-error';
-import type { CloudflareErrorDetails } from '../infrastructure/cloudflare/schemas/error-response.schema';
+
+export interface CloudflareErrorDetails {
+  code: number;
+  message: string;
+}
 
 export class InfrastructureError extends AppError {
     constructor(message: string, code: string, meta?: Record<string, unknown>) {

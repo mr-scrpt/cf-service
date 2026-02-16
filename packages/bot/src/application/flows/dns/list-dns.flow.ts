@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { KeyboardBuilder, PaginationComponent } from '@infrastructure/ui/components';
 import { DnsRecordFormatter } from '@infrastructure/ui/formatters';
 import { CallbackAction } from '@shared/constants';
@@ -10,7 +10,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 
 export class ListDnsFlow {
   constructor(
-    private readonly gateway: DnsGatewayPort,
+    private readonly gateway: IDnsGatewayPort,
     private readonly formatter: DnsRecordFormatter,
     private readonly pagination: PaginationComponent
   ) {}
@@ -56,7 +56,7 @@ export class ListDnsFlow {
       items: records,
       pageSize: 10,
       currentPage: page,
-      renderItem: (record, index) => this.formatter.formatListItem(record, index),
+      renderItem: (record, index) => this.formatter.formatListItem(record as any, index),
       renderEmpty: () => '📭 No DNS records found for this domain',
     });
 

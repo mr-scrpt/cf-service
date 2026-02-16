@@ -1,5 +1,5 @@
 import { Context } from 'grammy';
-import { DnsGatewayPort } from '@cloudflare-bot/shared';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import { BotCommand } from '../base/command.interface';
 import { CommandName } from '@shared/constants';
 import { TelegramErrorFormatter } from '@shared/core/errors/telegram.formatter';
@@ -9,7 +9,7 @@ export class ListDomainsCommand implements BotCommand {
   readonly name = CommandName.LIST_DOMAINS;
   readonly description = 'List all registered domains';
 
-  constructor(private readonly gateway: DnsGatewayPort) { }
+  constructor(private readonly gateway: IDnsGatewayPort) { }
 
   async execute(ctx: Context): Promise<void> {
     try {

@@ -13,9 +13,9 @@ import { LoggerPort } from '../ports';
  * @example
  * ```typescript
  * const gateway = createLoggingProxy(
- *   new CloudflareGatewayAdapter(env),
+ *   new SomeAdapter(config),
  *   logger,
- *   'CloudflareGateway'
+ *   'AdapterName'
  * );
  * ```
  */

@@ -1,6 +1,6 @@
 import { Context } from 'grammy';
+import { IDnsGatewayPort } from '@cloudflare-bot/application';
 import {
-  DnsGatewayPort,
   registerDomainSchema,
   ZodErrorAdapter,
 } from '@cloudflare-bot/shared';
@@ -13,7 +13,7 @@ export class RegisterDomainCommand implements BotCommand {
   readonly name = CommandName.REGISTER_DOMAIN;
   readonly description = 'Add domain to Cloudflare';
 
-  constructor(private readonly gateway: DnsGatewayPort) { }
+  constructor(private readonly gateway: IDnsGatewayPort) { }
 
   async execute(ctx: Context): Promise<void> {
     const match = typeof ctx.match === 'string' ? ctx.match.trim() : '';
@@ -27,7 +27,7 @@ export class RegisterDomainCommand implements BotCommand {
     }
 
     try {
-      const domain = await this.gateway.registerDomain(result.data);
+      const domain = await this.gateway.registerDomain({ domain: result.data.name });
       await ctx.reply(formatDomainRegistered(domain), { parse_mode: 'HTML' });
     } catch (error) {
       await ctx.reply(TelegramErrorFormatter.format(error as Error), { parse_mode: 'HTML' });

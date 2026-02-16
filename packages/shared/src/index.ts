@@ -29,8 +29,6 @@ export type {
 // Ports
 // Ports — Foundation
 export type { LoggerPort, NotifierPort } from './foundation/ports';
-// Ports — Domain
-export type { DnsGatewayPort, UserRepositoryPort } from './domain/ports';
 
 export {
   LoggerAdapter,
@@ -38,8 +36,6 @@ export {
   LoggerMode,
   LoggerLevel,
 } from './foundation/adapters/logger.adapter';
-export * from './infrastructure/cloudflare/adapters/gateway.adapter';
-export * from './infrastructure/cloudflare/schemas';
 
 // Foundation — Logging utilities
 export { createLoggingProxy } from './foundation/logging/logging-proxy';
@@ -64,9 +60,6 @@ export {
 
 // Errors
 export * from './errors';
-
-// Adapters
-export { CloudflareGatewayAdapter } from './infrastructure';
 
 export {
   TTL_VALUES,

@@ -1,2 +1,1 @@
-export * from './cloudflare.adapter';
-export * from './schemas';
+export * from './cloudflare.client';

@@ -1,7 +1,7 @@
 import { BotInitializer, InitializationContext } from '@infrastructure/bootstrap/initialization-context.interface';
-import { CloudflareGatewayAdapter } from '@cloudflare-bot/shared';
+import { DnsGatewayAdapter, CloudflareClient } from '@cloudflare-bot/infrastructure';
 import { env } from '@shared/config/env.config';
-import { createDnsStrategies } from '@domain/dns/strategies';
+import { createDnsStrategies } from '@domain/dns/strategies/strategies.factory';
 
 export class DomainInitializer implements BotInitializer {
   async initialize(context: InitializationContext): Promise<void> {
@@ -9,7 +9,12 @@ export class DomainInitializer implements BotInitializer {
       context.dependencies = {};
     }
     
-    context.dependencies.cloudflareGateway = new CloudflareGatewayAdapter(env);
+    const cloudflareClient = new CloudflareClient(
+      env.CLOUDFLARE_API_TOKEN,
+      env.CLOUDFLARE_ACCOUNT_ID
+    );
+    
+    context.dependencies.cloudflareGateway = new DnsGatewayAdapter(cloudflareClient);
     context.dependencies.strategyRegistry = createDnsStrategies();
   }
 }

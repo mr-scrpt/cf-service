@@ -1,4 +1,5 @@
-import { DIContainer, loadConfig } from '@cloudflare-bot/infrastructure';
+import { DIContainer } from '@cloudflare-bot/infrastructure';
+import { loadConfig } from '@cloudflare-bot/infrastructure';
 import { logger } from '@shared/utils/logger';
 import { createBotLogger } from '@shared/config/logger.config';
 import { BotApplication } from '@infrastructure/bootstrap';
