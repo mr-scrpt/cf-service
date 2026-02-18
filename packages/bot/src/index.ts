@@ -3,13 +3,16 @@ import { loadConfig } from '@cloudflare-bot/infrastructure';
 import { logger } from '@shared/utils/logger';
 import { createBotLogger } from '@shared/config/logger.config';
 import { BotApplication } from '@infrastructure/bootstrap';
+import { BotDIContainer } from '@infrastructure/di/bot-di-container';
 
 async function main() {
   const config = loadConfig();
   const botLogger = createBotLogger(config.NODE_ENV);
-  const container = new DIContainer(config, botLogger);
+  
+  const infraContainer = new DIContainer(config, botLogger);
+  const botContainer = new BotDIContainer();
 
-  const app = new BotApplication(container);
+  const app = new BotApplication(infraContainer, botContainer);
   
   await app.initialize();
   await app.start();

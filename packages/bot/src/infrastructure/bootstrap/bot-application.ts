@@ -23,14 +23,15 @@ type BotContext = Context & SessionFlavor<SessionData>;
 export class BotApplication {
   private bot: Bot<BotContext>;
   private lifecycleManager: LifecycleManager;
-  private botContainer: BotDIContainer;
   private initializers: BotInitializer[];
 
-  constructor(private readonly container: DIContainer) {
+  constructor(
+    private readonly container: DIContainer,
+    private readonly botContainer: BotDIContainer
+  ) {
     const telegramAdapter = this.container.getTelegramAdapter();
     this.bot = telegramAdapter.getBotTyped<BotContext>();
     this.lifecycleManager = new LifecycleManager();
-    this.botContainer = new BotDIContainer();
     
     this.initializers = [
       new DatabaseInitializer(),
