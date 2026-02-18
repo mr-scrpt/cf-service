@@ -22,6 +22,7 @@ import { MongooseDatabaseService } from '../database';
 import { CloudflareClient } from '../cloudflare/cloudflare.client';
 import { TelegramAdapter } from '../telegram';
 import { Env } from '../config/env.schema';
+import { DnsGatewayAdapter } from '../adapters/dns-gateway.adapter';
 
 export class DIContainer {
   private userRepository: IUserRepository;
@@ -32,6 +33,7 @@ export class DIContainer {
   private telegramBot: ITelegramBot;
   private logger: ILogger;
   private databaseService: IDatabaseService;
+  private dnsGatewayAdapter?: DnsGatewayAdapter;
 
   constructor(private config: Env, logger: ILogger) {
     this.logger = logger;
@@ -76,6 +78,13 @@ export class DIContainer {
 
   getCloudflareGateway(): ICloudflareGateway {
     return this.cloudflareGateway;
+  }
+
+  getDnsGatewayAdapter(): DnsGatewayAdapter {
+    if (!this.dnsGatewayAdapter) {
+      this.dnsGatewayAdapter = new DnsGatewayAdapter(this.cloudflareGateway);
+    }
+    return this.dnsGatewayAdapter;
   }
 
   getAddUserUseCase(): AddUserUseCase {
