@@ -1,5 +1,4 @@
 import { BotInitializer, InitializationContext } from '@infrastructure/bootstrap/initialization-context.interface';
-import { FlowsConfigurator } from '@infrastructure/bootstrap/flows.configurator';
 
 export class ApplicationInitializer implements BotInitializer {
   async initialize(context: InitializationContext): Promise<void> {
@@ -13,7 +12,7 @@ export class ApplicationInitializer implements BotInitializer {
       throw new Error('wizardEngine not initialized');
     }
     
-    const flowsConfigurator = new FlowsConfigurator();
+    const flowsConfigurator = context.botContainer.getFlowsConfigurator();
     context.flows = flowsConfigurator.createFlows(
       context.cloudflareGateway,
       context.strategyRegistry,

@@ -4,13 +4,8 @@ import { logger } from '@shared/utils/logger';
 import type { Context, NextFunction } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 
-let container: DIContainer;
-
-export function initAuthGuard(diContainer: DIContainer) {
-  container = diContainer;
-}
-
-export async function authGuard(ctx: Context, next: NextFunction): Promise<void> {
+export function createAuthGuard(container: DIContainer) {
+  return async (ctx: Context, next: NextFunction): Promise<void> => {
   const chatId = ctx.chat?.id;
   const userId = ctx.from?.id;
   const username = ctx.from?.username;
@@ -90,4 +85,5 @@ export async function authGuard(ctx: Context, next: NextFunction): Promise<void>
       reply_markup: keyboard,
     },
   );
+  };
 }

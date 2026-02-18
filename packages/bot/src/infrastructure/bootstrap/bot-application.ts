@@ -16,18 +16,21 @@ import {
   CommandsInitializer,
   LifecycleInitializer,
 } from './initializers';
+import { BotDIContainer } from '@infrastructure/di/bot-di-container';
 
 type BotContext = Context & SessionFlavor<SessionData>;
 
 export class BotApplication {
   private bot: Bot<BotContext>;
   private lifecycleManager: LifecycleManager;
+  private botContainer: BotDIContainer;
   private initializers: BotInitializer[];
 
   constructor(private readonly container: DIContainer) {
     const telegramAdapter = this.container.getTelegramAdapter();
     this.bot = telegramAdapter.getBotTyped<BotContext>();
     this.lifecycleManager = new LifecycleManager();
+    this.botContainer = new BotDIContainer();
     
     this.initializers = [
       new DatabaseInitializer(),
@@ -44,6 +47,7 @@ export class BotApplication {
   async initialize(): Promise<void> {
     const context: InitializationContext = {
       container: this.container,
+      botContainer: this.botContainer,
       bot: this.bot,
       lifecycleManager: this.lifecycleManager,
     };

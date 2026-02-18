@@ -25,30 +25,15 @@ import { Env } from '../config/env.schema';
 import { DnsGatewayAdapter } from '../adapters/dns-gateway.adapter';
 
 export class DIContainer {
-  private userRepository: IUserRepository;
-  private domainRepository: IDomainRepository;
-  private registrationRequestRepository: IRegistrationRequestRepository;
-  private cloudflareGateway: ICloudflareGateway;
-  private notifier: INotifier;
-  private telegramBot: ITelegramBot;
-  private logger: ILogger;
-  private databaseService: IDatabaseService;
+  private userRepository?: IUserRepository;
+  private domainRepository?: IDomainRepository;
+  private registrationRequestRepository?: IRegistrationRequestRepository;
+  private cloudflareGateway?: ICloudflareGateway;
+  private telegramAdapter?: TelegramAdapter;
+  private databaseService?: IDatabaseService;
   private dnsGatewayAdapter?: DnsGatewayAdapter;
 
-  constructor(private config: Env, logger: ILogger) {
-    this.logger = logger;
-    this.databaseService = new MongooseDatabaseService(config.MONGODB_URI);
-    this.userRepository = new MongoUserRepository();
-    this.domainRepository = new MongoDomainRepository();
-    this.registrationRequestRepository = new MongoRegistrationRequestRepository();
-    this.cloudflareGateway = new CloudflareClient(
-      config.CLOUDFLARE_API_TOKEN,
-      config.CLOUDFLARE_ACCOUNT_ID
-    );
-    
-    const telegramAdapter = new TelegramAdapter(config.TELEGRAM_BOT_TOKEN, logger);
-    this.notifier = telegramAdapter;
-    this.telegramBot = telegramAdapter;
+  constructor(private config: Env, private logger: ILogger) {
   }
 
   getLogger(): ILogger {
@@ -56,78 +41,106 @@ export class DIContainer {
   }
 
   getDatabaseService(): IDatabaseService {
+    if (!this.databaseService) {
+      this.databaseService = new MongooseDatabaseService(this.config.MONGODB_URI);
+    }
     return this.databaseService;
+  }
+  
+  getUserRepository(): IUserRepository {
+    if (!this.userRepository) {
+      this.userRepository = new MongoUserRepository();
+    }
+    return this.userRepository;
+  }
+  
+  getDomainRepository(): IDomainRepository {
+    if (!this.domainRepository) {
+      this.domainRepository = new MongoDomainRepository();
+    }
+    return this.domainRepository;
   }
 
   getRegisterDomainUseCase(): RegisterDomainUseCase {
-    return new RegisterDomainUseCase(this.cloudflareGateway, this.domainRepository);
-  }
-
-  getNotifier(): INotifier {
-    return this.notifier;
-  }
-
-  getTelegramBot(): ITelegramBot {
-    return this.telegramBot;
+    return new RegisterDomainUseCase(this.getCloudflareGateway(), this.getDomainRepository());
   }
 
   getTelegramAdapter(): TelegramAdapter {
-    const telegramAdapter = new TelegramAdapter(this.config.TELEGRAM_BOT_TOKEN, this.logger);
-    return telegramAdapter;
+    if (!this.telegramAdapter) {
+      this.telegramAdapter = new TelegramAdapter(this.config.TELEGRAM_BOT_TOKEN, this.logger);
+    }
+    return this.telegramAdapter;
+  }
+  
+  getNotifier(): INotifier {
+    return this.getTelegramAdapter();
+  }
+
+  getTelegramBot(): ITelegramBot {
+    return this.getTelegramAdapter();
   }
 
   getCloudflareGateway(): ICloudflareGateway {
+    if (!this.cloudflareGateway) {
+      this.cloudflareGateway = new CloudflareClient(
+        this.config.CLOUDFLARE_API_TOKEN,
+        this.config.CLOUDFLARE_ACCOUNT_ID
+      );
+    }
     return this.cloudflareGateway;
   }
 
   getDnsGatewayAdapter(): DnsGatewayAdapter {
     if (!this.dnsGatewayAdapter) {
-      this.dnsGatewayAdapter = new DnsGatewayAdapter(this.cloudflareGateway);
+      this.dnsGatewayAdapter = new DnsGatewayAdapter(this.getCloudflareGateway());
     }
     return this.dnsGatewayAdapter;
   }
 
   getAddUserUseCase(): AddUserUseCase {
-    return new AddUserUseCase(this.userRepository);
+    return new AddUserUseCase(this.getUserRepository());
   }
 
   getCheckUserAccessUseCase(): CheckUserAccessUseCase {
-    return new CheckUserAccessUseCase(this.userRepository);
+    return new CheckUserAccessUseCase(this.getUserRepository());
   }
 
   getListUsersUseCase(): ListUsersUseCase {
-    return new ListUsersUseCase(this.userRepository);
+    return new ListUsersUseCase(this.getUserRepository());
   }
 
   getRemoveUserUseCase(): RemoveUserUseCase {
-    return new RemoveUserUseCase(this.userRepository);
+    return new RemoveUserUseCase(this.getUserRepository());
   }
 
   getSyncUsernameUseCase(): SyncUsernameUseCase {
-    return new SyncUsernameUseCase(this.userRepository);
+    return new SyncUsernameUseCase(this.getUserRepository());
   }
 
   getSendNotificationUseCase(): SendNotificationUseCase {
-    return new SendNotificationUseCase(this.notifier, this.config.ALLOWED_CHAT_ID);
+    return new SendNotificationUseCase(this.getNotifier(), this.config.ALLOWED_CHAT_ID);
   }
 
   getCreateRegistrationRequestUseCase(): CreateRegistrationRequestUseCase {
-    return new CreateRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository);
+    return new CreateRegistrationRequestUseCase(this.getUserRepository(), this.getRegistrationRequestRepository());
   }
 
   getListPendingRequestsUseCase(): ListPendingRequestsUseCase {
-    return new ListPendingRequestsUseCase(this.registrationRequestRepository);
+    return new ListPendingRequestsUseCase(this.getRegistrationRequestRepository());
   }
 
   getApproveRegistrationRequestUseCase(): ApproveRegistrationRequestUseCase {
-    return new ApproveRegistrationRequestUseCase(this.userRepository, this.registrationRequestRepository, this.notifier);
+    return new ApproveRegistrationRequestUseCase(this.getUserRepository(), this.getRegistrationRequestRepository(), this.getNotifier());
   }
 
   getRejectRegistrationRequestUseCase(): RejectRegistrationRequestUseCase {
-    return new RejectRegistrationRequestUseCase(this.registrationRequestRepository, this.notifier);
+    return new RejectRegistrationRequestUseCase(this.getRegistrationRequestRepository(), this.getNotifier());
   }
 
   getRegistrationRequestRepository(): IRegistrationRequestRepository {
+    if (!this.registrationRequestRepository) {
+      this.registrationRequestRepository = new MongoRegistrationRequestRepository();
+    }
     return this.registrationRequestRepository;
   }
 

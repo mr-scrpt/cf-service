@@ -1,13 +1,8 @@
 import { BotInitializer, InitializationContext, BotContext } from '@infrastructure/bootstrap/initialization-context.interface';
-import { MiddlewareConfigurator } from '@infrastructure/bootstrap/middleware.configurator';
-import { HandlersConfigurator } from '@infrastructure/bootstrap/handlers.configurator';
 import { BotEvent } from '@shared/constants';
 
 export class RoutingInitializer implements BotInitializer {
   async initialize(context: InitializationContext): Promise<void> {
-    const middlewareConfigurator = new MiddlewareConfigurator();
-    middlewareConfigurator.configureMiddleware(context.bot, context.container);
-
     if (!context.flows) {
       throw new Error('flows not initialized');
     }
@@ -15,7 +10,7 @@ export class RoutingInitializer implements BotInitializer {
       throw new Error('wizardEngine not initialized');
     }
 
-    const handlersConfigurator = new HandlersConfigurator();
+    const handlersConfigurator = context.botContainer.getHandlersConfigurator();
     const { callbackRouter, textInputRouter } = handlersConfigurator.configureHandlers(
       context.flows,
       context.wizardEngine,
