@@ -103,8 +103,8 @@ Select record type:
       confirmationPrompt: '⚠️ Создать DNS запись с этими данными?',
       onComplete: async (ctx, collectedData) => {
         try {
-          const createdRecord = await this.gateway.createDnsRecord(strategy.toCreateInput({ zoneId, fields: collectedData }) as any);
-          const message = this.formatter.formatCreatedMessage(createdRecord as any);
+          const createdRecord = await this.gateway.createDnsRecord(strategy.toCreateInput({ zoneId, fields: collectedData }));
+          const message = this.formatter.formatCreatedMessage(createdRecord);
           const keyboard = this.mainMenu.getMainMenuKeyboard();
 
           await ctx.reply(message, {
