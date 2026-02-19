@@ -12,6 +12,11 @@ import {
   ListPendingRequestsUseCase,
   ApproveRegistrationRequestUseCase,
   RejectRegistrationRequestUseCase,
+  CreateDnsRecordUseCase,
+  UpdateDnsRecordUseCase,
+  DeleteDnsRecordUseCase,
+  ListDnsRecordsUseCase,
+  ListDomainsUseCase,
   ILogger,
   IDatabaseService,
   ITelegramBot
@@ -135,6 +140,26 @@ export class DIContainer {
 
   getRejectRegistrationRequestUseCase(): RejectRegistrationRequestUseCase {
     return new RejectRegistrationRequestUseCase(this.getRegistrationRequestRepository(), this.getNotifier());
+  }
+
+  getCreateDnsRecordUseCase(): CreateDnsRecordUseCase {
+    return new CreateDnsRecordUseCase(this.getDnsGatewayAdapter(), this.getLogger());
+  }
+
+  getUpdateDnsRecordUseCase(): UpdateDnsRecordUseCase {
+    return new UpdateDnsRecordUseCase(this.getDnsGatewayAdapter(), this.getLogger());
+  }
+
+  getDeleteDnsRecordUseCase(): DeleteDnsRecordUseCase {
+    return new DeleteDnsRecordUseCase(this.getDnsGatewayAdapter(), this.getLogger());
+  }
+
+  getListDnsRecordsUseCase(): ListDnsRecordsUseCase {
+    return new ListDnsRecordsUseCase(this.getDnsGatewayAdapter(), this.getLogger());
+  }
+
+  getListDomainsUseCase(): ListDomainsUseCase {
+    return new ListDomainsUseCase(this.getDnsGatewayAdapter(), this.getLogger());
   }
 
   getRegistrationRequestRepository(): IRegistrationRequestRepository {

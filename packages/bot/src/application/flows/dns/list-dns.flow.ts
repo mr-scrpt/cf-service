@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, ListDnsRecordsUseCase, ListDomainsUseCase } from '@cloudflare-bot/application';
 import { IDnsRecordFormatter, IPaginationComponent } from '@application/ports';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { CallbackAction } from '@shared/constants';
@@ -11,12 +11,14 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class ListDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly listDnsRecordsUseCase: ListDnsRecordsUseCase,
+    private readonly listDomainsUseCase: ListDomainsUseCase,
     private readonly formatter: IDnsRecordFormatter,
     private readonly pagination: IPaginationComponent
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
-    const domains = await this.gateway.listDomains();
+    const domains = await this.listDomainsUseCase.execute();
 
     if (domains.length === 0) {
       await ctx.reply('❌ No domains found. Please register a domain first.');
@@ -50,7 +52,7 @@ export class ListDnsFlow {
     }
     
     ctx.session.currentPage = page;
-    const records = await this.gateway.listDnsRecords(zoneId);
+    const records = await this.listDnsRecordsUseCase.execute(zoneId);
 
     const result = this.pagination.paginate({
       items: records,

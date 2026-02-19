@@ -1,5 +1,5 @@
 import { IDnsRecordFormatter, IMainMenu } from '@application/ports';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, DeleteDnsRecordUseCase, ListDnsRecordsUseCase, ListDomainsUseCase } from '@cloudflare-bot/application';
 import { type DnsRecordData } from '@cloudflare-bot/domain';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { SessionParser } from '@presentation/parsers';
@@ -12,12 +12,15 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class DeleteDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly deleteDnsRecordUseCase: DeleteDnsRecordUseCase,
+    private readonly listDnsRecordsUseCase: ListDnsRecordsUseCase,
+    private readonly listDomainsUseCase: ListDomainsUseCase,
     private readonly formatter: IDnsRecordFormatter,
     private readonly mainMenu: IMainMenu,
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
-    const domains = await this.gateway.listDomains();
+    const domains = await this.listDomainsUseCase.execute();
 
     if (domains.length === 0) {
       await ctx.reply('❌ No domains found. Please register a domain first.');
@@ -52,7 +55,7 @@ export class DeleteDnsFlow {
       return;
     }
 
-    const records = (await this.gateway.listDnsRecords(zone.zoneId)) as DnsRecordData[];
+    const records = (await this.listDnsRecordsUseCase.execute(zone.zoneId)) as DnsRecordData[];
 
     if (records.length === 0) {
       await ctx.editMessageText('📭 No DNS records found for this domain.');
@@ -141,7 +144,7 @@ Are you sure you want to delete this record?
       return;
     }
 
-    await this.gateway.deleteDnsRecord(record.id, zone.zoneId);
+    await this.deleteDnsRecordUseCase.execute(zone.zoneId, record.id);
 
     const successMessage = this.formatRecordListMessage((zone as any).zoneName);
     const keyboard = this.mainMenu.getMainMenuKeyboard();

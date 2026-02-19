@@ -1,4 +1,4 @@
-import type { DomainDto } from '@cloudflare-bot/application';
+import type { DomainDto, RegisterDomainResult } from '@cloudflare-bot/application';
 import { IDomainFormatter } from '@application/ports';
 
 export class DomainFormatter implements IDomainFormatter {
@@ -10,6 +10,20 @@ export class DomainFormatter implements IDomainFormatter {
 📍 <b>Domain:</b> ${domain.name}
 🆔 <b>Zone ID:</b> <code>${domain.id}</code>
 📊 <b>Status:</b> ${domain.status}
+
+🌐 <b>NS Servers</b> (add to your registrar):
+• ${nsServers}
+
+⚠️ <b>Important:</b> Update your domain registrar with these nameservers to activate Cloudflare.`;
+  }
+
+  formatRegistrationResult(result: RegisterDomainResult): string {
+    const nsServers = result.nsServers.join('\n• ');
+
+    return `✅ <b>Domain registered successfully!</b>
+
+📍 <b>Domain:</b> ${result.domain}
+🆔 <b>Zone ID:</b> <code>${result.zoneId}</code>
 
 🌐 <b>NS Servers</b> (add to your registrar):
 • ${nsServers}

@@ -14,8 +14,10 @@ export class RegisterDomainUseCase {
     
     const domainName = DomainName.create(validated.domain);
     
-    const existingDomain = await this.domainRepository.findByName(domainName);
-    if (existingDomain) {
+    const existingZones = await this.cloudflareGateway.listZones();
+    const domainExists = existingZones.some(zone => zone.name.toString() === domainName.toString());
+    
+    if (domainExists) {
       throw new DomainAlreadyRegisteredError(domainName.toString());
     }
     

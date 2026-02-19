@@ -1,5 +1,5 @@
 import { IDomainFormatter, IWizardEngine } from '@application/ports';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, RegisterDomainUseCase } from '@cloudflare-bot/application';
 import { domainNameSchema } from '@cloudflare-bot/domain';
 import { FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { WizardConfig } from '@infrastructure/wizard';
@@ -17,6 +17,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class CreateDomainFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly registerDomainUseCase: RegisterDomainUseCase,
     private readonly wizardEngine: IWizardEngine,
     private readonly formatter: IDomainFormatter,
     private readonly mainMenu: MainMenuFlow,
@@ -54,8 +55,8 @@ export class CreateDomainFlow {
 
   private async createDomain(ctx: SessionContext, fields: Record<string, unknown>): Promise<void> {
     try {
-      const domain = await this.gateway.registerDomain({ domain: fields.name as string });
-      const message = this.formatter.formatDomainRegistered(domain);
+      const result = await this.registerDomainUseCase.execute({ domain: fields.name as string });
+      const message = this.formatter.formatRegistrationResult(result);
       await ctx.reply(message, { parse_mode: 'HTML' });
     } catch (error) {
       const errorMessage = TelegramErrorFormatter.format(error as Error);

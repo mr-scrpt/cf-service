@@ -1,5 +1,5 @@
 import { Context, SessionFlavor } from 'grammy';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, ListDomainsUseCase } from '@cloudflare-bot/application';
 import { IDomainFormatter } from '@application/ports';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
 import { SessionData } from '@shared/types';
@@ -14,6 +14,7 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class ListDomainFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly listDomainsUseCase: ListDomainsUseCase,
     private readonly formatter: IDomainFormatter
   ) {}
 
@@ -21,7 +22,7 @@ export class ListDomainFlow {
     const keyboard = new KeyboardBuilder().addNavigation({ back: true });
 
     try {
-      const domains = await this.gateway.listDomains();
+      const domains = await this.listDomainsUseCase.execute();
       const message = this.formatter.formatDomainsList(domains);
 
       await ctx.editMessageText(message, {

@@ -1,5 +1,5 @@
 import { type DnsRecordData } from '@cloudflare-bot/domain';
-import type { DomainDto } from '@cloudflare-bot/application';
+import type { DomainDto, RegisterDomainResult } from '@cloudflare-bot/application';
 
 export interface IDnsRecordFormatter {
   formatList(records: DnsRecordData[]): string;
@@ -9,5 +9,6 @@ export interface IDnsRecordFormatter {
 
 export interface IDomainFormatter {
   formatDomainRegistered(domain: DomainDto): string;
+  formatRegistrationResult(result: RegisterDomainResult): string;
   formatDomainsList(domains: DomainDto[]): string;
 }

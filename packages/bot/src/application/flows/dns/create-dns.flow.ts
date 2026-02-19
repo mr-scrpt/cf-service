@@ -1,6 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { DnsRecordType } from '@cloudflare-bot/domain';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, CreateDnsRecordUseCase, ListDomainsUseCase } from '@cloudflare-bot/application';
 import { IDnsStrategyRegistry, IWizardEngine, IDnsRecordFormatter, IMainMenu } from '@application/ports';
 import { WizardConfig } from '@infrastructure/wizard';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
@@ -13,6 +13,8 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class CreateDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly createDnsRecordUseCase: CreateDnsRecordUseCase,
+    private readonly listDomainsUseCase: ListDomainsUseCase,
     private readonly strategyRegistry: IDnsStrategyRegistry,
     private readonly wizardEngine: IWizardEngine,
     private readonly formatter: IDnsRecordFormatter,
@@ -21,7 +23,7 @@ export class CreateDnsFlow {
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
     try {
-      const domains = await this.gateway.listDomains();
+      const domains = await this.listDomainsUseCase.execute();
 
       if (domains.length === 0) {
         await ctx.reply('❌ No domains found. Please register a domain first.');
@@ -103,7 +105,7 @@ Select record type:
       confirmationPrompt: '⚠️ Создать DNS запись с этими данными?',
       onComplete: async (ctx, collectedData) => {
         try {
-          const createdRecord = await this.gateway.createDnsRecord(strategy.toCreateInput({ zoneId, fields: collectedData }));
+          const createdRecord = await this.createDnsRecordUseCase.execute(strategy.toCreateInput({ zoneId, fields: collectedData }));
           const message = this.formatter.formatCreatedMessage(createdRecord);
           const keyboard = this.mainMenu.getMainMenuKeyboard();
 

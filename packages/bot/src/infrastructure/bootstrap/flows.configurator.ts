@@ -10,7 +10,15 @@ import {
   MainMenuFlow,
 } from '@application/flows';
 import { IDnsStrategyRegistry, IWizardEngine } from '@application/ports';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import {
+  IDnsGatewayPort,
+  CreateDnsRecordUseCase,
+  UpdateDnsRecordUseCase,
+  DeleteDnsRecordUseCase,
+  ListDnsRecordsUseCase,
+  ListDomainsUseCase,
+  RegisterDomainUseCase,
+} from '@cloudflare-bot/application';
 import { PaginationComponent } from '@infrastructure/ui/components';
 import { DnsRecordFormatter, DomainFormatter } from '@infrastructure/ui/formatters';
 
@@ -31,6 +39,12 @@ export class FlowsConfigurator {
     gateway: IDnsGatewayPort,
     strategyRegistry: IDnsStrategyRegistry,
     wizardEngine: IWizardEngine,
+    createDnsRecordUseCase: CreateDnsRecordUseCase,
+    updateDnsRecordUseCase: UpdateDnsRecordUseCase,
+    deleteDnsRecordUseCase: DeleteDnsRecordUseCase,
+    listDnsRecordsUseCase: ListDnsRecordsUseCase,
+    listDomainsUseCase: ListDomainsUseCase,
+    registerDomainUseCase: RegisterDomainUseCase,
   ): ApplicationFlows {
     const pagination = new PaginationComponent();
     const formatter = new DnsRecordFormatter(strategyRegistry);
@@ -42,16 +56,18 @@ export class FlowsConfigurator {
 
     const createDnsFlow = new CreateDnsFlow(
       gateway,
+      createDnsRecordUseCase,
+      listDomainsUseCase,
       strategyRegistry,
       wizardEngine,
       formatter,
       mainMenu,
     );
-    const listDnsFlow = new ListDnsFlow(gateway, formatter, pagination);
-    const deleteDnsFlow = new DeleteDnsFlow(gateway, formatter, mainMenu);
-    const editDnsFlow = new EditDnsFlow(gateway, mainMenu, strategyRegistry);
-    const createDomainFlow = new CreateDomainFlow(gateway, wizardEngine, domainFormatter, mainMenu);
-    const listDomainFlow = new ListDomainFlow(gateway, domainFormatter);
+    const listDnsFlow = new ListDnsFlow(gateway, listDnsRecordsUseCase, listDomainsUseCase, formatter, pagination);
+    const deleteDnsFlow = new DeleteDnsFlow(gateway, deleteDnsRecordUseCase, listDnsRecordsUseCase, listDomainsUseCase, formatter, mainMenu);
+    const editDnsFlow = new EditDnsFlow(gateway, updateDnsRecordUseCase, listDnsRecordsUseCase, listDomainsUseCase, mainMenu, strategyRegistry);
+    const createDomainFlow = new CreateDomainFlow(gateway, registerDomainUseCase, wizardEngine, domainFormatter, mainMenu);
+    const listDomainFlow = new ListDomainFlow(gateway, listDomainsUseCase, domainFormatter);
 
     return {
       mainMenu,

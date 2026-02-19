@@ -1,5 +1,5 @@
 import { IDnsStrategyRegistry, IMainMenu } from '@application/ports';
-import { IDnsGatewayPort } from '@cloudflare-bot/application';
+import { IDnsGatewayPort, UpdateDnsRecordUseCase, ListDnsRecordsUseCase, ListDomainsUseCase } from '@cloudflare-bot/application';
 import { type DnsRecordData } from '@cloudflare-bot/domain';
 import { FieldConfig, FieldInputType } from '@domain/dns/strategies/field-config.interface';
 import { KeyboardBuilder } from '@infrastructure/ui/components';
@@ -14,12 +14,15 @@ type SessionContext = Context & SessionFlavor<SessionData>;
 export class EditDnsFlow {
   constructor(
     private readonly gateway: IDnsGatewayPort,
+    private readonly updateDnsRecordUseCase: UpdateDnsRecordUseCase,
+    private readonly listDnsRecordsUseCase: ListDnsRecordsUseCase,
+    private readonly listDomainsUseCase: ListDomainsUseCase,
     private readonly mainMenu: IMainMenu,
     private readonly strategyRegistry: IDnsStrategyRegistry,
   ) {}
 
   async showDomainSelector(ctx: SessionContext): Promise<void> {
-    const domains = await this.gateway.listDomains();
+    const domains = await this.listDomainsUseCase.execute();
 
     if (domains.length === 0) {
       await ctx.reply('❌ No domains found. Please register a domain first.');
@@ -51,7 +54,7 @@ export class EditDnsFlow {
 
     SessionParser.setSelectedZone(ctx, domain);
 
-    const records = (await this.gateway.listDnsRecords(domain.id)) as any;
+    const records = (await this.listDnsRecordsUseCase.execute(domain.id)) as any;
 
     if (records.length === 0) {
       await ctx.editMessageText('❌ No DNS records found for this domain.', {
@@ -224,7 +227,7 @@ export class EditDnsFlow {
         ...processedChanges,
       };
 
-      await this.gateway.updateDnsRecord(record.id, zone.zoneId, updatedRecord as any);
+      await this.updateDnsRecordUseCase.execute(zone.zoneId, record.id, updatedRecord as any);
 
       const changesList = Object.entries(editSession.pendingChanges)
         .map(([key, value]) => `• <b>${key}</b>: <code>${value}</code>`)

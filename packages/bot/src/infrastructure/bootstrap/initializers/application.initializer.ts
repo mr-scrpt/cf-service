@@ -16,7 +16,13 @@ export class ApplicationInitializer implements BotInitializer {
     context.flows = flowsConfigurator.createFlows(
       context.cloudflareGateway,
       context.strategyRegistry,
-      context.wizardEngine
+      context.wizardEngine,
+      context.container.getCreateDnsRecordUseCase(),
+      context.container.getUpdateDnsRecordUseCase(),
+      context.container.getDeleteDnsRecordUseCase(),
+      context.container.getListDnsRecordsUseCase(),
+      context.container.getListDomainsUseCase(),
+      context.container.getRegisterDomainUseCase()
     );
   }
 }
