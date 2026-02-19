@@ -46,12 +46,12 @@ export class ApiApplication {
 
   async start(): Promise<void> {
     const port = this.env.API_PORT;
-    const url = `http://localhost:${port}`;
+    const host = this.env.API_HOST;
     
-    this.server = this.app.listen(port, () => {
-      this.logger.info(`🚀 API Server running at ${url}`, { 
+    this.server = this.app.listen(port, host, () => {
+      this.logger.info('🚀 API Server started', { 
         port, 
-        url,
+        host,
         env: this.env.NODE_ENV 
       });
     });
